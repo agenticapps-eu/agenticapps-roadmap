@@ -1,0 +1,12 @@
+{
+  "workflow": {
+    "_auto_chain_active": false
+  },
+  "host": "claude",
+  "project": "agenticapps-roadmap",
+  "linear": {
+    "team": "AGE",
+    "initiative": "agenticapps-workflow",
+    "project": "AgenticApps Roadmap"
+  }
+}
