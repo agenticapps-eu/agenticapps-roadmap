@@ -48,3 +48,9 @@ pnpm sync:snapshot                 # Linear → public/roadmap.json
 pnpm sync:gsd -- --dry-run         # preview repo → Linear backfill
 pnpm sync:gsd -- --project <name>  # apply one project after approval
 ```
+
+## Workflow
+
+This project uses the AgenticApps Superpowers + GSD + gstack workflow.
+Full hooks, rituals, and red-flag tables: [`.claude/claude-md/workflow.md`](.claude/claude-md/workflow.md).
+Vendored — re-sync via `/update-agenticapps-workflow`.
