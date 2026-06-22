@@ -1,6 +1,6 @@
 ---
 name: agentic-apps-workflow
-version: 1.9.0
+version: 1.9.1
 implements_spec: 0.4.0
 description: |
   Enforces the spec-first development workflow using Superpowers + GSD + gstack
