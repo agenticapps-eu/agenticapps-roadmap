@@ -1,8 +1,8 @@
-import { useLoaderData } from "react-router-dom";
+import { useRouteLoaderData } from "react-router-dom";
 import type { RoadmapJson } from "@/lib/roadmap/schema";
 
 export function TimelinePage() {
-  const data = useLoaderData() as RoadmapJson;
+  const data = useRouteLoaderData("root") as RoadmapJson;
 
   const withDate = data.projects
     .filter((p) => p.targetDate !== null)
