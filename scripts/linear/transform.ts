@@ -43,7 +43,7 @@ export interface RawWorkspace {
 // Leak detection
 // ---------------------------------------------------------------------------
 
-const TOKEN_RE = /lin_api_[A-Za-z0-9-]+/;
+const TOKEN_RE = /lin_api_[A-Za-z0-9_-]+/;
 const EMAIL_RE = /[\w.+-]+@[\w-]+\.[\w.-]+/;
 
 /**
