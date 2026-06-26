@@ -1,54 +1,150 @@
 {
-  "generatedAt": "2026-06-26T00:00:00Z",
+  "generatedAt": "2026-06-26T17:23:47.189Z",
   "initiatives": [
     {
-      "id": "ini-age-001",
-      "name": "agenticapps-workflow",
-      "color": "#5e6ad2",
-      "status": "started"
+      "id": "b3ee916d-dadb-4ca3-939a-452f1273edf2",
+      "name": "Callbot",
+      "color": "#0ea5e9",
+      "status": "Active"
     },
     {
-      "id": "ini-factiv-001",
-      "name": "Factiv",
+      "id": "e6eb41b8-eb1c-4729-97f4-073e5c1fcb90",
+      "name": "agenticapps-workflow",
       "color": null,
-      "status": "backlog"
+      "status": "Active"
+    },
+    {
+      "id": "0f31858f-1e1c-4244-bb63-f4340ec3053c",
+      "name": "Factiv",
+      "color": "#f2994a",
+      "status": "Active"
+    },
+    {
+      "id": "b18933f6-f073-44b7-982e-2c801ced0866",
+      "name": "cPARX",
+      "color": "#5e6ad2",
+      "status": "Active"
+    },
+    {
+      "id": "26fe7e6e-2cc3-40d7-89ca-d84cacbe6ef9",
+      "name": "fx-signals",
+      "color": "#f2c94c",
+      "status": "Active"
     }
   ],
   "projects": [
     {
-      "id": "proj-001",
+      "id": "268c0c07-d970-49c5-9ffe-57c9abcce654",
       "name": "AgenticApps Roadmap",
-      "summary": "The roadmap web app",
-      "initiativeId": "ini-age-001",
-      "status": "In Progress",
-      "priority": 1,
+      "summary": "Private, filterable roadmap that reads all Linear projects/issues and syncs Linear with the repos' GSD plans. React on Cloudflare Pages, gated by Cloudflare Access.",
+      "initiativeId": "e6eb41b8-eb1c-4729-97f4-073e5c1fcb90",
+      "status": "Backlog",
+      "priority": 2,
       "startDate": "2026-06-22",
       "targetDate": "2026-08-17",
       "milestones": [
         {
-          "id": "ms-001",
-          "name": "Phase 1 — Scaffold",
-          "targetDate": "2026-06-30"
+          "id": "a3e86ad4-5569-4bbf-adfb-a51ce8ecc4e5",
+          "name": "Phase 1 · Scaffold",
+          "targetDate": "2026-06-29"
         },
         {
-          "id": "ms-002",
-          "name": "Phase 2 — Data layer",
-          "targetDate": "2026-07-15"
+          "id": "a8688afd-8cde-4993-9f95-715857915958",
+          "name": "Phase 2 · Linear data layer & snapshot",
+          "targetDate": "2026-07-06"
+        },
+        {
+          "id": "45df666d-9c1a-4d06-9b20-7fdd22aaa72e",
+          "name": "Phase 3 · Functions proxy + Access",
+          "targetDate": "2026-07-13"
+        },
+        {
+          "id": "8654acc1-b02d-4038-84c3-e003de84abbb",
+          "name": "Phase 4 · Timeline UI",
+          "targetDate": "2026-07-20"
+        },
+        {
+          "id": "f7a522be-bea9-4bc9-a9c8-96294afb907f",
+          "name": "Phase 5 · Dashboard, filters & drill-down",
+          "targetDate": "2026-07-27"
+        },
+        {
+          "id": "75055f53-9659-40b5-a255-4168871952bd",
+          "name": "Phase 6 · sync-gsd-linear backfill",
+          "targetDate": "2026-08-03"
+        },
+        {
+          "id": "bf5afeef-916e-4a3a-b451-51720bf0072b",
+          "name": "Phase 7 · Live refresh & write-back",
+          "targetDate": "2026-08-10"
+        },
+        {
+          "id": "1b8bf0a8-ba49-4ecb-9a23-86de813fa597",
+          "name": "Phase 8 · Deploy, gate & document",
+          "targetDate": "2026-08-17"
         }
       ],
       "issueCounts": {
-        "backlog": 1,
-        "started": 1,
-        "done": 1
+        "backlog": 24,
+        "started": 0,
+        "done": 0
       }
     },
     {
-      "id": "proj-002",
+      "id": "476509d4-d5d6-4cef-a0a8-b1d11762b26d",
       "name": "Dashboard: Codex host integration",
-      "summary": null,
-      "initiativeId": "ini-age-001",
+      "summary": "Add `host: codex` detection to agenticapps-dashboard's HostAdapter so Codex-installed projects appear alongside Claude / pi.",
+      "initiativeId": "e6eb41b8-eb1c-4729-97f4-073e5c1fcb90",
+      "status": "Backlog",
+      "priority": 3,
+      "startDate": null,
+      "targetDate": null,
+      "milestones": [],
+      "issueCounts": {
+        "backlog": 1,
+        "started": 0,
+        "done": 0
+      }
+    },
+    {
+      "id": "1cabd30a-bcc1-43eb-b76c-8eee8295d8f4",
+      "name": "Callbot — Operations & Runbook",
+      "summary": "Laufender Betrieb: UptimeRobot-Monitoring, Sentry-Errors, 3-stufiger Failover-Plan, wöchentliches Transkript-Review, BAFA-Erinnerungen, Cost-Reviews, Runbook für Incidents.",
+      "initiativeId": "b3ee916d-dadb-4ca3-939a-452f1273edf2",
+      "status": "Backlog",
+      "priority": 3,
+      "startDate": null,
+      "targetDate": null,
+      "milestones": [],
+      "issueCounts": {
+        "backlog": 3,
+        "started": 0,
+        "done": 2
+      }
+    },
+    {
+      "id": "1a3e71a5-3af2-40a4-a13d-dcfc7d369627",
+      "name": "Callbot — Pilot Customer #2 (Non-Healthcare)",
+      "summary": "Zweiter Pilot in einer Non-Healthcare-Branche. Beweist Stack für nicht-medizinische Kunden.",
+      "initiativeId": "b3ee916d-dadb-4ca3-939a-452f1273edf2",
       "status": "Backlog",
       "priority": 2,
+      "startDate": null,
+      "targetDate": null,
+      "milestones": [],
+      "issueCounts": {
+        "backlog": 1,
+        "started": 0,
+        "done": 0
+      }
+    },
+    {
+      "id": "f43815a6-d0f8-400f-8ba6-4730bf130c26",
+      "name": "Callbot — Pilot Customer #1 (Hausarzt)",
+      "summary": "Erster zahlender Hausarzt-Pilot. Von Lead-Qualifikation über T1–T3 bis Go-Live + 2 Wochen Hypercare.",
+      "initiativeId": "b3ee916d-dadb-4ca3-939a-452f1273edf2",
+      "status": "Backlog",
+      "priority": 1,
       "startDate": null,
       "targetDate": null,
       "milestones": [],
@@ -59,11 +155,238 @@
       }
     },
     {
-      "id": "proj-003",
+      "id": "a90f04b2-b193-4bac-ba09-327d0fab61a9",
+      "name": "Callbot — Sales Operations",
+      "summary": "Bernards 3-Termin-Prozess operationalisieren: Sales-Material, BAFA-Choreografie, Lead-Pipeline, Asana-Onboarding-Template, Demo-Setup.",
+      "initiativeId": "b3ee916d-dadb-4ca3-939a-452f1273edf2",
+      "status": "Backlog",
+      "priority": 2,
+      "startDate": null,
+      "targetDate": null,
+      "milestones": [],
+      "issueCounts": {
+        "backlog": 3,
+        "started": 0,
+        "done": 0
+      }
+    },
+    {
+      "id": "17e78750-2b8b-49e4-b1e2-830230966165",
+      "name": "Callbot — Compliance & Legal",
+      "summary": "AV-Verträge mit allen Sub-Processors, DSFA-Template, anwaltlich geprüfte Vertragsklauseln, Versicherungen, GmbH/UG-Gründung, BAFA-Antragsbegleitung.",
+      "initiativeId": "b3ee916d-dadb-4ca3-939a-452f1273edf2",
+      "status": "Backlog",
+      "priority": 1,
+      "startDate": null,
+      "targetDate": null,
+      "milestones": [],
+      "issueCounts": {
+        "backlog": 3,
+        "started": 0,
+        "done": 0
+      }
+    },
+    {
+      "id": "184e600e-134a-497c-852b-5a3d79072167",
+      "name": "Callbot — Branche: Non-Healthcare (TBD)",
+      "summary": "Zweites Branchen-Template (Restaurant, Handwerk, Friseur, Fahrschule). Auswahl mit Bernard nach Lead-Pipeline.",
+      "initiativeId": "b3ee916d-dadb-4ca3-939a-452f1273edf2",
+      "status": "Backlog",
+      "priority": 2,
+      "startDate": null,
+      "targetDate": null,
+      "milestones": [],
+      "issueCounts": {
+        "backlog": 1,
+        "started": 0,
+        "done": 0
+      }
+    },
+    {
+      "id": "27eb2c3f-2351-4ffc-bd71-d6d8dbac776a",
+      "name": "Callbot — Branche: Hausarzt",
+      "summary": "Branchen-Template Hausarzt: System-Prompt, 8 Intents, Notfall-Trigger, BTM-Blacklist, Slot-Definitionen, 30+ Black-Box-Test-Szenarien, RAG-Eval.",
+      "initiativeId": "b3ee916d-dadb-4ca3-939a-452f1273edf2",
+      "status": "Backlog",
+      "priority": 1,
+      "startDate": null,
+      "targetDate": null,
+      "milestones": [],
+      "issueCounts": {
+        "backlog": 0,
+        "started": 0,
+        "done": 3
+      }
+    },
+    {
+      "id": "a30409c6-f837-41ea-8555-358cbb98f963",
+      "name": "Callbot — Admin UI MVP",
+      "summary": "Kleines internes Admin-UI für Bernard + Donald. CRUD für Tenants, Doctors, Opening Hours, FAQ, IGeL, Intents.",
+      "initiativeId": "b3ee916d-dadb-4ca3-939a-452f1273edf2",
+      "status": "Backlog",
+      "priority": 2,
+      "startDate": null,
+      "targetDate": null,
+      "milestones": [],
+      "issueCounts": {
+        "backlog": 0,
+        "started": 0,
+        "done": 8
+      }
+    },
+    {
+      "id": "5e5b86fe-8c66-4b76-b10d-cc037ceaf7ef",
+      "name": "Callbot — Backend MVP",
+      "summary": "Hono-Worker auf Cloudflare: Vapi/Twilio Webhooks, Compliance-Module, RAG-Retrieval gegen pgvector, 30-Tage-Retention-Cron, Audit-Log.",
+      "initiativeId": "b3ee916d-dadb-4ca3-939a-452f1273edf2",
+      "status": "Backlog",
+      "priority": 1,
+      "startDate": null,
+      "targetDate": null,
+      "milestones": [],
+      "issueCounts": {
+        "backlog": 0,
+        "started": 0,
+        "done": 6
+      }
+    },
+    {
+      "id": "cc1dcbc9-2137-4755-ad9c-c4ac9d62dd08",
+      "name": "Callbot — Infrastructure & Setup",
+      "summary": "Accounts & Secrets für Supabase Frankfurt, Vapi (EU), Sipgate, OpenRouter, Cloudflare Workers + Pages, GitHub.",
+      "initiativeId": "b3ee916d-dadb-4ca3-939a-452f1273edf2",
+      "status": "Backlog",
+      "priority": 1,
+      "startDate": null,
+      "targetDate": null,
+      "milestones": [],
+      "issueCounts": {
+        "backlog": 3,
+        "started": 1,
+        "done": 7
+      }
+    },
+    {
+      "id": "adfc70f8-0425-49bd-90f0-cb032804704b",
       "name": "cPARX Prototype",
-      "summary": "Prototype for cPARX",
-      "initiativeId": "ini-factiv-001",
-      "status": "Cancelled",
+      "summary": "4-week prototype of the cPARX AI platform: document-based DD pipeline, mock Investment Readiness scoring, chatbot + case dashboard, architecture docs.",
+      "initiativeId": "b18933f6-f073-44b7-982e-2c801ced0866",
+      "status": "Backlog",
+      "priority": 0,
+      "startDate": "2026-04-13",
+      "targetDate": "2026-05-08",
+      "milestones": [
+        {
+          "id": "53293d9c-e1ae-4db0-bd33-e6a6ca044b89",
+          "name": "Week 0 — Foundations",
+          "targetDate": "2026-04-17"
+        },
+        {
+          "id": "4f33b518-6c95-4a84-ab60-f07953a6cb4b",
+          "name": "Week 1 — Infrastructure & Data Model",
+          "targetDate": "2026-04-17"
+        },
+        {
+          "id": "eaf8e35c-406e-4c07-b23c-e776f438546b",
+          "name": "Week 2 — DD Pipeline & Mock Scoring",
+          "targetDate": "2026-04-25"
+        },
+        {
+          "id": "bf8e0cde-84bd-4399-844b-f47272089670",
+          "name": "Week 3 — UI (Chatbot + Dashboard)",
+          "targetDate": "2026-05-02"
+        },
+        {
+          "id": "cc786283-bd02-413f-8db3-d51f2370cebe",
+          "name": "Week 4 — Integration, Testing & Handover",
+          "targetDate": "2026-05-08"
+        }
+      ],
+      "issueCounts": {
+        "backlog": 12,
+        "started": 1,
+        "done": 82
+      }
+    },
+    {
+      "id": "5bdb6bd6-c3f4-4a2d-8358-f393cb926a75",
+      "name": "fx-signals Web App V2",
+      "summary": "Multi-tenant model, IA redesign, UI polish, security hardening, and global engine fixes.",
+      "initiativeId": "26fe7e6e-2cc3-40d7-89ca-d84cacbe6ef9",
+      "status": "Backlog",
+      "priority": 0,
+      "startDate": null,
+      "targetDate": null,
+      "milestones": [
+        {
+          "id": "aeb80842-e460-4a6a-82be-70e3a3467e05",
+          "name": "M1 — Tenant model in code",
+          "targetDate": null
+        },
+        {
+          "id": "49113e1d-ce58-4364-9d3c-a1e16dad1042",
+          "name": "M2 — IA redesign",
+          "targetDate": null
+        },
+        {
+          "id": "491656cb-df30-4a67-89d9-4c91ee572de1",
+          "name": "M3 — UI polish",
+          "targetDate": null
+        },
+        {
+          "id": "537d0b4d-045e-4727-a3e7-6a919a0e1964",
+          "name": "M4 — Onboarding + metering",
+          "targetDate": null
+        },
+        {
+          "id": "ce45f1be-22dd-4937-ad11-286b5075b8b7",
+          "name": "M5 — Security + pen-test",
+          "targetDate": null
+        },
+        {
+          "id": "d62b2c5c-fe4c-41d7-9fa4-d70455a09300",
+          "name": "M6 — Engine fixes",
+          "targetDate": null
+        },
+        {
+          "id": "332f9fe5-5b20-4df1-8e0b-ef540f46c3a1",
+          "name": "M7 — Trading-agent integration expansion",
+          "targetDate": null
+        },
+        {
+          "id": "c8a2c7fe-83ed-4b9f-b5bd-d5a00fa08092",
+          "name": "M8 — Security follow-ups",
+          "targetDate": "2026-06-12"
+        }
+      ],
+      "issueCounts": {
+        "backlog": 13,
+        "started": 4,
+        "done": 49
+      }
+    },
+    {
+      "id": "02af7ad6-7b09-4e8e-974f-4587c0fe127a",
+      "name": "fx-signals Website",
+      "summary": null,
+      "initiativeId": "26fe7e6e-2cc3-40d7-89ca-d84cacbe6ef9",
+      "status": "Backlog",
+      "priority": 0,
+      "startDate": null,
+      "targetDate": null,
+      "milestones": [],
+      "issueCounts": {
+        "backlog": 0,
+        "started": 0,
+        "done": 0
+      }
+    },
+    {
+      "id": "ef8077e1-2281-4207-bb2d-09b5908a7adb",
+      "name": "fx-signals Web App V1",
+      "summary": null,
+      "initiativeId": "26fe7e6e-2cc3-40d7-89ca-d84cacbe6ef9",
+      "status": "Backlog",
       "priority": 0,
       "startDate": null,
       "targetDate": null,
