@@ -19,5 +19,4 @@ venv/
 .planning/cache/
 .planning/state/
 session-handoff.md
-public/roadmap.json
 .gstack/

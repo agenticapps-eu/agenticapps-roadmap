@@ -1,0 +1,78 @@
+{
+  "generatedAt": "2026-06-26T00:00:00Z",
+  "initiatives": [
+    {
+      "id": "ini-age-001",
+      "name": "agenticapps-workflow",
+      "color": "#5e6ad2",
+      "status": "started"
+    },
+    {
+      "id": "ini-factiv-001",
+      "name": "Factiv",
+      "color": null,
+      "status": "backlog"
+    }
+  ],
+  "projects": [
+    {
+      "id": "proj-001",
+      "name": "AgenticApps Roadmap",
+      "summary": "The roadmap web app",
+      "initiativeId": "ini-age-001",
+      "status": "In Progress",
+      "priority": 1,
+      "startDate": "2026-06-22",
+      "targetDate": "2026-08-17",
+      "milestones": [
+        {
+          "id": "ms-001",
+          "name": "Phase 1 — Scaffold",
+          "targetDate": "2026-06-30"
+        },
+        {
+          "id": "ms-002",
+          "name": "Phase 2 — Data layer",
+          "targetDate": "2026-07-15"
+        }
+      ],
+      "issueCounts": {
+        "backlog": 1,
+        "started": 1,
+        "done": 1
+      }
+    },
+    {
+      "id": "proj-002",
+      "name": "Dashboard: Codex host integration",
+      "summary": null,
+      "initiativeId": "ini-age-001",
+      "status": "Backlog",
+      "priority": 2,
+      "startDate": null,
+      "targetDate": null,
+      "milestones": [],
+      "issueCounts": {
+        "backlog": 2,
+        "started": 0,
+        "done": 0
+      }
+    },
+    {
+      "id": "proj-003",
+      "name": "cPARX Prototype",
+      "summary": "Prototype for cPARX",
+      "initiativeId": "ini-factiv-001",
+      "status": "Cancelled",
+      "priority": 0,
+      "startDate": null,
+      "targetDate": null,
+      "milestones": [],
+      "issueCounts": {
+        "backlog": 0,
+        "started": 0,
+        "done": 0
+      }
+    }
+  ]
+}

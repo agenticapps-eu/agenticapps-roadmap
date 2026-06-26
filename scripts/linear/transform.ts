@@ -1,4 +1,4 @@
-import { RoadmapJsonSchema, type RoadmapJson } from "@/lib/roadmap/schema.ts";
+import { RoadmapJsonSchema, type RoadmapJson } from "../../src/lib/roadmap/schema.ts";
 
 // ---------------------------------------------------------------------------
 // Raw Linear response types (allow-list — only fields we actually read)

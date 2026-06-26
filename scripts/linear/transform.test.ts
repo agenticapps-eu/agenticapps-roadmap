@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { buildSnapshot, assertNoLeak } from "./transform.ts";
-import { RoadmapJsonSchema } from "@/lib/roadmap/schema.ts";
+import { RoadmapJsonSchema } from "../../src/lib/roadmap/schema.ts";
 import { rawMalicious } from "./__fixtures__/raw-malicious.ts";
 import { rawClean } from "./__fixtures__/raw-clean.ts";
 
