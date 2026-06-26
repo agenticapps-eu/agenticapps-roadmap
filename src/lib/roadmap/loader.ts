@@ -11,5 +11,10 @@ export async function roadmapLoader(): Promise<RoadmapJson> {
     throw new Response("Failed to load roadmap snapshot", { status: res.status });
   }
   const json: unknown = await res.json();
-  return RoadmapJsonSchema.parse(json);
+  const parsed = RoadmapJsonSchema.safeParse(json);
+  if (!parsed.success) {
+    // Don't surface the raw Zod path tree in the UI; keep it consistent with the !res.ok branch.
+    throw new Response("Roadmap snapshot is malformed", { status: 500 });
+  }
+  return parsed.data;
 }

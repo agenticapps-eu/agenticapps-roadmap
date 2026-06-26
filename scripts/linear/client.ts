@@ -57,7 +57,7 @@ interface GqlIssueState {
 }
 
 interface GqlIssue {
-  state: GqlIssueState;
+  state: GqlIssueState | null;
 }
 
 interface GqlMilestone {

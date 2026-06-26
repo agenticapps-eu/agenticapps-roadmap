@@ -5,7 +5,8 @@ import { RoadmapJsonSchema, type RoadmapJson } from "../../src/lib/roadmap/schem
 // ---------------------------------------------------------------------------
 
 interface RawIssue {
-  state: { type: string };
+  // Linear allows an issue to have no workflow state (e.g. in triage); guard for null.
+  state: { type: string } | null;
 }
 
 interface RawMilestone {
@@ -109,6 +110,7 @@ export function buildSnapshot(
   const projects = raw.projects.map((proj) => {
     const counts = { backlog: 0, started: 0, done: 0 };
     for (const issue of proj.issues.nodes) {
+      if (issue.state === null) continue;
       const bucket = bucketFor(issue.state.type);
       if (bucket !== null) {
         counts[bucket] += 1;

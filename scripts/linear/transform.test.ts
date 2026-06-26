@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { buildSnapshot, assertNoLeak } from "./transform.ts";
+import { buildSnapshot, assertNoLeak, type RawWorkspace } from "./transform.ts";
 import { RoadmapJsonSchema } from "../../src/lib/roadmap/schema.ts";
 import { rawMalicious } from "./__fixtures__/raw-malicious.ts";
 import { rawClean } from "./__fixtures__/raw-clean.ts";
@@ -72,6 +72,37 @@ describe("buildSnapshot — clean fixture", () => {
       name: "Phase 1 — Scaffold",
       targetDate: "2026-06-30",
     });
+  });
+});
+
+describe("buildSnapshot — null issue state (Linear allows stateless issues)", () => {
+  it("does not crash and skips null-state issues when bucketing", () => {
+    const raw: RawWorkspace = {
+      initiatives: [{ id: "ini-x", name: "X", color: null, state: "Active" }],
+      projects: [
+        {
+          id: "proj-x",
+          name: "Proj X",
+          description: null,
+          initiativeId: "ini-x",
+          state: { name: "Backlog", type: "backlog" },
+          priority: 0,
+          startedAt: null,
+          targetDate: null,
+          projectMilestones: { nodes: [] },
+          issues: {
+            nodes: [
+              { state: { type: "completed" } },
+              { state: null }, // stateless issue must be skipped, not crash
+              { state: { type: "started" } },
+            ],
+          },
+        },
+      ],
+    };
+    const result = buildSnapshot(raw, { now: "2026-06-26T00:00:00.000Z" });
+    const proj = result.projects.find((p) => p.id === "proj-x");
+    expect(proj?.issueCounts).toEqual({ backlog: 0, started: 1, done: 1 });
   });
 });
 

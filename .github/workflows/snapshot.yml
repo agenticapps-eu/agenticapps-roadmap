@@ -6,6 +6,10 @@ on:
     # 06:00 UTC daily
     - cron: "0 6 * * *"
 
+concurrency:
+  group: snapshot
+  cancel-in-progress: false
+
 jobs:
   snapshot:
     runs-on: ubuntu-latest
