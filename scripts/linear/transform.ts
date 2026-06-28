@@ -57,7 +57,7 @@ export function assertNoLeak(serialized: string): void {
       "SECURITY: snapshot contains a Linear API token pattern (lin_api_…)"
     );
   }
-  const liveKey = process.env["LINEAR_API_KEY"];
+  const liveKey = typeof process !== "undefined" ? process.env["LINEAR_API_KEY"] : undefined;
   if (liveKey && serialized.includes(liveKey)) {
     throw new Error(
       "SECURITY: snapshot contains the live LINEAR_API_KEY value"
