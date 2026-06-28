@@ -286,9 +286,11 @@ No `useRevalidator()`, no `revalidate()` call needed. Mounts in `AppHeader.tsx` 
 ### Reading the binding and selecting an operation (handler core)
 ```typescript
 // Source: developers.cloudflare.com/pages/functions/api-reference (context.env, onRequestGet)
-//         + scripts/linear/query.ts, mapWorkspace, transform.ts (existing, reused)
+//         + scripts/linear/query.ts, map.ts (mapWorkspace), transform.ts (existing, reused)
+// NOTE (post-review): mapWorkspace + GqlResponse import from the process-free map.ts,
+// NOT client.ts — the Worker must never pull in client.ts's process.env reference.
 import { WORKSPACE_QUERY } from "../../../scripts/linear/query.ts";
-import { mapWorkspace, type GqlResponse } from "../../../scripts/linear/client.ts";
+import { mapWorkspace, type GqlResponse } from "../../../scripts/linear/map.ts";
 import { buildSnapshot } from "../../../scripts/linear/transform.ts";
 
 interface Env { LINEAR_API_KEY: string }
@@ -309,17 +311,19 @@ export const onRequestGet: PagesFunction<Env> = async ({ params, env }) => {
     body: JSON.stringify({ query: entry.query }),
   });
   if (!upstream.ok) return new Response("upstream error", { status: 502 });
-  const json = (await upstream.json()) as GqlResponse;
-  if (json.errors?.length) return new Response("upstream error", { status: 502 });
 
+  // NOTE (post-review): upstream.json() is INSIDE the try so malformed JSON (SyntaxError)
+  // ⇒ generic 502, same as a transform/assertNoLeak failure. Do not hoist json/errors out.
   try {
+    const json = (await upstream.json()) as GqlResponse;
+    if (json.errors?.length) return new Response("upstream error", { status: 502 });
     const result = entry.transform(mapWorkspace(json)); // buildSnapshot → assertNoLeak inside
     return new Response(JSON.stringify(result), {
       status: 200,
       headers: { "Content-Type": "application/json", "Cache-Control": "private, max-age=60" },
     });
   } catch {
-    return new Response("upstream error", { status: 502 }); // assertNoLeak/parse failure ⇒ no PII out
+    return new Response("upstream error", { status: 502 }); // json/assertNoLeak/parse failure ⇒ no PII out
   }
 };
 ```
