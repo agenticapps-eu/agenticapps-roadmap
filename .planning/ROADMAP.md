@@ -69,7 +69,7 @@ Plans:
 **Plans**: 5 plans · 4 waves · **Status**: In progress
 
 Plans:
-- [ ] 03-01: Make query + GQL→RawWorkspace map runtime-agnostic and Worker-importable (Wave 1)
+- [x] 03-01: Make query + GQL→RawWorkspace map runtime-agnostic and Worker-importable (Wave 1)
 - [ ] 03-02: Config foundation — Worker types, vitest glob, functions tsconfig, live-preview script, gitignore secret (Wave 1, checkpoint)
 - [ ] 03-03: Build the Linear proxy Pages Function test-first (Wave 2, TDD)
 - [ ] 03-04: Client live-data path + source toggle with snapshot fallback (Wave 3, checkpoint)

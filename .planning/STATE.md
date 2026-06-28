@@ -10,9 +10,9 @@ No `.planning/PROJECT.md` — design rationale lives in `docs/architecture.md` (
 ## Current Position
 
 Phase: 3 of 8 (Linear proxy & Access)
-Plan: 0 of 5 in current phase
+Plan: 1 of 5 in current phase
 Status: In progress — executing phase 3 (sequential, on branch `phase-03-linear-proxy`)
-Last activity: 2026-06-28 — reconstructed top-level tracking (ROADMAP/REQUIREMENTS/STATE); starting Wave 1.
+Last activity: 2026-06-28 — completed 03-01 (shared runtime-agnostic query/map + bundling probe)
 
 Progress: [██░░░░░░░░] 25% (2 of 8 phases complete)
 
@@ -35,6 +35,7 @@ Execution mode: **sequential on main** (user-selected). Worktree isolation disab
 - 2026-06-22 (architecture): Hybrid pattern C — static snapshot default + Pages Functions for live refresh/write-back; Cloudflare Pages host; Cloudflare Access (email allow-list) gating; per-project dry-run-first backfill.
 - 2026-06-28 (phase 03 planning): Folded cross-AI review feedback — process-free `scripts/linear/map.ts` boundary, single-try/catch live fallback, fixture full-`GqlResponse` contract, blocking Access-proof gate.
 - 2026-06-28 (this session): Continue without prior STATE/ROADMAP → user chose to reconstruct them first before executing phase 03.
+- 2026-06-28 (03-01): Cross-dir .ts import CONFIRMED — functions/ → scripts/linear/ bundles correctly under wrangler@4 esbuild; src/lib/linear relocation NOT needed. mapWorkspace lives in process-free map.ts; Worker must import map.ts, never client.ts. fetchWorkspaceWith NOT built (YAGNI).
 
 ### Pending Todos / Open Items
 
