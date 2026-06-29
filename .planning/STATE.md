@@ -25,8 +25,8 @@ No `.planning/PROJECT.md` — design rationale lives in `docs/architecture.md` (
 ## Current Position
 
 Phase: 3 of 8 (Linear proxy & Access)
-Plan: 3 of 5 in current phase
-Status: In progress — 03-03 complete; 03-04 (live smoke + UI) next
+Plan: 4 of 5 in current phase
+Status: In progress — 03-04 complete (live smoke + latent-bug fixes); 03-05 (Access proof — BLOCKING) next
 Last activity: 2026-06-29
 
 Progress: [██████████] 100%
@@ -53,11 +53,12 @@ Execution mode: **sequential on main** (user-selected). Worktree isolation disab
 - 2026-06-28 (03-01): Cross-dir .ts import CONFIRMED — functions/ → scripts/linear/ bundles correctly under wrangler@4 esbuild; src/lib/linear relocation NOT needed. mapWorkspace lives in process-free map.ts; Worker must import map.ts, never client.ts. fetchWorkspaceWith NOT built (YAGNI).
 - 2026-06-29 (03-02): npx --yes wrangler@4 in preview:functions keeps wrangler ephemeral (no project dep added); wrangler.toml unchanged — existing entries sufficient; types:[@cloudflare/workers-types] only in tsconfig.functions.json to prevent node/worker type bleed.
 - 2026-06-29 (03-03): Full GqlResponse fixture contract confirmed — gqlClean/gqlWithEmail carry top-level `data` key; stubs return directly (no double-wrap). Single try/catch body-handling stretch maps any throw (malformed JSON, assertNoLeak, schema parse) to generic 502. transform.ts process-guard ported to globalThis cast — typechecks under both node and workers-types tsconfigs. REQ-PROXY-1..4 all green (13/13 tests).
+- 2026-06-29 (03-04): Two-part Linear fetch design chosen — MAIN_QUERY (bounded, no issues) + ISSUES_QUERY (cursor-paginated, flat top-level) assembled in fetch-workspace.ts to avoid Linear "Query too complex" at production data volumes; map.ts/transform.ts/schema.ts unchanged. Live field names corrected to live schema (Initiative.status, Project.initiatives.nodes[].id, Project.status). Both fixes also correct the Phase-02 CI snapshot path once LINEAR_API_KEY secret is set. REQ-LOADER satisfied; live smoke passed (271 issues, 5 initiatives, 20 projects; no token/PII in responses).
 
 ### Pending Todos / Open Items
 
 - `LINEAR_API_KEY` repo secret still unset → daily CI snapshot Action fails until set (GitHub → Settings → Secrets → Actions). Committed `roadmap.json` stays as real MCP-seeded data.
-- Phase 03 human checkpoints: 03-02 DONE (workers-types legitimacy approved), 03-04 (live smoke + UI preview), 03-05 (Access proof — BLOCKING).
+- Phase 03 human checkpoints: 03-02 DONE (workers-types legitimacy approved), 03-04 DONE (live smoke APPROVED — 271 issues, no token leak, latent bugs fixed), 03-05 (Access proof — BLOCKING).
 
 ## Completed Phases
 

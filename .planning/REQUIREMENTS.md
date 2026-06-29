@@ -33,7 +33,7 @@
 - [x] **REQ-PROXY-2**: The proxy runs the transform + leak-gate pipeline so an upstream response containing PII (email) yields a 502 with no PII in the body.
 - [x] **REQ-PROXY-3**: The proxy has a complete error table — 500 for missing key, 502 for upstream non-ok / GraphQL errors / malformed body — all with generic bodies.
 - [x] **REQ-PROXY-4**: Successful responses set `Cache-Control: private, max-age=60` with a minimal per-isolate rate limit, and the deployment is gated by Cloudflare Access over BOTH the Pages app AND `/api/*`, proven by captured evidence.
-- [ ] **REQ-LOADER**: The client loader defaults to the snapshot (zero `/api/*` calls); `?source=live` fetches and validates the live snapshot with a total-failure-safe fallback, a "live unavailable" notice, and a header toggle returning to the clean default URL.
+- [x] **REQ-LOADER**: The client loader defaults to the snapshot (zero `/api/*` calls); `?source=live` fetches and validates the live snapshot with a total-failure-safe fallback, a "live unavailable" notice, and a header toggle returning to the clean default URL.
 
 ### Timeline UI (Phase 4)
 
@@ -90,7 +90,7 @@
 | REQ-PROXY-2 | Phase 3 | Complete |
 | REQ-PROXY-3 | Phase 3 | Complete |
 | REQ-PROXY-4 | Phase 3 | Complete |
-| REQ-LOADER | Phase 3 | Pending |
+| REQ-LOADER | Phase 3 | Complete |
 | TL-01..04 | Phase 4 | Pending |
 | OV-01..04 | Phase 5 | Pending |
 | SYNC-01..04 | Phase 6 | Pending |

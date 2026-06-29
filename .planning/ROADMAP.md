@@ -72,7 +72,7 @@ Plans:
 - [x] 03-01: Make query + GQL→RawWorkspace map runtime-agnostic and Worker-importable (Wave 1)
 - [x] 03-02: Config foundation — Worker types, vitest glob, functions tsconfig, live-preview script, gitignore secret (Wave 1, checkpoint)
 - [x] 03-03: Build the Linear proxy Pages Function test-first (Wave 2, TDD)
-- [ ] 03-04: Client live-data path + source toggle with snapshot fallback (Wave 3, checkpoint)
+- [x] 03-04: Client live-data path + source toggle with snapshot fallback (Wave 3, checkpoint)
 - [ ] 03-05: Access setup runbook + captured Access-enforcement proof (Wave 4, checkpoint/blocking)
 
 ### Phase 4: Roadmap timeline UI
