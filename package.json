@@ -10,7 +10,8 @@
     "typecheck": "tsc -b --noEmit",
     "preview": "vite preview",
     "test": "vitest run",
-    "sync:snapshot": "tsx scripts/sync-snapshot.ts"
+    "sync:snapshot": "tsx scripts/sync-snapshot.ts",
+    "preview:functions": "npx --yes wrangler@4 pages dev dist"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
