@@ -34,20 +34,6 @@ const validSnapshot: RoadmapJson = {
   ],
 };
 
-/** A fetch stub that serves a given body for a given URL, and serves a valid
- *  snapshot for any other URL (i.e. /roadmap.json).
- */
-function makeFetchStub(
-  matchUrl: string,
-  matchResponse: Response,
-): ReturnType<typeof vi.fn> {
-  return vi.fn(async (url: string) => {
-    if (url === matchUrl) return matchResponse;
-    // Default: serve a valid snapshot for /roadmap.json
-    return new Response(JSON.stringify(validSnapshot), { status: 200 });
-  });
-}
-
 /** A 200 Response that serves a valid RoadmapJson body. */
 function okSnapshot(): Response {
   return new Response(JSON.stringify(validSnapshot), { status: 200 });
@@ -61,7 +47,7 @@ afterEach(() => vi.unstubAllGlobals());
 
 describe("snapshot default (no ?source)", () => {
   it("returns live=false and makes NO /api/linear/* fetch", async () => {
-    const fetchMock = vi.fn(async (_url: string) => okSnapshot());
+    const fetchMock = vi.fn(async () => okSnapshot());
     vi.stubGlobal("fetch", fetchMock);
 
     const result = await roadmapLoader(args("http://localhost/"));
@@ -71,10 +57,9 @@ describe("snapshot default (no ?source)", () => {
     expect(result.data).toBeDefined();
 
     // The key assertion: no /api/linear/* call must have been made
-    const linearCalls = fetchMock.mock.calls.filter(([url]: [string]) =>
-      url.includes("/api/linear"),
+    expect(fetchMock).not.toHaveBeenCalledWith(
+      expect.stringContaining("/api/linear"),
     );
-    expect(linearCalls).toHaveLength(0);
   });
 });
 
@@ -106,12 +91,7 @@ describe("live success (?source=live)", () => {
 
 describe("live fallback (?source=live) — failure modes", () => {
   it("(a) rejected fetch falls back: resolves with liveUnavailable=true, no throw", async () => {
-    const fetchMock = makeFetchStub(
-      "/api/linear/snapshot",
-      // This factory won't be used — we override the matched path to reject
-      okSnapshot(),
-    );
-    // Override: /api/linear/snapshot rejects (network error)
+    // /api/linear/snapshot rejects (network error); /roadmap.json returns valid snapshot
     vi.stubGlobal(
       "fetch",
       vi.fn(async (url: string) => {
