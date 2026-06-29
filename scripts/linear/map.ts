@@ -33,8 +33,10 @@ interface GqlProject {
   id: string;
   name: string;
   description: string | null;
-  initiative: { id: string } | null;
-  state: GqlProjectState;
+  // Linear projects belong to an initiatives connection (a project can have
+  // several); we take the first as the primary. Empty nodes → no initiative.
+  initiatives: { nodes: { id: string }[] };
+  status: GqlProjectState;
   priority: number;
   startedAt: string | null;
   targetDate: string | null;
@@ -46,7 +48,8 @@ interface GqlInitiative {
   id: string;
   name: string;
   color: string | null;
-  state: string;
+  // Linear's InitiativeStatus is an enum scalar (Proposed/Planned/Active/…).
+  status: string;
 }
 
 export interface GqlResponse {
@@ -73,14 +76,14 @@ export function mapWorkspace(json: GqlResponse): RawWorkspace {
       id: ini.id,
       name: ini.name,
       color: ini.color,
-      state: ini.state,
+      state: ini.status,
     })),
     projects: projects.nodes.map((proj) => ({
       id: proj.id,
       name: proj.name,
       description: proj.description,
-      initiativeId: proj.initiative?.id ?? null,
-      state: proj.state,
+      initiativeId: proj.initiatives.nodes[0]?.id ?? null,
+      state: proj.status,
       priority: proj.priority,
       startedAt: proj.startedAt,
       targetDate: proj.targetDate,

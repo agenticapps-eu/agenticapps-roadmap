@@ -6,8 +6,8 @@
  * `.json()` returns DIRECTLY. mapWorkspace reads `json.data.initiatives` /
  * `json.data.projects` so no wrapper is needed.
  *
- * Note: `initiative: { id }` is the nested GQL shape (vs flat `initiativeId`
- * in RawWorkspace). mapWorkspace does the projection.
+ * Note: `initiatives: { nodes: [{ id }] }` is the nested GQL connection shape
+ * (vs flat `initiativeId` in RawWorkspace). mapWorkspace takes the first node.
  */
 
 import type { GqlResponse } from "../map.ts";
@@ -20,13 +20,13 @@ export const gqlClean: GqlResponse = {
           id: "ini-age-001",
           name: "agenticapps-workflow",
           color: "#5e6ad2",
-          state: "started",
+          status: "started",
         },
         {
           id: "ini-factiv-001",
           name: "Factiv",
           color: null,
-          state: "backlog",
+          status: "backlog",
         },
       ],
     },
@@ -36,8 +36,8 @@ export const gqlClean: GqlResponse = {
           id: "proj-001",
           name: "AgenticApps Roadmap",
           description: "The roadmap web app",
-          initiative: { id: "ini-age-001" },
-          state: { name: "In Progress", type: "started" },
+          initiatives: { nodes: [{ id: "ini-age-001" }] },
+          status: { name: "In Progress", type: "started" },
           priority: 1,
           startedAt: "2026-06-22",
           targetDate: "2026-08-17",
@@ -68,8 +68,8 @@ export const gqlClean: GqlResponse = {
           id: "proj-002",
           name: "Dashboard: Codex host integration",
           description: null,
-          initiative: { id: "ini-age-001" },
-          state: { name: "Backlog", type: "backlog" },
+          initiatives: { nodes: [{ id: "ini-age-001" }] },
+          status: { name: "Backlog", type: "backlog" },
           priority: 2,
           startedAt: null,
           targetDate: null,
@@ -85,8 +85,8 @@ export const gqlClean: GqlResponse = {
           id: "proj-003",
           name: "cPARX Prototype",
           description: "Prototype for cPARX",
-          initiative: { id: "ini-factiv-001" },
-          state: { name: "Cancelled", type: "cancelled" },
+          initiatives: { nodes: [{ id: "ini-factiv-001" }] },
+          status: { name: "Cancelled", type: "cancelled" },
           priority: 0,
           startedAt: null,
           targetDate: null,

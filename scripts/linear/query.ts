@@ -11,7 +11,7 @@ export const WORKSPACE_QUERY = `
         id
         name
         color
-        state
+        status
       }
     }
     projects {
@@ -19,10 +19,12 @@ export const WORKSPACE_QUERY = `
         id
         name
         description
-        initiative {
-          id
+        initiatives {
+          nodes {
+            id
+          }
         }
-        state {
+        status {
           name
           type
         }
