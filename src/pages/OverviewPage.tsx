@@ -1,8 +1,8 @@
 import { useRouteLoaderData } from "react-router-dom";
-import type { RoadmapJson } from "@/lib/roadmap/schema";
+import type { RoadmapLoaderData } from "@/lib/roadmap/loader";
 
 export function OverviewPage() {
-  const data = useRouteLoaderData("root") as RoadmapJson;
+  const { data } = useRouteLoaderData("root") as RoadmapLoaderData;
 
   return (
     <div>
