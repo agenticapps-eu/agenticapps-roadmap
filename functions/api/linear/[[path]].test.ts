@@ -10,12 +10,27 @@
  *
  * Tests cover REQ-PROXY-1..4 + 500 missing key + 502 upstream + 502
  * malformed-JSON + token-never-present across ALL paths.
+ *
+ * Two-fetch strategy (complexity-safe):
+ * - First fetch: MAIN_QUERY (projects + initiatives, no issues nested)
+ * - Second+ fetches: ISSUES_QUERY paginated (flat issues with project.id)
+ * The stub returns different payloads per call index.
  */
 
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { onRequestGet } from "./[[path]].ts";
 import { gqlClean } from "../../../scripts/linear/__fixtures__/gql-clean.ts";
 import { gqlWithEmail } from "../../../scripts/linear/__fixtures__/gql-with-email.ts";
+import {
+  mainResponseClean,
+  mainResponseWithEmail,
+} from "../../../scripts/linear/__fixtures__/main-response.ts";
+import {
+  issuesPageSingle,
+  issuesPageOne,
+  issuesPageTwo,
+  issuesPageEmpty,
+} from "../../../scripts/linear/__fixtures__/issues-page.ts";
 import { RoadmapJsonSchema } from "../../../src/lib/roadmap/schema.ts";
 
 // ---------------------------------------------------------------------------
@@ -266,5 +281,144 @@ describe("502 upstream errors", () => {
 
     const res = await onRequestGet(ctx(["snapshot"]));
     expect(res.status).toBe(502);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Two-fetch strategy: REQ-PROXY-PAGINATE — multi-page issue aggregation
+// ---------------------------------------------------------------------------
+
+describe("REQ-PROXY-PAGINATE: two-fetch complexity-safe strategy", () => {
+  /**
+   * Helper: build a fetch stub from an ordered list of response payloads.
+   * Each call to fetch() consumes the next payload in sequence.
+   */
+  function stubFetchSequence(
+    payloads: Array<{ ok: boolean; json?: () => Promise<unknown> }>
+  ) {
+    let callIndex = 0;
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockImplementation(() => {
+        const payload = payloads[callIndex++];
+        return Promise.resolve(payload);
+      })
+    );
+  }
+
+  it("aggregates issue counts correctly across two pages (hasNextPage true → false)", async () => {
+    // Call 1: MAIN_QUERY response (no issues)
+    // Call 2: ISSUES_QUERY page 1 (hasNextPage: true, endCursor: "cursor-abc")
+    // Call 3: ISSUES_QUERY page 2 (hasNextPage: false)
+    stubFetchSequence([
+      { ok: true, json: async () => mainResponseClean },
+      { ok: true, json: async () => issuesPageOne },
+      { ok: true, json: async () => issuesPageTwo },
+    ]);
+
+    const res = await onRequestGet(ctx(["snapshot"]));
+
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as { projects: Array<{ id: string; issueCounts: { backlog: number; started: number; done: number } }> };
+    const parsed = RoadmapJsonSchema.safeParse(body);
+    expect(parsed.success).toBe(true);
+
+    // proj-001: started+1, completed+1 (from page 1) → started:1, done:1, backlog:0
+    const p1 = body.projects.find((p) => p.id === "proj-001");
+    expect(p1?.issueCounts.started).toBe(1);
+    expect(p1?.issueCounts.done).toBe(1);
+    expect(p1?.issueCounts.backlog).toBe(0);
+
+    // proj-002: backlog+1, triage+1 (from page 2) → backlog:2, started:0, done:0
+    const p2 = body.projects.find((p) => p.id === "proj-002");
+    expect(p2?.issueCounts.backlog).toBe(2);
+    expect(p2?.issueCounts.started).toBe(0);
+    expect(p2?.issueCounts.done).toBe(0);
+  });
+
+  it("skips null-project issues (orphan/inbox) without attributing them anywhere", async () => {
+    // issuesPageOne has one null-project issue — it must not bump any project count
+    stubFetchSequence([
+      { ok: true, json: async () => mainResponseClean },
+      { ok: true, json: async () => issuesPageOne },
+      { ok: true, json: async () => issuesPageTwo },
+    ]);
+
+    const res = await onRequestGet(ctx(["snapshot"]));
+    expect(res.status).toBe(200);
+
+    const body = (await res.json()) as { projects: Array<{ id: string; issueCounts: { backlog: number; started: number; done: number } }> };
+    // Total attributed issues = proj-001 (started+done=2) + proj-002 (backlog=2) = 4
+    // The null-project started issue must NOT appear in any project
+    const totalIssues = body.projects.reduce(
+      (sum, p) => sum + p.issueCounts.backlog + p.issueCounts.started + p.issueCounts.done,
+      0
+    );
+    expect(totalIssues).toBe(4); // not 5 (the null-project issue is skipped)
+  });
+
+  it("returns 502 when the issues request fails (non-ok status)", async () => {
+    // Call 1: main request succeeds; Call 2: issues request fails
+    stubFetchSequence([
+      { ok: true, json: async () => mainResponseClean },
+      { ok: false },
+    ]);
+
+    const res = await onRequestGet(ctx(["snapshot"]));
+    expect(res.status).toBe(502);
+    const body = await res.text();
+    expect(body).not.toMatch(/lin_api_/);
+    expect(body).not.toContain("@");
+  });
+
+  it("returns 502 when the issues request returns GraphQL errors", async () => {
+    stubFetchSequence([
+      { ok: true, json: async () => mainResponseClean },
+      {
+        ok: true,
+        json: async () => ({
+          data: { issues: { nodes: [], pageInfo: { hasNextPage: false, endCursor: null } } },
+          errors: [{ message: "issues query failed" }],
+        }),
+      },
+    ]);
+
+    const res = await onRequestGet(ctx(["snapshot"]));
+    expect(res.status).toBe(502);
+  });
+
+  it("single-page issues: correct issue counts from single issues page", async () => {
+    stubFetchSequence([
+      { ok: true, json: async () => mainResponseClean },
+      { ok: true, json: async () => issuesPageSingle },
+    ]);
+
+    const res = await onRequestGet(ctx(["snapshot"]));
+    expect(res.status).toBe(200);
+
+    const body = (await res.json()) as { projects: Array<{ id: string; issueCounts: { backlog: number; started: number; done: number } }> };
+    // proj-001: unstarted→backlog, started, completed→done, cancelled→skip
+    const p1 = body.projects.find((p) => p.id === "proj-001");
+    expect(p1?.issueCounts.backlog).toBe(1);
+    expect(p1?.issueCounts.started).toBe(1);
+    expect(p1?.issueCounts.done).toBe(1);
+
+    // proj-002: triage→backlog, backlog→backlog
+    const p2 = body.projects.find((p) => p.id === "proj-002");
+    expect(p2?.issueCounts.backlog).toBe(2);
+  });
+
+  it("email-leak via main response still fires assertNoLeak and returns 502 with no PII", async () => {
+    stubFetchSequence([
+      { ok: true, json: async () => mainResponseWithEmail },
+      { ok: true, json: async () => issuesPageEmpty },
+    ]);
+
+    const res = await onRequestGet(ctx(["snapshot"]));
+    expect(res.status).toBe(502);
+    const body = await res.text();
+    expect(body).not.toContain("@");
+    expect(body).not.toContain("secret@example.com");
+    expect(body).not.toMatch(/lin_api_/);
   });
 });
