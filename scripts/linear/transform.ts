@@ -57,7 +57,16 @@ export function assertNoLeak(serialized: string): void {
       "SECURITY: snapshot contains a Linear API token pattern (lin_api_…)"
     );
   }
-  const liveKey = typeof process !== "undefined" ? process.env["LINEAR_API_KEY"] : undefined;
+  // Check for process.env at runtime without importing node types.
+  // `typeof process` is valid JS but TS complains when "node" types are absent;
+  // casting through unknown avoids the type error in the Worker tsconfig while
+  // preserving the same runtime behaviour.
+  const nodeProcess = (
+    typeof (globalThis as Record<string, unknown>)["process"] !== "undefined"
+      ? (globalThis as Record<string, unknown>)["process"]
+      : undefined
+  ) as { env?: Record<string, string | undefined> } | undefined;
+  const liveKey = nodeProcess?.env?.["LINEAR_API_KEY"];
   if (liveKey && serialized.includes(liveKey)) {
     throw new Error(
       "SECURITY: snapshot contains the live LINEAR_API_KEY value"
