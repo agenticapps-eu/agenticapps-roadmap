@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v0.1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-06-29T07:00:22.583Z"
+last_updated: "2026-06-29T07:09:55.547Z"
 last_activity: 2026-06-29
 progress:
   total_phases: 8
   completed_phases: 0
   total_plans: 5
-  completed_plans: 4
+  completed_plans: 5
   percent: 0
 ---
 
@@ -25,11 +25,11 @@ No `.planning/PROJECT.md` — design rationale lives in `docs/architecture.md` (
 ## Current Position
 
 Phase: 3 of 8 (Linear proxy & Access)
-Plan: 2 of 5 in current phase
-Status: In progress — executing phase 3, plan 03-03 next (sequential, on branch `phase-03-linear-proxy`)
-Last activity: 2026-06-29 — completed 03-02 (config foundation: workers-types, tsconfig.functions.json, vitest glob, .dev.vars gitignore)
+Plan: 3 of 5 in current phase
+Status: In progress — 03-03 complete; 03-04 (live smoke + UI) next
+Last activity: 2026-06-29
 
-Progress: [████████░░] 80%
+Progress: [██████████] 100%
 
 ## Phase 3 Wave Plan
 
@@ -52,6 +52,7 @@ Execution mode: **sequential on main** (user-selected). Worktree isolation disab
 - 2026-06-28 (this session): Continue without prior STATE/ROADMAP → user chose to reconstruct them first before executing phase 03.
 - 2026-06-28 (03-01): Cross-dir .ts import CONFIRMED — functions/ → scripts/linear/ bundles correctly under wrangler@4 esbuild; src/lib/linear relocation NOT needed. mapWorkspace lives in process-free map.ts; Worker must import map.ts, never client.ts. fetchWorkspaceWith NOT built (YAGNI).
 - 2026-06-29 (03-02): npx --yes wrangler@4 in preview:functions keeps wrangler ephemeral (no project dep added); wrangler.toml unchanged — existing entries sufficient; types:[@cloudflare/workers-types] only in tsconfig.functions.json to prevent node/worker type bleed.
+- 2026-06-29 (03-03): Full GqlResponse fixture contract confirmed — gqlClean/gqlWithEmail carry top-level `data` key; stubs return directly (no double-wrap). Single try/catch body-handling stretch maps any throw (malformed JSON, assertNoLeak, schema parse) to generic 502. transform.ts process-guard ported to globalThis cast — typechecks under both node and workers-types tsconfigs. REQ-PROXY-1..4 all green (13/13 tests).
 
 ### Pending Todos / Open Items
 
