@@ -28,7 +28,7 @@
 
 - [ ] **REQ-SHARE**: The Phase-02 query string and GQL→RawWorkspace mapping are runtime-agnostic and importable by the Worker (no Node-only boundary).
 - [ ] **REQ-GUARD**: The audited leak-gate (`assertNoLeak`) is reused server-side so no token/PII can pass through the proxy.
-- [ ] **REQ-TYPE**: `@cloudflare/workers-types` installed (verified legitimate), `functions/**` typechecked with no `any`, and vitest discovers tests under `functions/**`.
+- [x] **REQ-TYPE**: `@cloudflare/workers-types` installed (verified legitimate), `functions/**` typechecked with no `any`, and vitest discovers tests under `functions/**`.
 - [ ] **REQ-PROXY-1**: The proxy serves only registered named operations, authenticated by the binding token, with the token absent from every response body (success and all error paths).
 - [ ] **REQ-PROXY-2**: The proxy runs the transform + leak-gate pipeline so an upstream response containing PII (email) yields a 502 with no PII in the body.
 - [ ] **REQ-PROXY-3**: The proxy has a complete error table — 500 for missing key, 502 for upstream non-ok / GraphQL errors / malformed body — all with generic bodies.
@@ -85,7 +85,7 @@
 | SNAP-01..05 | Phase 2 | Validated |
 | REQ-SHARE | Phase 3 | Pending |
 | REQ-GUARD | Phase 3 | Pending |
-| REQ-TYPE | Phase 3 | Pending |
+| REQ-TYPE | Phase 3 | Complete |
 | REQ-PROXY-1 | Phase 3 | Pending |
 | REQ-PROXY-2 | Phase 3 | Pending |
 | REQ-PROXY-3 | Phase 3 | Pending |

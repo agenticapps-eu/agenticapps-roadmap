@@ -1,3 +1,18 @@
+---
+gsd_state_version: 1.0
+milestone: v0.1.0
+milestone_name: milestone
+status: executing
+last_updated: "2026-06-29T07:00:22.583Z"
+last_activity: 2026-06-29
+progress:
+  total_phases: 8
+  completed_phases: 0
+  total_plans: 5
+  completed_plans: 4
+  percent: 0
+---
+
 # Project State
 
 ## Project Reference
@@ -10,11 +25,11 @@ No `.planning/PROJECT.md` — design rationale lives in `docs/architecture.md` (
 ## Current Position
 
 Phase: 3 of 8 (Linear proxy & Access)
-Plan: 1 of 5 in current phase
-Status: In progress — executing phase 3 (sequential, on branch `phase-03-linear-proxy`)
-Last activity: 2026-06-28 — completed 03-01 (shared runtime-agnostic query/map + bundling probe)
+Plan: 2 of 5 in current phase
+Status: In progress — executing phase 3, plan 03-03 next (sequential, on branch `phase-03-linear-proxy`)
+Last activity: 2026-06-29 — completed 03-02 (config foundation: workers-types, tsconfig.functions.json, vitest glob, .dev.vars gitignore)
 
-Progress: [██░░░░░░░░] 25% (2 of 8 phases complete)
+Progress: [████████░░] 80%
 
 ## Phase 3 Wave Plan
 
@@ -36,11 +51,12 @@ Execution mode: **sequential on main** (user-selected). Worktree isolation disab
 - 2026-06-28 (phase 03 planning): Folded cross-AI review feedback — process-free `scripts/linear/map.ts` boundary, single-try/catch live fallback, fixture full-`GqlResponse` contract, blocking Access-proof gate.
 - 2026-06-28 (this session): Continue without prior STATE/ROADMAP → user chose to reconstruct them first before executing phase 03.
 - 2026-06-28 (03-01): Cross-dir .ts import CONFIRMED — functions/ → scripts/linear/ bundles correctly under wrangler@4 esbuild; src/lib/linear relocation NOT needed. mapWorkspace lives in process-free map.ts; Worker must import map.ts, never client.ts. fetchWorkspaceWith NOT built (YAGNI).
+- 2026-06-29 (03-02): npx --yes wrangler@4 in preview:functions keeps wrangler ephemeral (no project dep added); wrangler.toml unchanged — existing entries sufficient; types:[@cloudflare/workers-types] only in tsconfig.functions.json to prevent node/worker type bleed.
 
 ### Pending Todos / Open Items
 
 - `LINEAR_API_KEY` repo secret still unset → daily CI snapshot Action fails until set (GitHub → Settings → Secrets → Actions). Committed `roadmap.json` stays as real MCP-seeded data.
-- Phase 03 human checkpoints: 03-02 (workers-types legitimacy), 03-04 (live smoke + UI preview), 03-05 (Access proof — BLOCKING).
+- Phase 03 human checkpoints: 03-02 DONE (workers-types legitimacy approved), 03-04 (live smoke + UI preview), 03-05 (Access proof — BLOCKING).
 
 ## Completed Phases
 
