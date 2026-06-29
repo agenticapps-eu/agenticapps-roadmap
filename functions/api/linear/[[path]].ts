@@ -8,12 +8,17 @@
 //  - Single try/catch around the body-handling stretch; ANY throw → generic 502
 //  - Cache-Control: private, max-age=60 on success
 //  - Per-isolate fixed-window rate limit → 429 when exceeded
+//
+// Fetch strategy (complexity-safe):
+//  - MAIN_QUERY fetches initiatives + projects (no issues nested)
+//  - ISSUES_QUERY paginates flat issues and buckets by project.id
+//  - Results are reassembled into GqlResponse shape before mapWorkspace
+//  - Both requests use the same auth header; token never appears in responses
 // ---------------------------------------------------------------------------
 
-import { WORKSPACE_QUERY } from "../../../scripts/linear/query.ts";
+import { fetchAssembledWorkspace } from "../../../scripts/linear/fetch-workspace.ts";
 import {
   mapWorkspace,
-  type GqlResponse,
 } from "../../../scripts/linear/map.ts";
 import { buildSnapshot } from "../../../scripts/linear/transform.ts";
 
@@ -27,13 +32,12 @@ interface Env {
 
 // ---------------------------------------------------------------------------
 // Named-operation registry
-// Client supplies an op name; the registry resolves the query + transform.
+// Client supplies an op name; the registry resolves the transform.
 // The client can never inject raw GraphQL.
 // ---------------------------------------------------------------------------
 
 const OPERATIONS = {
   snapshot: {
-    query: WORKSPACE_QUERY,
     transform: buildSnapshot,
   },
 } as const;
@@ -86,37 +90,25 @@ export const onRequestGet: PagesFunction<Env> = async ({ params, env }) => {
     return new Response("internal error", { status: 500 });
   }
 
-  // 5. Upstream fetch
-  const upstream = await fetch(LINEAR_ENDPOINT, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: env.LINEAR_API_KEY,
-    },
-    body: JSON.stringify({ query: entry.query }),
-  });
-
-  // 6. Non-ok upstream → 502
-  if (!upstream.ok) {
-    return new Response("upstream error", { status: 502 });
-  }
-
-  // 7. Single try/catch: json() + errors check + mapWorkspace + transform
-  //    ANY throw (malformed JSON, GraphQL errors, assertNoLeak, schema parse) → generic 502
+  // 5. Two-part fetch + assemble + transform
+  //    fetchAssembledWorkspace throws on any upstream non-ok, GraphQL errors,
+  //    or malformed body. mapWorkspace + buildSnapshot throw on assertNoLeak or
+  //    schema parse failure. Single try/catch: ANY throw → generic 502.
   //    The catch body MUST NOT include the upstream body, parsed json, or auth header.
   let result;
   try {
-    const json = (await upstream.json()) as GqlResponse;
-    if (json.errors && json.errors.length > 0) {
-      return new Response("upstream error", { status: 502 });
-    }
-    const raw = mapWorkspace(json);
+    const assembled = await fetchAssembledWorkspace(
+      fetch,
+      LINEAR_ENDPOINT,
+      env.LINEAR_API_KEY
+    );
+    const raw = mapWorkspace(assembled);
     result = entry.transform(raw);
   } catch {
     return new Response("upstream error", { status: 502 });
   }
 
-  // 8. Success — schema-valid RoadmapJson with cache header
+  // 6. Success — schema-valid RoadmapJson with cache header
   return new Response(JSON.stringify(result), {
     status: 200,
     headers: {

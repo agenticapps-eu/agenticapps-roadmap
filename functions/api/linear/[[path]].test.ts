@@ -19,8 +19,6 @@
 
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { onRequestGet } from "./[[path]].ts";
-import { gqlClean } from "../../../scripts/linear/__fixtures__/gql-clean.ts";
-import { gqlWithEmail } from "../../../scripts/linear/__fixtures__/gql-with-email.ts";
 import {
   mainResponseClean,
   mainResponseWithEmail,
@@ -77,12 +75,16 @@ describe("REQ-PROXY-1: unknown operation", () => {
 
 describe("REQ-PROXY-2: snapshot success", () => {
   it("returns 200 with schema-valid RoadmapJson and Cache-Control header", async () => {
+    // Two-fetch strategy: call 1 = MAIN_QUERY, call 2 = ISSUES_QUERY
+    let callIndex = 0;
     vi.stubGlobal(
       "fetch",
-      vi.fn().mockResolvedValue({
-        ok: true,
-        status: 200,
-        json: async () => gqlClean, // returned DIRECTLY — not wrapped in { data: ... }
+      vi.fn().mockImplementation(() => {
+        const payloads = [
+          { ok: true, status: 200, json: async () => mainResponseClean },
+          { ok: true, status: 200, json: async () => issuesPageSingle },
+        ];
+        return Promise.resolve(payloads[callIndex++]);
       })
     );
 
@@ -103,12 +105,18 @@ describe("REQ-PROXY-2: snapshot success", () => {
 
 describe("REQ-PROXY-3: email leak gate", () => {
   it("returns 502 when upstream contains an email and body has no PII", async () => {
+    // Email is in mainResponseWithEmail's project description (main request).
+    // The issues request also completes so assembledWorkspace is built — then
+    // mapWorkspace + buildSnapshot → assertNoLeak fires on the description.
+    let callIndex = 0;
     vi.stubGlobal(
       "fetch",
-      vi.fn().mockResolvedValue({
-        ok: true,
-        status: 200,
-        json: async () => gqlWithEmail, // fixture has secret@example.com planted
+      vi.fn().mockImplementation(() => {
+        const payloads = [
+          { ok: true, status: 200, json: async () => mainResponseWithEmail },
+          { ok: true, status: 200, json: async () => issuesPageEmpty },
+        ];
+        return Promise.resolve(payloads[callIndex++]);
       })
     );
 
@@ -174,12 +182,15 @@ describe("REQ-PROXY-4: token never present in any response body", () => {
   });
 
   it("200 success body does not contain the API key", async () => {
+    let callIndex = 0;
     vi.stubGlobal(
       "fetch",
-      vi.fn().mockResolvedValue({
-        ok: true,
-        status: 200,
-        json: async () => gqlClean,
+      vi.fn().mockImplementation(() => {
+        const payloads = [
+          { ok: true, status: 200, json: async () => mainResponseClean },
+          { ok: true, status: 200, json: async () => issuesPageSingle },
+        ];
+        return Promise.resolve(payloads[callIndex++]);
       })
     );
     const res = await onRequestGet(ctx(["snapshot"]));
@@ -201,12 +212,15 @@ describe("REQ-PROXY-4: token never present in any response body", () => {
   });
 
   it("502 email-leak body does not contain the API key", async () => {
+    let callIndex = 0;
     vi.stubGlobal(
       "fetch",
-      vi.fn().mockResolvedValue({
-        ok: true,
-        status: 200,
-        json: async () => gqlWithEmail,
+      vi.fn().mockImplementation(() => {
+        const payloads = [
+          { ok: true, status: 200, json: async () => mainResponseWithEmail },
+          { ok: true, status: 200, json: async () => issuesPageEmpty },
+        ];
+        return Promise.resolve(payloads[callIndex++]);
       })
     );
     const res = await onRequestGet(ctx(["snapshot"]));
