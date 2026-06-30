@@ -66,14 +66,14 @@ Plans:
   2. Upstream PII (emails) and malformed/error responses produce generic 5xx with no token/PII; success sets `Cache-Control: private, max-age=60`.
   3. The client defaults to the snapshot (zero `/api/*` calls) and only fetches live with `?source=live`, with a total-failure-safe fallback + "live unavailable" notice.
   4. Captured evidence proves an unauthenticated request to `/api/linear/snapshot` is blocked by Access and an allowed identity succeeds.
-**Plans**: 5 plans · 4 waves · **Status**: In progress
+**Plans**: 5 plans · 4 waves · **Status**: BLOCKED (4/5 plans; success criterion 4 — Access proof — deferred as a blocking HUMAN-UAT item)
 
 Plans:
 - [x] 03-01: Make query + GQL→RawWorkspace map runtime-agnostic and Worker-importable (Wave 1)
 - [x] 03-02: Config foundation — Worker types, vitest glob, functions tsconfig, live-preview script, gitignore secret (Wave 1, checkpoint)
 - [x] 03-03: Build the Linear proxy Pages Function test-first (Wave 2, TDD)
 - [x] 03-04: Client live-data path + source toggle with snapshot fallback (Wave 3, checkpoint)
-- [ ] 03-05: Access setup runbook + captured Access-enforcement proof (Wave 4, checkpoint/blocking)
+- [~] 03-05: Access setup runbook ✅ done; **captured Access-enforcement proof BLOCKED/deferred** → `.planning/phases/03/03-HUMAN-UAT.md` (Wave 4, blocking)
 
 ### Phase 4: Roadmap timeline UI
 **Goal**: The hero view — initiative swimlanes across a month axis with scheduled bars and undated backfill pills.
