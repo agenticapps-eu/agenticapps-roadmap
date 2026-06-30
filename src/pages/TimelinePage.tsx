@@ -2,7 +2,9 @@ import { useRouteLoaderData } from "react-router-dom";
 import type { RoadmapLoaderData } from "@/lib/roadmap/loader";
 
 export function TimelinePage() {
-  const { data } = useRouteLoaderData("root") as RoadmapLoaderData;
+  const loaderData = useRouteLoaderData("root") as RoadmapLoaderData | null;
+  if (!loaderData) return null;
+  const { data } = loaderData;
 
   const withDate = data.projects
     .filter((p) => p.targetDate !== null)
