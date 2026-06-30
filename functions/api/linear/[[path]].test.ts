@@ -401,6 +401,32 @@ describe("REQ-PROXY-PAGINATE: two-fetch complexity-safe strategy", () => {
     expect(res.status).toBe(502);
   });
 
+  it("returns 502 when hasNextPage=true but endCursor=null (pagination invariant violation)", async () => {
+    // Linear API contract: hasNextPage=true implies endCursor≠null. If violated,
+    // fetchAssembledWorkspace throws (prevents infinite loop) and the handler returns 502.
+    stubFetchSequence([
+      { ok: true, json: async () => mainResponseClean },
+      {
+        ok: true,
+        json: async () => ({
+          data: {
+            issues: {
+              nodes: [],
+              pageInfo: { hasNextPage: true, endCursor: null },
+            },
+          },
+        }),
+      },
+    ]);
+
+    const res = await onRequestGet(ctx(["snapshot"]));
+    expect(res.status).toBe(502);
+    const body = await res.text();
+    // Generic error — must not contain token, email, or cursor value
+    expect(body).not.toMatch(/lin_api_/);
+    expect(body).not.toContain("@");
+  });
+
   it("single-page issues: correct issue counts from single issues page", async () => {
     stubFetchSequence([
       { ok: true, json: async () => mainResponseClean },

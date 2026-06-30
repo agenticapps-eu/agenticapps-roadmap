@@ -140,6 +140,11 @@ export async function fetchAssembledWorkspace(
     }
 
     hasNextPage = pageInfo.hasNextPage;
+    if (hasNextPage && pageInfo.endCursor === null) {
+      throw new Error(
+        "Pagination invariant violated: hasNextPage=true but endCursor=null"
+      );
+    }
     afterCursor = pageInfo.endCursor;
   }
 
