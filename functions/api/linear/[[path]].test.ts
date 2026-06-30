@@ -17,8 +17,8 @@
  * The stub returns different payloads per call index.
  */
 
-import { describe, it, expect, vi, afterEach } from "vitest";
-import { onRequestGet } from "./[[path]].ts";
+import { describe, it, expect, vi, afterEach, beforeEach } from "vitest";
+import { onRequestGet, _resetRateLimitForTest } from "./[[path]].ts";
 import {
   mainResponseClean,
   mainResponseWithEmail,
@@ -50,6 +50,7 @@ function ctx(
 
 afterEach(() => {
   vi.unstubAllGlobals();
+  _resetRateLimitForTest();
 });
 
 // ---------------------------------------------------------------------------
@@ -460,5 +461,57 @@ describe("REQ-PROXY-PAGINATE: two-fetch complexity-safe strategy", () => {
     expect(body).not.toContain("@");
     expect(body).not.toContain("secret@example.com");
     expect(body).not.toMatch(/lin_api_/);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 429 rate limit
+// ---------------------------------------------------------------------------
+
+describe("429 rate limit", () => {
+  beforeEach(() => {
+    // Reset per-isolate counter so each test starts from 0 requests in the window.
+    _resetRateLimitForTest();
+    // Use a stub that returns an upstream error — we only care about rate-limit
+    // logic here; the handler catches the upstream error and returns 502.
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({ ok: false, status: 503 })
+    );
+  });
+
+  it("30th request is not rate limited but 31st is (> LIMIT off-by-one)", async () => {
+    // Make 29 warm-up requests (requestCount 1..29 — none trigger 429)
+    for (let i = 0; i < 29; i++) {
+      await onRequestGet(ctx(["snapshot"]));
+    }
+
+    // Request 30: requestCount becomes 30; 30 > 30 is false → not rate limited
+    const res30 = await onRequestGet(ctx(["snapshot"]));
+    expect(res30.status).not.toBe(429); // upstream error returns 502, not 429
+
+    // Request 31: requestCount becomes 31; 31 > 30 is true → rate limited
+    const res31 = await onRequestGet(ctx(["snapshot"]));
+    expect(res31.status).toBe(429);
+    expect(await res31.text()).toBe("rate limited");
+  });
+
+  it("allows requests again after the window resets", async () => {
+    vi.useFakeTimers();
+    try {
+      // Exhaust rate limit: 31 requests puts requestCount at 31 (last is 429)
+      for (let i = 0; i < 31; i++) {
+        await onRequestGet(ctx(["snapshot"]));
+      }
+
+      // Advance clock past WINDOW_MS (60_000 ms) to trigger the window reset
+      vi.advanceTimersByTime(60_001);
+
+      // Next request: window resets → requestCount becomes 1 → not rate limited
+      const res = await onRequestGet(ctx(["snapshot"]));
+      expect(res.status).not.toBe(429); // upstream error returns 502, not 429
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });

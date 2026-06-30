@@ -64,6 +64,12 @@ function isRateLimited(): boolean {
   return requestCount > LIMIT;
 }
 
+/** Resets the in-memory rate-limit counters. For test use only. */
+export function _resetRateLimitForTest(): void {
+  windowStart = Date.now();
+  requestCount = 0;
+}
+
 // ---------------------------------------------------------------------------
 // Handler
 // ---------------------------------------------------------------------------
