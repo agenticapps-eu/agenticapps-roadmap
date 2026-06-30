@@ -83,14 +83,29 @@ export const issuesPageTwo: GqlIssuesPage = {
 };
 
 /**
- * Empty issues response for the email-leak test path (main response has the email).
+ * Issues response used as the second-fetch stub in email-leak tests.
+ * The main response carries the email; this page just needs to exist so the
+ * pagination loop completes before assertNoLeak fires.
  */
-export const issuesPageEmpty: GqlIssuesPage = {
+export const issuesPageForEmailLeak: GqlIssuesPage = {
   data: {
     issues: {
       nodes: [
         { project: { id: "proj-bad-001" }, state: { type: "started" } },
       ],
+      pageInfo: { hasNextPage: false, endCursor: null },
+    },
+  },
+};
+
+/**
+ * Genuinely empty issues response (zero nodes). Use when a test requires a
+ * stub that contributes no issue counts to any project.
+ */
+export const issuesPageEmpty: GqlIssuesPage = {
+  data: {
+    issues: {
+      nodes: [],
       pageInfo: { hasNextPage: false, endCursor: null },
     },
   },

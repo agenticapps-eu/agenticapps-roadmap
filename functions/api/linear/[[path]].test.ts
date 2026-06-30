@@ -27,7 +27,7 @@ import {
   issuesPageSingle,
   issuesPageOne,
   issuesPageTwo,
-  issuesPageEmpty,
+  issuesPageForEmailLeak,
 } from "../../../scripts/linear/__fixtures__/issues-page.ts";
 import { RoadmapJsonSchema } from "../../../src/lib/roadmap/schema.ts";
 
@@ -115,7 +115,7 @@ describe("REQ-PROXY-3: email leak gate", () => {
       vi.fn().mockImplementation(() => {
         const payloads = [
           { ok: true, status: 200, json: async () => mainResponseWithEmail },
-          { ok: true, status: 200, json: async () => issuesPageEmpty },
+          { ok: true, status: 200, json: async () => issuesPageForEmailLeak },
         ];
         return Promise.resolve(payloads[callIndex++]);
       })
@@ -219,7 +219,7 @@ describe("REQ-PROXY-4: token never present in any response body", () => {
       vi.fn().mockImplementation(() => {
         const payloads = [
           { ok: true, status: 200, json: async () => mainResponseWithEmail },
-          { ok: true, status: 200, json: async () => issuesPageEmpty },
+          { ok: true, status: 200, json: async () => issuesPageForEmailLeak },
         ];
         return Promise.resolve(payloads[callIndex++]);
       })
@@ -452,7 +452,7 @@ describe("REQ-PROXY-PAGINATE: two-fetch complexity-safe strategy", () => {
   it("email-leak via main response still fires assertNoLeak and returns 502 with no PII", async () => {
     stubFetchSequence([
       { ok: true, json: async () => mainResponseWithEmail },
-      { ok: true, json: async () => issuesPageEmpty },
+      { ok: true, json: async () => issuesPageForEmailLeak },
     ]);
 
     const res = await onRequestGet(ctx(["snapshot"]));
