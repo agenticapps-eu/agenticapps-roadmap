@@ -151,6 +151,8 @@ Bar text contrast: use white (`#ffffff`) when the initiative color luminance < 0
 
 ## Layout Architecture
 
+Primary visual anchor: the initiative-colored scheduled bars and the dashed undated "needs-backfill" pills together form the hero focal point; the `h1 'Timeline'` heading is the entry point but not the focal anchor.
+
 ```
 Page
 ├── AppHeader (sticky, z-50, h-14) — existing, unchanged
@@ -164,13 +166,13 @@ Page
             │       ├── MonthCell × 7       "Jul 2026" … "Jan 2027"
             │       └── TodayMarker         absolute vertical line
             │
-            └── InitiativeLanes (space-y-px border-t border-(--color-border))
+            └── InitiativeLanes (divide-y divide-(--color-border) border-t border-(--color-border))
                 └── InitiativeLane × 5
                     ├── LaneHeader (flex h-8 items-center gap-2 px-4 border-b)
                     │   ├── ColorSwatch (8×8px circle, initiative color)
                     │   └── span.text-xs.font-semibold  initiative.name
                     └── LaneBody (flex min-h-12)
-                        ├── ParkingRail (w-40 shrink-0 bg-(--color-muted) p-2 space-y-1.5)
+                        ├── ParkingRail (w-40 shrink-0 bg-(--color-muted) p-2 space-y-2)
                         │   └── UndatedPill × N (h-7, dashed border)
                         └── ScheduledGrid (flex-1 relative bg-(--color-background))
                             ├── MonthGridLines (absolute inset-0, border-l per month column)
