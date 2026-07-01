@@ -83,7 +83,16 @@ Plans:
   1. All projects appear; scheduled ones as bars, undated ones as dashed needs-backfill pills.
   2. Milestone markers + hover popover with project summary and Linear link.
   3. Color-by-initiative, responsive, dark mode, and empty/loading/error states.
-**Plans**: TBD · **Status**: Pending
+**Plans**: 7 plans · 4 waves · **Status**: Planned
+
+Plans:
+- [ ] 04-01-PLAN.md — D-13: thread project.url through query→map→transform→schema + pipeline tests (Wave 1)
+- [ ] 04-02-PLAN.md — Pure timeline utils: dateUtils + colorUtils with unit tests, TDD (Wave 1)
+- [ ] 04-03-PLAN.md — Scaffold shadcn hover-card/popover/badge (base-ui, zero new deps) (Wave 1)
+- [ ] 04-04-PLAN.md — ProjectPopoverContent + MilestoneMarker leaves (Wave 2)
+- [ ] 04-05-PLAN.md — UndatedPill + ScheduledBar interactive primitives (Wave 3)
+- [ ] 04-06-PLAN.md — AxisRow + InitiativeLane + TimelinePage assembly + states (Wave 4)
+- [ ] 04-07-PLAN.md — Gated snapshot re-run to populate url (needs LINEAR_API_KEY) (Wave 2, checkpoint)
 
 ### Phase 5: Overview dashboard, filters & drill-down
 **Goal**: An overview dashboard with KPI cards, per-initiative health, shareable URL-encoded filters, and drill-down to Linear.
