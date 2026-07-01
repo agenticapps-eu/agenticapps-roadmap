@@ -1,10 +1,11 @@
 ---
 phase: 4
 slug: roadmap-timeline-ui
-status: draft
+status: approved
 shadcn_initialized: true
 preset: b2fA
 created: 2026-07-01
+reviewed_at: 2026-07-01
 ---
 
 # Phase 4 — UI Design Contract
@@ -58,6 +59,10 @@ Declared values (multiples of 4 only):
 | xl | 32px | Space above the timeline grid from the page heading |
 | 2xl | 48px | Initiative lane height (28px bar + 10px top + 10px bottom pad) |
 | 3xl | 64px | Minimum width for D-07 short bar (no startDate, targetDate only) |
+
+Layout-level exception: `py-24` (96px) is used only for vertical centering of the
+empty-state block (D-12) — it is a valid multiple of 4 but sits outside the token
+scale above and applies to that one full-height placeholder, not to component layout.
 
 Fixed component dimensions (not spacing tokens):
 
