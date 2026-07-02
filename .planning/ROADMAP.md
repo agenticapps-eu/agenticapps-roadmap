@@ -110,7 +110,6 @@ Plans:
 **Wave 2** *(blocked on Wave 1 completion)*
 
 - [ ] 04-04-PLAN.md — ProjectPopoverContent + MilestoneMarker leaves (Wave 2)
-- [ ] 04-07-PLAN.md — Gated snapshot re-run to populate url (needs LINEAR_API_KEY) (Wave 2, checkpoint)
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
@@ -119,6 +118,7 @@ Plans:
 **Wave 4** *(blocked on Wave 3 completion)*
 
 - [ ] 04-06-PLAN.md — AxisRow + InitiativeLane + TimelinePage assembly + states (Wave 4)
+- [ ] 04-07-PLAN.md — Gated snapshot re-run to populate url (needs LINEAR_API_KEY) (Wave 4, checkpoint)
 
 ### Phase 5: Overview dashboard, filters & drill-down
 

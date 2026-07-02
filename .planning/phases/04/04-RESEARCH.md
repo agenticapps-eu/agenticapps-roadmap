@@ -651,22 +651,25 @@ function todayLeftPercent(now: Date, windowStart: Date, windowDays: number): num
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **`openDelay` / `closeDelay` prop names on base-ui PreviewCard**
    - What we know: UI-SPEC requires 300ms open delay, 200ms close delay on HoverCard
    - What's unclear: base-ui `PreviewCard.Root` prop names at v1.6.0 (may be `delay` or `openDelay`/`closeDelay`)
    - Recommendation: Check [base-ui.com/react/components/hover-card](https://base-ui.com/react/components/hover-card.md) or `@base-ui/react/preview-card` TypeScript types at implementation time. [ASSUMED: prop names match the UI-SPEC]
+   - **RESOLVED:** Verified at implementation time per the 04-05 acceptance criterion (delay props must compile without a TS "Property does not exist" error); any divergence is documented in 04-05-SUMMARY.md. TypeScript is the enforcing gate.
 
 2. **Snapshot re-run requires `LINEAR_API_KEY`**
    - What we know: `pnpm sync:snapshot` throws without the key (reads `process.env.LINEAR_API_KEY`); the key is unset per STATE.md
    - What's unclear: When will the key be configured? If the D-13 plan runs in CI, the snapshot stays without `url`. If it runs locally, the user must export the key.
    - Recommendation: The D-13 plan should include a task that runs `pnpm sync:snapshot` locally (not in CI) and commits the updated `roadmap.json`. Alternatively, the planner can stage D-13 as a Wave 0 plan with a `checkpoint:human-verify` for the snapshot re-run. The `url` field in the popover is gracefully omitted if null.
+   - **RESOLVED:** Addressed by plan 04-07 (`checkpoint:human-verify`, `autonomous: false`, wave 4) — snapshot re-run is gated on `LINEAR_API_KEY` with graceful deferral (link omitted when `url` is null), so the UI ships regardless.
 
 3. **fx-signals Web App V2 milestone `M8` has `targetDate: "2026-06-12"`**
    - What we know: The project itself has `targetDate: null` (→ pill), but milestone M8 has a real past targetDate
    - What's unclear: Should milestone dates be rendered on pills? (Per D-10: "Milestone markers appear on the bar" — pills are NOT bars)
    - Recommendation: Milestones only appear on bars (D-10). Undated pills have no milestone markers. The UI-SPEC does not specify pill milestone markers.
+   - **RESOLVED:** D-10 decision — milestone markers render only on bars, never on pills (enforced by 04-04: `MilestoneMarker` returns null when `targetDate` is null, and 04-05 renders markers only inside `ScheduledBar`).
 
 ---
 
