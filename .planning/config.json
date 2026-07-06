@@ -133,5 +133,9 @@
         "evidence": "Pre-launch DB-AUDIT.md with zero Critical, zero High findings; otherwise BLOCKS launch"
       }
     }
+  },
+  "knowledge_capture": {
+    "enabled": true,
+    "note": "~/Obsidian/Memex/40-49 Resources/44 Agentic Coding Learnings/agenticapps-roadmap.md"
   }
 }
