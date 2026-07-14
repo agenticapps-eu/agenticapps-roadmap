@@ -136,6 +136,54 @@ describe("buildSnapshot — email in free-text is redacted, not fatal", () => {
   });
 });
 
+describe("buildSnapshot — project.url passthrough (D-13)", () => {
+  it("carries an input url through and emits null when url is absent", () => {
+    const raw: RawWorkspace = {
+      initiatives: [{ id: "ini-x", name: "X", color: null, state: "Active" }],
+      projects: [
+        {
+          id: "proj-with-url",
+          name: "Proj With URL",
+          description: null,
+          url: "https://linear.app/agenticapps/project/abc",
+          initiativeId: "ini-x",
+          state: { name: "Backlog", type: "backlog" },
+          priority: 0,
+          startedAt: null,
+          targetDate: null,
+          projectMilestones: { nodes: [] },
+          issues: { nodes: [] },
+        },
+        {
+          id: "proj-no-url",
+          name: "Proj No URL",
+          description: null,
+          initiativeId: "ini-x",
+          state: { name: "Backlog", type: "backlog" },
+          priority: 0,
+          startedAt: null,
+          targetDate: null,
+          projectMilestones: { nodes: [] },
+          issues: { nodes: [] },
+        },
+      ],
+    };
+    const result = buildSnapshot(raw, { now: "2026-06-26T00:00:00.000Z" });
+    const withUrl = result.projects.find((p) => p.id === "proj-with-url");
+    const noUrl = result.projects.find((p) => p.id === "proj-no-url");
+    expect(withUrl?.url).toBe("https://linear.app/agenticapps/project/abc");
+    expect(noUrl?.url).toBeNull();
+  });
+});
+
+describe("assertNoLeak — Linear project URL is not a leak (D-13, T-04-03)", () => {
+  it("does not throw on a linear.app project URL", () => {
+    expect(() =>
+      assertNoLeak('{"url":"https://linear.app/agenticapps/project/abc-123"}')
+    ).not.toThrow();
+  });
+});
+
 describe("RoadmapJsonSchema", () => {
   it("rejects a malformed object missing required fields", () => {
     const result = RoadmapJsonSchema.safeParse({ bad: "data" });
