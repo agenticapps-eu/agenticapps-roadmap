@@ -10,7 +10,7 @@
     "project": "AgenticApps Roadmap"
   },
   "hooks": {
-    "_enforcement_contract": "docs/workflow/ENFORCEMENT-PLAN.md",
+    "_enforcement_contract": "docs/ENFORCEMENT-PLAN.md",
     "_note": "These hooks are declarative intent. Enforcement is in CLAUDE.md + .claude/skills/agentic-apps-workflow/SKILL.md via the commitment principle. Orchestrator code does NOT read this block today.",
     "context_warnings": true,
     "pre_phase": {
@@ -35,7 +35,7 @@
       "design_critique": {
         "enabled": true,
         "skill": "impeccable:critique",
-        "trigger": "ui_hint_yes && design_shotgun_completed",
+        "trigger": "ui_hint_yes && ui_spec_exists",
         "evidence": "UI-SPEC.md cites impeccable critique scores per variant"
       }
     },
@@ -107,7 +107,6 @@
         "skill": "observability:scan",
         "trigger": ".observability/baseline.json present (project adopted §10.9 enforcement)",
         "evidence": ".observability/delta.json; advisory warning when counts.high_confidence_gaps > 0",
-        "programmatic_hook": ".claude/hooks/observability-postphase-scan.sh",
         "blocking": false,
         "rationale": "ADR-0027 (migration 0018) — advisory delta scan of agent-written code; never blocks (LLM-driven scanner). No-op without a baseline. Promote to blocking once the deterministic scanner ships."
       }
