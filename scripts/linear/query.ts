@@ -34,6 +34,7 @@ export const MAIN_QUERY = `
         id
         name
         description
+        url
         initiatives(first: 3) {
           nodes {
             id

@@ -19,6 +19,7 @@ interface RawProject {
   id: string;
   name: string;
   description: string | null;
+  url?: string | null;
   initiativeId: string | null;
   state: { name: string; type: string };
   priority: number;
@@ -147,6 +148,7 @@ export function buildSnapshot(
       id: proj.id,
       name: redactEmails(proj.name),
       summary: proj.description === null ? null : redactEmails(proj.description),
+      url: proj.url ?? null,
       initiativeId: proj.initiativeId,
       status: proj.state.name,
       priority: proj.priority,
