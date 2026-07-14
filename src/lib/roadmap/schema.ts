@@ -16,6 +16,7 @@ const ProjectSchema = z.object({
   id: z.string(),
   name: z.string(),
   summary: z.string().nullable(),
+  url: z.string().nullish(),
   initiativeId: z.string().nullable(),
   status: z.string(),
   priority: z.number().int(),

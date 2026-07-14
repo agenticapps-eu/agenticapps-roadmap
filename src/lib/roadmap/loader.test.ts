@@ -23,6 +23,7 @@ const validSnapshot: RoadmapJson = {
       id: "proj-001",
       name: "AgenticApps Roadmap",
       summary: "The roadmap app",
+      url: "https://linear.app/agenticapps/project/test-proj-001",
       initiativeId: "ini-001",
       status: "started",
       priority: 1,
