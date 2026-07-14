@@ -107,9 +107,9 @@ export const mainResponseClean: GqlMainResponse = {
 };
 
 /**
- * Main response fixture for the email-leak test.
- * The email is in a project description so assertNoLeak fires through
- * the assembled path (same as the old gql-with-email fixture).
+ * Main response fixture for the email-redaction test.
+ * The email is in a project description; buildSnapshot scrubs it from the
+ * free-text field so the assembled path serves 200 with no PII in the body.
  */
 export const mainResponseWithEmail: GqlMainResponse = {
   data: {

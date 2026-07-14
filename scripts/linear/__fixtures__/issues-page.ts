@@ -83,9 +83,9 @@ export const issuesPageTwo: GqlIssuesPage = {
 };
 
 /**
- * Issues response used as the second-fetch stub in email-leak tests.
+ * Issues response used as the second-fetch stub in email-redaction tests.
  * The main response carries the email; this page just needs to exist so the
- * pagination loop completes before assertNoLeak fires.
+ * pagination loop completes before buildSnapshot redacts the free-text fields.
  */
 export const issuesPageForEmailLeak: GqlIssuesPage = {
   data: {

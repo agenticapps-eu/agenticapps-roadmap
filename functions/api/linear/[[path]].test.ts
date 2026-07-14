@@ -104,11 +104,11 @@ describe("REQ-PROXY-2: snapshot success", () => {
 // REQ-PROXY-3: Email in upstream → 502, no PII in body
 // ---------------------------------------------------------------------------
 
-describe("REQ-PROXY-3: email leak gate", () => {
-  it("returns 502 when upstream contains an email and body has no PII", async () => {
+describe("REQ-PROXY-3: email redaction gate", () => {
+  it("redacts an upstream email and serves 200 with no PII in the body", async () => {
     // Email is in mainResponseWithEmail's project description (main request).
-    // The issues request also completes so assembledWorkspace is built — then
-    // mapWorkspace + buildSnapshot → assertNoLeak fires on the description.
+    // buildSnapshot scrubs emails from free-text fields, so the snapshot serves
+    // successfully with the email redacted rather than failing the whole request.
     let callIndex = 0;
     vi.stubGlobal(
       "fetch",
@@ -123,7 +123,7 @@ describe("REQ-PROXY-3: email leak gate", () => {
 
     const res = await onRequestGet(ctx(["snapshot"]));
 
-    expect(res.status).toBe(502);
+    expect(res.status).toBe(200);
     const body = await res.text();
     expect(body).not.toContain("@");
     expect(body).not.toContain("secret@example.com");
@@ -212,7 +212,7 @@ describe("REQ-PROXY-4: token never present in any response body", () => {
     expect(body).not.toMatch(/lin_api_/);
   });
 
-  it("502 email-leak body does not contain the API key", async () => {
+  it("200 redacted-email body does not contain the API key", async () => {
     let callIndex = 0;
     vi.stubGlobal(
       "fetch",
@@ -225,7 +225,7 @@ describe("REQ-PROXY-4: token never present in any response body", () => {
       })
     );
     const res = await onRequestGet(ctx(["snapshot"]));
-    expect(res.status).toBe(502);
+    expect(res.status).toBe(200);
     const body = await bodyOf(res);
     expect(body).not.toContain(TEST_KEY);
     expect(body).not.toMatch(/lin_api_/);
@@ -449,14 +449,14 @@ describe("REQ-PROXY-PAGINATE: two-fetch complexity-safe strategy", () => {
     expect(p2?.issueCounts.backlog).toBe(2);
   });
 
-  it("email-leak via main response still fires assertNoLeak and returns 502 with no PII", async () => {
+  it("email in main response is redacted through the assembled path — 200 with no PII", async () => {
     stubFetchSequence([
       { ok: true, json: async () => mainResponseWithEmail },
       { ok: true, json: async () => issuesPageForEmailLeak },
     ]);
 
     const res = await onRequestGet(ctx(["snapshot"]));
-    expect(res.status).toBe(502);
+    expect(res.status).toBe(200);
     const body = await res.text();
     expect(body).not.toContain("@");
     expect(body).not.toContain("secret@example.com");

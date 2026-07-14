@@ -60,6 +60,12 @@ vector, and is already fixed (`02f45c1`).
   global) — only the `lin_api_` regex + email regex fire in production. This is
   acceptable: the regex covers the token format, and the token is never placed
   into the serialized snapshot in the first place. (Matches code-review IN-02.)
+- **Emails in free text are redacted, not rejected** — `buildSnapshot` scrubs
+  email addresses from user-authored fields (project name/description, milestone
+  and initiative names) to `[redacted]` before serialization. A single email in
+  one description no longer 502s the whole snapshot; `assertNoLeak`'s email regex
+  remains a fail-closed backstop for any field not covered by redaction. The
+  `lin_api_` token check stays fatal (never redacted).
 - **No server-side error logging** — by design here (guarantees no token/PII in
   logs). A future `console.error(err.message)` for diagnosability would need to
   stay message-only; deferred as code-review IN-01.
