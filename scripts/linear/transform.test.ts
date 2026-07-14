@@ -106,6 +106,36 @@ describe("buildSnapshot — null issue state (Linear allows stateless issues)", 
   });
 });
 
+describe("buildSnapshot — email in free-text is redacted, not fatal", () => {
+  it("redacts an email in a project description and still builds", () => {
+    const raw: RawWorkspace = {
+      initiatives: [{ id: "ini-x", name: "X", color: null, state: "Active" }],
+      projects: [
+        {
+          id: "proj-x",
+          name: "Proj X",
+          description: "Ping owner at jane.doe@example.com for access",
+          initiativeId: "ini-x",
+          state: { name: "Backlog", type: "backlog" },
+          priority: 0,
+          startedAt: null,
+          targetDate: null,
+          projectMilestones: {
+            nodes: [{ id: "ms-x", name: "Ask carol@example.org", targetDate: null }],
+          },
+          issues: { nodes: [] },
+        },
+      ],
+    };
+    const result = buildSnapshot(raw, { now: "2026-06-26T00:00:00.000Z" });
+    const proj = result.projects.find((p) => p.id === "proj-x");
+    expect(proj?.summary).not.toContain("@example.com");
+    expect(proj?.milestones[0]?.name).not.toContain("@example.org");
+    // No email survives anywhere in the serialized snapshot.
+    expect(JSON.stringify(result)).not.toMatch(/@/);
+  });
+});
+
 describe("RoadmapJsonSchema", () => {
   it("rejects a malformed object missing required fields", () => {
     const result = RoadmapJsonSchema.safeParse({ bad: "data" });

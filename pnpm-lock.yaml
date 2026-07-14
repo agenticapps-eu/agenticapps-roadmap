@@ -39,6 +39,9 @@ importers:
         specifier: ^4.4.3
         version: 4.4.3
     devDependencies:
+      '@cloudflare/workers-types':
+        specifier: ^4.20260629.1
+        version: 4.20260629.1
       '@eslint/js':
         specifier: ^9.39.0
         version: 9.39.4
@@ -273,6 +276,9 @@ packages:
     peerDependenciesMeta:
       '@types/react':
         optional: true
+
+  '@cloudflare/workers-types@4.20260629.1':
+    resolution: {integrity: sha512-5vq2ErIFVRSQ8Dcw5YOeEoBdZBudqBjHFKTWD3SBGiJR5hD1+/86aRUV/DTpEK9sXXCGOTGgpWBGlPSlW7djVg==}
 
   '@dotenvx/dotenvx@1.75.1':
     resolution: {integrity: sha512-/BITOC9dmS/edY2zQwZNicQ059O6RKabtQfyEafV0nGtfYRNHYy1DIPiYVcov40+tob9hfmBnbR963dS+EQ1DQ==}
@@ -2794,6 +2800,8 @@ snapshots:
       use-sync-external-store: 1.6.0(react@19.2.7)
     optionalDependencies:
       '@types/react': 19.2.17
+
+  '@cloudflare/workers-types@4.20260629.1': {}
 
   '@dotenvx/dotenvx@1.75.1':
     dependencies:

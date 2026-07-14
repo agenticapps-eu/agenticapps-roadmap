@@ -47,6 +47,17 @@ export interface RawWorkspace {
 const TOKEN_RE = /lin_api_[A-Za-z0-9_-]+/;
 const EMAIL_RE = /[\w.+-]+@[\w-]+\.[\w.-]+/;
 
+// Global variant for redaction. Emails are PII but legitimately appear in
+// user-authored free text (project descriptions, milestone names); scrub them
+// from the output rather than failing the whole snapshot. assertNoLeak still
+// runs afterward as a fail-closed backstop.
+const EMAIL_RE_G = /[\w.+-]+@[\w-]+\.[\w.-]+/g;
+
+/** Replaces email addresses in free-text with a redaction marker. */
+function redactEmails(value: string): string {
+  return value.replace(EMAIL_RE_G, "[redacted]");
+}
+
 /**
  * Throws if `serialized` contains an API token pattern or an email address.
  * Also checks for the live LINEAR_API_KEY value if the env var is set.
@@ -57,7 +68,16 @@ export function assertNoLeak(serialized: string): void {
       "SECURITY: snapshot contains a Linear API token pattern (lin_api_…)"
     );
   }
-  const liveKey = process.env["LINEAR_API_KEY"];
+  // Check for process.env at runtime without importing node types.
+  // `typeof process` is valid JS but TS complains when "node" types are absent;
+  // casting through unknown avoids the type error in the Worker tsconfig while
+  // preserving the same runtime behaviour.
+  const nodeProcess = (
+    typeof (globalThis as Record<string, unknown>)["process"] !== "undefined"
+      ? (globalThis as Record<string, unknown>)["process"]
+      : undefined
+  ) as { env?: Record<string, string | undefined> } | undefined;
+  const liveKey = nodeProcess?.env?.["LINEAR_API_KEY"];
   if (liveKey && serialized.includes(liveKey)) {
     throw new Error(
       "SECURITY: snapshot contains the live LINEAR_API_KEY value"
@@ -102,7 +122,7 @@ export function buildSnapshot(
 
   const initiatives = raw.initiatives.map((ini) => ({
     id: ini.id,
-    name: ini.name,
+    name: redactEmails(ini.name),
     color: ini.color,
     status: ini.state,
   }));
@@ -119,14 +139,14 @@ export function buildSnapshot(
 
     const milestones = proj.projectMilestones.nodes.map((ms) => ({
       id: ms.id,
-      name: ms.name,
+      name: redactEmails(ms.name),
       targetDate: ms.targetDate,
     }));
 
     return {
       id: proj.id,
-      name: proj.name,
-      summary: proj.description,
+      name: redactEmails(proj.name),
+      summary: proj.description === null ? null : redactEmails(proj.description),
       initiativeId: proj.initiativeId,
       status: proj.state.name,
       priority: proj.priority,
