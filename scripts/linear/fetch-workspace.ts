@@ -25,6 +25,7 @@ interface RawMainProject {
   id: string;
   name: string;
   description: string | null;
+  url: string;
   initiatives: { nodes: { id: string }[] };
   status: { name: string; type: string };
   priority: number;

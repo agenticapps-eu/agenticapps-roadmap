@@ -33,6 +33,7 @@ interface GqlProject {
   id: string;
   name: string;
   description: string | null;
+  url: string;
   // Linear projects belong to an initiatives connection (a project can have
   // several); we take the first as the primary. Empty nodes → no initiative.
   initiatives: { nodes: { id: string }[] };
@@ -82,6 +83,7 @@ export function mapWorkspace(json: GqlResponse): RawWorkspace {
       id: proj.id,
       name: proj.name,
       description: proj.description,
+      url: proj.url,
       initiativeId: proj.initiatives.nodes[0]?.id ?? null,
       state: proj.status,
       priority: proj.priority,
