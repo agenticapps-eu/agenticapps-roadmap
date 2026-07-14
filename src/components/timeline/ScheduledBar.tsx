@@ -13,38 +13,17 @@ import {
 } from "@/components/ui/popover";
 import { ProjectPopoverContent } from "@/components/timeline/ProjectPopoverContent";
 import { MilestoneMarker } from "@/components/timeline/MilestoneMarker";
-import { barPosition, type TimelineWindow } from "@/lib/timeline/dateUtils";
+import {
+  barPosition,
+  markerPercent,
+  type TimelineWindow,
+} from "@/lib/timeline/dateUtils";
 import { luminanceFor } from "@/lib/timeline/colorUtils";
 import type { Milestone, Project } from "@/lib/roadmap/schema";
 import { cn } from "@/lib/utils";
 
 /** Cluster count threshold: milestones within 12px collapse to one indicator (D-10). */
 const CLUSTER_PX = 12;
-
-/** Parse a YYYY-MM-DD snapshot date as local midnight (matches dateUtils). */
-function localMidnight(date: string): number {
-  return new Date(date + "T00:00:00").getTime();
-}
-
-/**
- * A dated milestone's position as a percentage of the bar's own width. Only
- * meaningful for a full span bar (startDate + targetDate); startDate-less bars
- * (D-07) and off-window stubs have no interior span, so markers pin to the end.
- */
-function markerLeftPercent(
-  msDate: string,
-  project: Project,
-  isSpan: boolean
-): number {
-  if (!isSpan || project.startDate === null || project.targetDate === null) {
-    return 100;
-  }
-  const start = localMidnight(project.startDate);
-  const target = localMidnight(project.targetDate);
-  const span = target - start;
-  if (span <= 0) return 100;
-  return Math.min(100, Math.max(0, ((localMidnight(msDate) - start) / span) * 100));
-}
 
 type MarkerCluster = {
   milestone: Milestone;
@@ -133,15 +112,17 @@ export function ScheduledBar({
     else box.right = "0";
   }
 
-  const isSpan = pos.kind === "span";
   const showText = pos.kind !== "stub";
   const textColor = luminanceFor(color) < 0.4 ? "#ffffff" : "#1a1a1a";
 
+  // Markers position against the bar's clamped effective range so they stay
+  // aligned on window-clamped bars. fixedEnd/stub have a degenerate range, so
+  // markerPercent returns 100 (pinned to the end), matching D-07 behavior.
   const positioned = project.milestones
     .filter((m): m is Milestone & { targetDate: string } => m.targetDate !== null)
     .map((m) => ({
       milestone: m,
-      leftPercent: markerLeftPercent(m.targetDate, project, isSpan),
+      leftPercent: markerPercent(m.targetDate, pos.effectiveStart, pos.effectiveEnd),
     }));
   const clusters = clusterMarkers(positioned, barWidthPx);
 

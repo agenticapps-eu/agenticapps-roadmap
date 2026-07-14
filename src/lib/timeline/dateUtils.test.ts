@@ -5,6 +5,7 @@ import {
   barPosition,
   getMonthColumns,
   todayLeftPercent,
+  markerPercent,
 } from "./dateUtils";
 
 // July 2026 reference window: 2026-07-01 .. 2027-01-31 (7 months).
@@ -95,5 +96,48 @@ describe("barPosition", () => {
     expect(pos.width).toBe(0);
     expect(pos.kind).toBe("fixedEnd");
     expect(pos.clampedLeft).toBe(false);
+  });
+
+  it("exposes the clamped effective range used to size the bar (marker basis)", () => {
+    // Starts before the window, ends inside: effectiveStart pins to windowStart,
+    // effectiveEnd stays at the real target — this is the basis markers must use.
+    const pos = barPosition("2026-06-22", "2026-08-17", WINDOW);
+    expect(pos.effectiveStart.getTime()).toBe(WINDOW.windowStart.getTime());
+    expect(pos.effectiveEnd.getTime()).toBe(
+      new Date("2026-08-17T00:00:00").getTime()
+    );
+  });
+
+  it("clamps effectiveEnd to windowEnd for a bar extending past the window", () => {
+    const pos = barPosition("2026-08-05", "2027-06-01", WINDOW);
+    expect(pos.clampedRight).toBe(true);
+    expect(pos.effectiveEnd.getTime()).toBe(WINDOW.windowEnd.getTime());
+  });
+});
+
+describe("markerPercent", () => {
+  const eStart = new Date(2026, 6, 1); // Jul 1
+  const eEnd = new Date(2026, 7, 1); // Aug 1
+
+  it("is 0 at the effective start", () => {
+    expect(markerPercent("2026-07-01", eStart, eEnd)).toBe(0);
+  });
+
+  it("is 100 at the effective end", () => {
+    expect(markerPercent("2026-08-01", eStart, eEnd)).toBe(100);
+  });
+
+  it("clamps a milestone before the effective start to 0 (D-03 clamped bar)", () => {
+    // The bug: on a window-clamped bar this must sit at the visible left edge,
+    // not be pushed inward by the unclamped start.
+    expect(markerPercent("2026-06-15", eStart, eEnd)).toBe(0);
+  });
+
+  it("clamps a milestone after the effective end to 100", () => {
+    expect(markerPercent("2026-09-01", eStart, eEnd)).toBe(100);
+  });
+
+  it("returns 100 for a degenerate zero-length range", () => {
+    expect(markerPercent("2026-07-01", eStart, eStart)).toBe(100);
   });
 });

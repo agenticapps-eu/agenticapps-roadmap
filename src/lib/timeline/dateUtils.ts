@@ -61,6 +61,11 @@ export function barPosition(
   clampedLeft: boolean;
   clampedRight: boolean;
   kind: "span" | "fixedEnd" | "stub";
+  // The clamped date range the bar box is sized to. Interior milestone markers
+  // MUST position against this basis (not the raw start/target) or they drift on
+  // window-clamped bars.
+  effectiveStart: Date;
+  effectiveEnd: Date;
 } {
   const { windowStart, windowEnd, windowDays } = window;
   const target = new Date(targetDate + "T00:00:00");
@@ -76,6 +81,9 @@ export function barPosition(
       clampedLeft: false,
       clampedRight,
       kind: "fixedEnd",
+      // No interior span; markers pin to the end (degenerate range).
+      effectiveStart: effectiveEnd,
+      effectiveEnd,
     };
   }
 
@@ -97,5 +105,25 @@ export function barPosition(
     clampedRight,
     // Entirely off-window (before or after) collapses to zero effective width → stub.
     kind: rawWidth <= 0 ? "stub" : "span",
+    effectiveStart,
+    effectiveEnd,
   };
+}
+
+/**
+ * A dated milestone's position as a percentage of a bar's own width, measured
+ * against the bar's clamped effective range (from barPosition). Milestones
+ * outside the visible range clamp to the nearest edge (0 or 100). Degenerate
+ * (zero-length) ranges pin to 100.
+ */
+export function markerPercent(
+  msDate: string,
+  effectiveStart: Date,
+  effectiveEnd: Date
+): number {
+  const span = effectiveEnd.getTime() - effectiveStart.getTime();
+  if (span <= 0) return 100;
+  const ms = new Date(msDate + "T00:00:00").getTime();
+  const pct = ((ms - effectiveStart.getTime()) / span) * 100;
+  return Math.min(100, Math.max(0, pct));
 }
