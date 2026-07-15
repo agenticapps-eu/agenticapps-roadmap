@@ -80,6 +80,23 @@ describe("runCli", () => {
     expect(confirm).not.toHaveBeenCalled();
   });
 
+  it("a --project-less --dry-run warns and skips one misconfigured repo, previewing the rest (WR-04)", async () => {
+    vi.mocked(parseRepo).mockImplementation((_dirs, meta) => {
+      if (meta.repo === "repo-a") {
+        throw new Error("Config entry \"repo-a\" has no teamKey configured");
+      }
+      return fakeModel(meta.repo);
+    });
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => undefined);
+
+    const code = await runCli(["--dry-run"]);
+
+    expect(code).toBe(0);
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('Skipping "repo-a"'));
+    // repo-b's preview still ran despite repo-a's failure.
+    expect(applyProject).toHaveBeenCalledTimes(1);
+  });
+
   it("a --project-less --apply throws the bulk-write error", async () => {
     await expect(runCli(["--apply"])).rejects.toThrow(/bulk write is disallowed/);
     expect(applyProject).not.toHaveBeenCalled();

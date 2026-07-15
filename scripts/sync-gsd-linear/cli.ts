@@ -204,8 +204,16 @@ export async function runCli(argv: string[]): Promise<number> {
     throw new Error(BULK_WRITE_ERROR);
   }
 
+  // WR-04: walkPlanning already fails soft (warns, returns []) for a missing
+  // sibling repo -- buildModel/parseRepo can still throw (e.g. no teamKey,
+  // schema-parse failure), so wrap each entry so one misconfigured repo is
+  // warned+skipped rather than aborting every other repo's read-only preview.
   for (const entry of config) {
-    await previewProject(deps, entry, map, opts);
+    try {
+      await previewProject(deps, entry, map, opts);
+    } catch (err) {
+      console.warn(`Skipping "${entry.name}": ${err instanceof Error ? err.message : String(err)}`);
+    }
   }
   return 0;
 }
