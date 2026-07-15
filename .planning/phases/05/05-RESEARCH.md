@@ -426,9 +426,9 @@ Not applicable — this is a greenfield UI phase (new components + one optional 
 | A3 | `null` `initiativeId` projects may warrant an "Unassigned" health row | aggregate.ts | Low — cosmetic; decide during planning |
 | A4 | shadcn base-nova registry is reachable to scaffold `dialog`/`card`; else hand-author | Standard Stack | Low — hand-authored fallback provided and verified against installed parts |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-None blocking. A1–A3 are small UX decisions for the planner/executor to settle and unit-test; the fallback in A4 is fully specified.
+None blocking. RESOLVED: A1 (undated-exclusion when range active), A2 (custom-over-quarter range precedence, coexist), and A3 (Unassigned health row) are settled and pinned as tests in 05-02; A4 (registry-failure-is-blocking with verified hand-authored fallback) is settled in 05-03. All four are unit-tested or acceptance-gated in the finalized plans.
 
 ## Environment Availability
 
