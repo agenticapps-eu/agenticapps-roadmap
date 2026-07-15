@@ -146,6 +146,32 @@ describe("runCli", () => {
     expect(writeLinearMap).toHaveBeenCalledTimes(1);
   });
 
+  it("--project X --apply --write-snapshot never patches the snapshot on the pre-approval leg (WR-06)", async () => {
+    const code = await runCli(["--project", "repo-a", "--apply", "--write-snapshot"]);
+    expect(code).toBe(0);
+    expect(applyProject).toHaveBeenCalledTimes(2);
+    // Pre-approval preview leg: writeSnapshot forced false regardless of the flag.
+    expect(vi.mocked(applyProject).mock.calls[0]![3]).toMatchObject({
+      dryRun: true,
+      writeSnapshot: false,
+    });
+    // Post-approval real write: writeSnapshot honors the flag.
+    expect(vi.mocked(applyProject).mock.calls[1]![3]).toMatchObject({
+      dryRun: false,
+      writeSnapshot: true,
+    });
+  });
+
+  it("--project X --write-snapshot without --apply still patches the plain preview (no approval gate exists)", async () => {
+    const code = await runCli(["--project", "repo-a", "--write-snapshot"]);
+    expect(code).toBe(0);
+    expect(applyProject).toHaveBeenCalledTimes(1);
+    expect(vi.mocked(applyProject).mock.calls[0]![3]).toMatchObject({
+      dryRun: true,
+      writeSnapshot: true,
+    });
+  });
+
   it("--project X --apply aborts without writing when confirm() returns false", async () => {
     vi.mocked(confirm).mockResolvedValue(false);
     const code = await runCli(["--project", "repo-a", "--apply"]);

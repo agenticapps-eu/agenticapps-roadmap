@@ -108,7 +108,12 @@ async function applyOneProject(
 
   const diffSummary = await applyProject(deps, model, map, {
     dryRun: true,
-    writeSnapshot: opts.writeSnapshot,
+    // WR-06: in apply mode this leg is the PRE-APPROVAL preview -- it must
+    // never patch public/roadmap.json, or declining the y/N prompt below
+    // would still have mutated the snapshot. Only a plain preview (no
+    // --apply, no approval gate at all) or the real post-approval write
+    // below may patch it.
+    writeSnapshot: opts.applyMode ? false : opts.writeSnapshot,
     mapPath: MAP_PATH,
     roadmapPath: ROADMAP_PATH,
   });
