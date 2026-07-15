@@ -213,15 +213,20 @@ const QUARTER_MONTH_RANGES: Record<string, [string, string]> = {
 /**
  * OV-02 / 05-REVIEWS finding 3 — SETTLED: quarter and custom from/to may
  * COEXIST in the URL (FilterBar does not clear one when setting the other).
- * Custom from/to takes PRECEDENCE when both are present (this branch is
- * reachable, not dead). Falls back to the quarter's resolved range, else
- * null. An invalid/out-of-range/malformed quarter resolves to null.
+ * Custom from/to takes PRECEDENCE when either bound is present (this branch is
+ * reachable, not dead). A lone bound is open-ended (WR-01): a lone `from` means
+ * "on/after from", a lone `to` means "on/before to". Bounds are normalized so a
+ * reversed from > to still filters rather than excluding everything (WR-02).
+ * Falls back to the quarter's resolved range, else null. An
+ * invalid/out-of-range/malformed quarter resolves to null.
  */
 export function resolveRange(
   filters: Filters
 ): { start: string; end: string } | null {
-  if (filters.from && filters.to) {
-    return { start: filters.from, end: filters.to };
+  if (filters.from || filters.to) {
+    const lo = filters.from ?? "0000-01-01";
+    const hi = filters.to ?? "9999-12-31";
+    return lo <= hi ? { start: lo, end: hi } : { start: hi, end: lo };
   }
   if (filters.quarter) {
     const m = /^(\d{4})-Q([1-4])$/.exec(filters.quarter);

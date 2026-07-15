@@ -294,9 +294,28 @@ describe("resolveRange", () => {
     }
   );
 
-  it("returns the range AS GIVEN for a reversed from > to custom range (no throw)", () => {
+  it("normalizes a reversed from > to custom range (WR-02)", () => {
     const f: Filters = { ...EMPTY_FILTERS, from: "2026-05-01", to: "2026-01-01" };
-    expect(resolveRange(f)).toEqual({ start: "2026-05-01", end: "2026-01-01" });
+    expect(resolveRange(f)).toEqual({ start: "2026-01-01", end: "2026-05-01" });
+  });
+
+  it("honors a lone from bound as open-ended (WR-01)", () => {
+    expect(resolveRange({ ...EMPTY_FILTERS, from: "2026-05-01" })).toEqual({
+      start: "2026-05-01",
+      end: "9999-12-31",
+    });
+  });
+
+  it("honors a lone to bound as open-ended (WR-01)", () => {
+    expect(resolveRange({ ...EMPTY_FILTERS, to: "2026-05-01" })).toEqual({
+      start: "0000-01-01",
+      end: "2026-05-01",
+    });
+  });
+
+  it("custom from/to takes precedence over a coexisting quarter", () => {
+    const f: Filters = { ...EMPTY_FILTERS, quarter: "2026-Q3", from: "2026-02-01", to: "2026-02-28" };
+    expect(resolveRange(f)).toEqual({ start: "2026-02-01", end: "2026-02-28" });
   });
 });
 
