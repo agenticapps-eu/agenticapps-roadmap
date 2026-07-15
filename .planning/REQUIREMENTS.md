@@ -46,7 +46,7 @@
 
 - [ ] **OV-01**: Overview KPI cards (initiatives, projects, scheduled vs undated, by-priority, by-status) + per-initiative health strip.
 - [ ] **OV-02**: Filters (initiative, time range, status, priority) are URL-encoded, shareable, and survive reload.
-- [ ] **OV-03**: Drill-down from project → milestones + issues with deep links to Linear.
+- [ ] **OV-03**: Drill-down from project → issue-counts breakdown + milestones, with a deep link to Linear (individual issues live in Linear, one click away — the snapshot stores only aggregate counts). *(scoped by Phase-5 decision D-05-03)*
 - [ ] **OV-04**: "Out of sync with plan" badge when a repo's `.planning/` is ahead of Linear.
 
 ### sync-gsd-linear CLI (Phase 6)
