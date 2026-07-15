@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v0.1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-07-15T12:23:40.148Z"
+last_updated: "2026-07-15T12:42:35.501Z"
 last_activity: 2026-07-15
 progress:
   total_phases: 8
   completed_phases: 2
   total_plans: 26
-  completed_plans: 24
+  completed_plans: 25
   percent: 25
 ---
 
@@ -25,11 +25,11 @@ No `.planning/PROJECT.md` — design rationale lives in `docs/architecture.md` (
 ## Current Position
 
 Phase: 06 (sync-gsd-linear CLI) — EXECUTING
-Plan: 5 of 7
+Plan: 6 of 7
 Status: Ready to execute
 Last activity: 2026-07-15
 
-Progress: [█████████░] 92%
+Progress: [██████████] 96%
 
 ## Phase 3 Wave Plan
 
@@ -60,6 +60,8 @@ Execution mode: **sequential on main** (user-selected). Worktree isolation disab
 - [Phase 06]: 06-02: Walker sorts phase-dir/plan-file listings alphabetically for deterministic output; parser.ts helpers stay module-private (transform.ts style); completionStatusFor ROADMAP match checks both full slug and number-stripped suffix.
 - [Phase 06]: 06-03: titleHash() is identity-agnostic; slug-not-title / plan-key-not-title contract lives in the file header. mutations.ts adds target-scoped paginated PROJECT_ISSUES_QUERY beyond scripts/linear/query.ts's workflow-state-only ISSUES_QUERY, plus PROJECT_UPDATE/PROJECT_MILESTONE_UPDATE/ISSUE_UPDATE beyond RESEARCH's verified *_CREATE examples (same id+input pattern; may go uncalled by 06-06's create-only v1 apply).
 - [Phase 06-04]: comparePhaseNumber orders decimal phase numbers component-wise (never whole-string float coercion); proposeDates re-sorts before assigning dates and leaves completed phases untouched. buildDiff(model, resolved) emits the full enumerated SyncOperation[] write set matched by titleHash of identity; drifted existing-milestone dates surface as informational only (v1 apply is create-only).
+- [Phase 06]: 06-05: resolveProjectByLabel added as a file-local, soft-failing (null-on-error) lookup since RawWorkspace's MAIN_QUERY read omits per-project label attachment; resolveProject takes labeledProjectId as an explicit parameter rather than making its own network call.
+- [Phase 06]: 06-05: idempotency proof (resolve-before-create finds existing records, no duplicate) tested at the resolveProject/resolveMilestone/resolveIssue function level against linear-mutation-mock.ts's real create handlers + direct in-memory state reads, not through buildResolvedWorkspace's full network path.
 
 ### Pending Todos / Open Items
 
