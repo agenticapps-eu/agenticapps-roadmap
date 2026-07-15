@@ -16,13 +16,26 @@ import type { NormalizedPhase } from "./config.ts";
 const MS_PER_WEEK = 7 * 24 * 60 * 60 * 1000;
 
 /**
+ * Component-wise numeric segment parse. A non-numeric segment (e.g. a phase
+ * dir with no leading numeric token, whose `number` falls back to the raw
+ * slug -- parser.ts) maps to `Infinity` rather than `NaN`, so the comparator
+ * below stays total: every comparison resolves to a real ordering instead of
+ * `NaN` (falsy/unordered), which would otherwise make Array.sort's result
+ * order undefined (WR-01).
+ */
+function numericSegment(s: string): number {
+  const n = Number(s);
+  return Number.isFinite(n) ? n : Infinity;
+}
+
+/**
  * Orders two NormalizedPhase.number strings ("04", "04.2", "04.10")
  * component-wise: split on ".", compare each numeric segment left-to-right,
  * shorter-is-less on a tie. Never coerces the whole string to a float.
  */
 export function comparePhaseNumber(a: string, b: string): number {
-  const aParts = a.split(".").map(Number);
-  const bParts = b.split(".").map(Number);
+  const aParts = a.split(".").map(numericSegment);
+  const bParts = b.split(".").map(numericSegment);
   const len = Math.max(aParts.length, bParts.length);
   for (let i = 0; i < len; i++) {
     const aVal = aParts[i];

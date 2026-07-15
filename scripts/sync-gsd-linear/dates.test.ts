@@ -30,6 +30,17 @@ describe("comparePhaseNumber", () => {
   it("returns 0 for equal numbers", () => {
     expect(comparePhaseNumber("04.2", "04.2")).toBe(0);
   });
+
+  it("orders a non-numeric phase slug (no leading numeric token) after every numeric one (WR-01)", () => {
+    expect(comparePhaseNumber("intro-notes", "01")).toBeGreaterThan(0);
+    expect(comparePhaseNumber("01", "intro-notes")).toBeLessThan(0);
+  });
+
+  it("stays a total comparator across a mixed list -- no NaN ordering (WR-01)", () => {
+    const numbers = ["03", "intro-notes", "01", "02"];
+    const sorted = [...numbers].sort(comparePhaseNumber);
+    expect(sorted).toEqual(["01", "02", "03", "intro-notes"]);
+  });
 });
 
 describe("proposeDates", () => {
