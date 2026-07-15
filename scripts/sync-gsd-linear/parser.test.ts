@@ -86,6 +86,29 @@ describe("parseRepo", () => {
     }
   });
 
+  it("ignores a '#'-comment inside a fenced code block when picking the H1 title", () => {
+    // Regression: H1 extraction matched the first `# ` line anywhere in the
+    // body, including bash comments inside ``` fences, producing garbage
+    // titles for real plans (verifier gap, phase 06). The title must be the
+    // genuine markdown H1, not the fenced comment that precedes it.
+    const dir = mkdtempSync(path.join(tmpdir(), "sync-gsd-linear-parser-test-"));
+    try {
+      const phasesDir = path.join(dir, "phases", "01-fenced");
+      mkdirSync(phasesDir, { recursive: true });
+      writeFileSync(
+        path.join(phasesDir, "01-01-PLAN.md"),
+        "---\nphase: 01\nplan: 01\n---\n\n" +
+          "```bash\n# CURRENT: numeric filters only (0001, 0005)\necho hi\n```\n\n" +
+          "# Real Plan Title\n\nBody prose.\n"
+      );
+      const raw = walkPlanning(dir);
+      const model = parseRepo(raw, META);
+      expect(model.phases[0]?.plans[0]?.title).toBe("Real Plan Title");
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
   it("keeps the leading numeric token as a dot-separated string, not parseFloat", () => {
     const raw = walkPlanning(path.join(FIXTURES_ROOT, "decimal-phase"));
     const model = parseRepo(raw, META);

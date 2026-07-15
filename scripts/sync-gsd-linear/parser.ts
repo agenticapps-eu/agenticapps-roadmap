@@ -30,7 +30,8 @@ import type { RawPhaseDir } from "./walker.ts";
 // ---------------------------------------------------------------------------
 
 const FRONTMATTER_RE = /^---\r?\n[\s\S]*?\r?\n---\r?\n?/;
-const H1_RE = /^#\s+(.+)$/m;
+const FENCE_RE = /^\s*(?:```|~~~)/;
+const H1_LINE_RE = /^#\s+(.+)$/;
 const GENERIC_HEADING_RE = /^Phase\s+\d+/i;
 const NUMBER_TOKEN_RE = /^(\d+(?:\.\d+)?)/;
 const TASK_LINE_RE = /^\s*-\s+\S/;
@@ -40,6 +41,25 @@ const COMPLETE_MARKER_RE = /\[x\]/i;
 function stripFrontmatter(content: string): string {
   const match = content.match(FRONTMATTER_RE);
   return match ? content.slice(match[0].length) : content;
+}
+
+/**
+ * First genuine markdown H1 in the body, ignoring `#`-comment lines inside
+ * fenced (``` / ~~~) code blocks. A single-regex `/^#\s+/m` match wrongly
+ * grabbed bash comments inside fences, yielding garbage plan titles.
+ */
+function firstH1(body: string): string | null {
+  let inFence = false;
+  for (const line of body.split(/\r?\n/)) {
+    if (FENCE_RE.test(line)) {
+      inFence = !inFence;
+      continue;
+    }
+    if (inFence) continue;
+    const match = line.match(H1_LINE_RE);
+    if (match) return match[1]!.trim();
+  }
+  return null;
 }
 
 /** Extracts the plan body's task/checklist lines (e.g. `- [ ]`, `- [x]`, `- `). */
@@ -59,8 +79,7 @@ function taskLinesFor(body: string): string[] {
 function titleFor(planFile: string, content: string, slug: string): string {
   const hasFrontmatter = FRONTMATTER_RE.test(content);
   const body = stripFrontmatter(content);
-  const h1Match = body.match(H1_RE);
-  const heading = h1Match ? h1Match[1]!.trim() : slug;
+  const heading = firstH1(body) ?? slug;
 
   if (hasFrontmatter || !GENERIC_HEADING_RE.test(heading)) {
     return heading;
