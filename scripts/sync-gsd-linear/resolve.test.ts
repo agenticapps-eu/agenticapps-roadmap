@@ -7,7 +7,6 @@ import {
   resolveProject,
   readProjectIssues,
   resolveMilestone,
-  resolveIssue,
   buildResolvedWorkspace,
 } from "./resolve.ts";
 import { fetchAssembledWorkspace } from "../linear/fetch-workspace.ts";
@@ -286,6 +285,55 @@ describe("readProjectIssues", () => {
     const issues = await readProjectIssues(fetchFn, ENDPOINT, AUTH, "proj-x");
     expect(issues.map((i) => i.id)).toEqual(["issue-a", "issue-b"]);
   });
+
+  it("recovers identityKey from a `<!--gsd-key:...-->` description marker (CR-01)", async () => {
+    const planKey = "repo1/01-go-routing/01-01-PLAN.md";
+    const fetchFn = stubFetch({
+      ProjectIssues: {
+        data: {
+          issues: {
+            nodes: [
+              {
+                id: "issue-001",
+                title: "Go-based routing scaffold",
+                description: `- [ ] Task 1\n\n<!--gsd-key:${planKey}-->`,
+                projectMilestone: null,
+                labels: { nodes: [] },
+              },
+            ],
+            pageInfo: { hasNextPage: false, endCursor: null },
+          },
+        },
+      },
+    });
+
+    const issues = await readProjectIssues(fetchFn, ENDPOINT, AUTH, "proj-cw-001");
+    expect(issues[0]?.identityKey).toBe(planKey);
+  });
+
+  it("leaves identityKey null when the description carries no marker (issue predates this CLI's convention)", async () => {
+    const fetchFn = stubFetch({
+      ProjectIssues: {
+        data: {
+          issues: {
+            nodes: [
+              {
+                id: "issue-002",
+                title: "Some pre-existing issue",
+                description: "No marker here.",
+                projectMilestone: null,
+                labels: { nodes: [] },
+              },
+            ],
+            pageInfo: { hasNextPage: false, endCursor: null },
+          },
+        },
+      },
+    });
+
+    const issues = await readProjectIssues(fetchFn, ENDPOINT, AUTH, "proj-cw-001");
+    expect(issues[0]?.identityKey).toBeNull();
+  });
 });
 
 describe("resolveMilestone", () => {
@@ -310,34 +358,25 @@ describe("resolveMilestone", () => {
     map.milestones["repo1/01-go-routing"] = { id: "ms-1" };
     expect(resolveMilestone(project, "01-go-routing", map)).toBe("ms-1");
   });
-});
 
-describe("resolveIssue", () => {
-  const planKey = "repo1/01-go-routing/01-01-PLAN.md";
-  const project: ResolvedProject = {
-    id: "proj-1",
-    name: "repo1-project",
-    repoKey: "repo1",
-    milestones: [],
-    issues: [
-      { id: "issue-1", title: planKey, identityKey: null, projectId: "proj-1", milestoneId: null, labelIds: [] },
-    ],
-  };
-
-  it("resolves via titleHash match against the issue's own title (never the display title)", () => {
-    expect(resolveIssue(project, planKey, emptyMap())).toBe("issue-1");
-  });
-
-  it("returns null when no issue's title hashes to the plan key", () => {
-    expect(resolveIssue(project, "repo1/01-go-routing/02-01-PLAN.md", emptyMap())).toBeNull();
-  });
-
-  it("resolves via the stored map id when present", () => {
+  it("resolves via the stored map id even when the milestone was renamed in the Linear UI (WR-05)", () => {
+    const renamedProject: ResolvedProject = {
+      ...project,
+      milestones: [{ id: "ms-1", name: "Renamed In Linear UI", targetDate: null }],
+    };
     const map = emptyMap();
-    map.issues[planKey] = { id: "issue-1" };
-    expect(resolveIssue(project, planKey, map)).toBe("issue-1");
+    map.milestones["repo1/01-go-routing"] = { id: "ms-1" };
+    expect(resolveMilestone(renamedProject, "01-go-routing", map)).toBe("ms-1");
   });
 });
+
+// Note (WR-03): there is no resolveIssue helper -- the old title-hash-of-
+// planKey tier could never match a real issue (apply.ts titles issues with
+// plan.title, never plan.key) and was dead code, only "proven" by a
+// contradictory fixture that titled an issue with the plan key. Issue
+// identity is recovered via the description marker (readProjectIssues,
+// above) and consumed directly through ResolvedIssue.identityKey by
+// diff.ts/apply.ts -- see diff.test.ts and apply.test.ts's CR-01 coverage.
 
 describe("buildResolvedWorkspace", () => {
   const baseEntry: SyncConfigEntry = {
@@ -449,7 +488,7 @@ describe("buildResolvedWorkspace", () => {
 // ---------------------------------------------------------------------------
 
 describe("idempotent re-resolve after create (mutation mock)", () => {
-  it("resolveProject/resolveMilestone/resolveIssue find the existing records after a create — no duplicate", async () => {
+  it("resolveProject/resolveMilestone/readProjectIssues find the existing records after a create — no duplicate", async () => {
     const mock = createMutationMock();
 
     // Simulate apply.ts's (06-06) resolve-before-create writes for a first run.
@@ -476,11 +515,21 @@ describe("idempotent re-resolve after create (mutation mock)", () => {
       }),
     });
 
+    // apply.ts always titles an issue with the plan's display title, never
+    // its identity key (D-06-01) — the identity key travels in the
+    // description marker instead (CR-01).
     await mock.fetchFn(ENDPOINT, {
       method: "POST",
       body: JSON.stringify({
         query: ISSUE_CREATE,
-        variables: { input: { teamId: "team-age-001", title: planKey, projectId } },
+        variables: {
+          input: {
+            teamId: "team-age-001",
+            title: "Go-based routing scaffold",
+            description: `- [ ] Create router\n\n<!--gsd-key:${planKey}-->`,
+            projectId,
+          },
+        },
       }),
     });
 
@@ -501,25 +550,12 @@ describe("idempotent re-resolve after create (mutation mock)", () => {
     const milestoneId = resolveMilestone(resolvedProject, "01-go-routing", emptyMap());
     expect(milestoneId).toBeTruthy();
 
-    // resolveIssue needs project.issues populated — the mock has no HTTP read
-    // for this (no ProjectIssues handler, out of this plan's file scope to
-    // add). Read its in-memory state directly instead: the same fields a
-    // real readProjectIssues call would have mapped.
-    const projectWithIssues: ResolvedProject = {
-      ...resolvedProject,
-      issues: mock.state.issues
-        .filter((i) => i.projectId === projectId)
-        .map((i) => ({
-          id: i.id,
-          title: i.title,
-          identityKey: null,
-          projectId: i.projectId,
-          milestoneId: i.projectMilestoneId,
-          labelIds: i.labelIds,
-        })),
-    };
-    const issueId = resolveIssue(projectWithIssues, planKey, emptyMap());
-    expect(issueId).toBeTruthy();
+    // The real per-project read (PROJECT_ISSUES_QUERY) recovers identityKey
+    // from the description marker, map-free.
+    const issues = await readProjectIssues(mock.fetchFn, ENDPOINT, AUTH, projectId);
+    expect(issues).toHaveLength(1);
+    expect(issues[0]?.identityKey).toBe(planKey);
+    expect(issues[0]?.title).toBe("Go-based routing scaffold");
 
     // Re-create with identical inputs (what apply.ts's resolve-before-create
     // would do on a second run) — the mock must return the SAME ids, proving
@@ -538,5 +574,44 @@ describe("idempotent re-resolve after create (mutation mock)", () => {
     expect(mock.state.projects).toHaveLength(1);
     expect(mock.state.projectMilestones).toHaveLength(1);
     expect(mock.state.issues).toHaveLength(1);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// CR-01: issue dedup survives total linear-map.json loss via the description
+// marker alone — the locked-decision proof this fix requires.
+// ---------------------------------------------------------------------------
+
+describe("CR-01: map-loss idempotency via the description marker", () => {
+  it("an existing issue titled plan.title and carrying the gsd-key marker resolves identityKey with an EMPTY map", async () => {
+    const planKey = "claude-workflow/01-go-routing/01-01-PLAN.md";
+    const fetchFn = stubFetch({
+      ProjectIssues: {
+        data: {
+          issues: {
+            nodes: [
+              {
+                id: "issue-001",
+                // Titled with the plan's display heading (D-06-01), NEVER
+                // the raw identity key — the contradictory pre-CR-01
+                // fixtures titled issues with planKey directly.
+                title: "Go-based routing scaffold",
+                description: `- [ ] Create router\n\n<!--gsd-key:${planKey}-->`,
+                projectMilestone: null,
+                labels: { nodes: [] },
+              },
+            ],
+            pageInfo: { hasNextPage: false, endCursor: null },
+          },
+        },
+      },
+    });
+
+    // The map is completely empty — simulating total linear-map.json loss.
+    const issues = await readProjectIssues(fetchFn, ENDPOINT, AUTH, "proj-cw-001");
+    expect(issues[0]?.identityKey).toBe(planKey);
+    // This is exactly the field diff.ts's issue-create decision matches on
+    // (titleHash(issue.identityKey) === titleHash(plan.key)), so a re-run
+    // against this workspace with an empty map must NOT emit issue-create.
   });
 });

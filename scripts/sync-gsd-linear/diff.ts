@@ -8,10 +8,14 @@
 // this list, and nothing on this list may go unexecuted.
 //
 // Resolve-before-create discipline (06-RESEARCH.md Pattern 2): every entity
-// is matched against resolved state by titleHash of its identity (phase
-// slug for milestones, plan key for issues -- never a display title) before
-// an operation is emitted; a match means no operation is needed for that
-// entity.
+// is matched against resolved state stored-map-id-first, then by identity
+// (phase slug for milestones via resolve.ts's resolveMilestone -- WR-05;
+// plan key for issues via ResolvedIssue.identityKey, recovered from either
+// the map or the issue's description marker -- CR-01; never a display
+// title) before an operation is emitted; a match means no operation is
+// needed for that entity. buildDiff therefore takes `map` as an input
+// alongside the resolved workspace, purely to hand it through to
+// resolveMilestone.
 //
 // v1 apply is create-only: an EXISTING milestone whose targetDate drifted
 // from the freshly-proposed date is never written (PROJECT_MILESTONE_UPDATE
@@ -21,6 +25,7 @@
 
 import type {
   DiffSummary,
+  LinearMap,
   NormalizedModel,
   NormalizedPhase,
   ResolvedMilestone,
@@ -28,6 +33,7 @@ import type {
   SyncOperation,
 } from "./config.ts";
 import { titleHash } from "./hash.ts";
+import { resolveMilestone } from "./resolve.ts";
 
 const LABEL_NAME_PREFIX = "roadmap:";
 
@@ -36,19 +42,26 @@ function labelNameFor(repo: string): string {
   return `${LABEL_NAME_PREFIX}${repo}`;
 }
 
-/** Finds the resolved milestone whose name hashes to this phase's slug hash. */
+/**
+ * Finds the resolved milestone matching this phase, stored map id first,
+ * title-hash fallback (WR-05) — delegates to resolve.ts's resolveMilestone
+ * so this is the one place that order is implemented.
+ */
 function findMatchingMilestone(
   phase: NormalizedPhase,
-  resolved: ResolvedWorkspace
+  resolved: ResolvedWorkspace,
+  map: LinearMap
 ): ResolvedMilestone | undefined {
   if (!resolved.project) return undefined;
-  const hash = titleHash(phase.slug);
-  return resolved.project.milestones.find((m) => titleHash(m.name) === hash);
+  const id = resolveMilestone(resolved.project, phase.slug, map);
+  if (!id) return undefined;
+  return resolved.project.milestones.find((m) => m.id === id);
 }
 
 export function buildDiff(
   model: NormalizedModel,
-  resolved: ResolvedWorkspace
+  resolved: ResolvedWorkspace,
+  map: LinearMap
 ): DiffSummary {
   const operations: SyncOperation[] = [];
   const datesInformational: string[] = [];
@@ -90,7 +103,7 @@ export function buildDiff(
   }
 
   for (const phase of model.phases) {
-    const existingMilestone = findMatchingMilestone(phase, resolved);
+    const existingMilestone = findMatchingMilestone(phase, resolved, map);
     if (!existingMilestone) {
       const dateDetail = phase.proposedDate ? ` (target ${phase.proposedDate})` : "";
       operations.push({

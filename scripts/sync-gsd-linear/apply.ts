@@ -14,31 +14,30 @@
 // freshly-rebuilt operation set differs from the one just computed (TOCTOU
 // guard) -- it never writes something that wasn't just shown.
 //
-// WHY issue-identity enrichment is MAP-BASED, not title-hash-based:
+// WHY issue-identity enrichment is MAP-FIRST, MARKER-FALLBACK, never
+// title-hash-based (CR-01):
 //   diff.ts matches issues via `ResolvedIssue.identityKey` (never `title`,
 //   per hash.ts's file-header contract: "issue identity hashes the plan's
 //   stable identity KEY, NEVER the display title"). resolve.ts's
-//   readProjectIssues (PROJECT_ISSUES_QUERY has no description field to
-//   carry a hidden identity token) always returns `identityKey: null` --
-//   by design it leaves enrichment to the caller. Rather than overloading
-//   the real Linear issue's `title` field with the identity key (which
-//   would fight D-06-01 "titled from the plan heading" and produce
-//   unreadable issue titles in the Linear UI), this module recovers
-//   identityKey via the FIRST resolve tier only: a reverse lookup through
-//   the already-written `linear-map.json` issues pool (id -> plan key).
-//   This is sufficient for every must-have this plan states ("a second
-//   apply against the now-populated MAP/workspace is a no-op") without
-//   requiring a Linear issue's visible title to ever be a raw identity
-//   string. Internal module layout is explicitly Claude's Discretion per
-//   06-CONTEXT.md.
+//   readProjectIssues already recovers identityKey from a
+//   `<!--gsd-key:...-->` marker embedded in the issue's description
+//   (PROJECT_ISSUES_QUERY fetches `description`) -- this module's
+//   withIssueIdentity layers the STORED linear-map.json id on top as the
+//   first tier (a reverse lookup through the issues pool, id -> plan key),
+//   falling back to that marker-recovered key only when no map entry
+//   exists. This is what makes a second apply a no-op even after
+//   linear-map.json is lost/rebased -- without ever overloading the real
+//   Linear issue's `title` field with the identity key (which would fight
+//   D-06-01 "titled from the plan heading" and produce unreadable issue
+//   titles in the Linear UI). Internal module layout is explicitly Claude's
+//   Discretion per 06-CONTEXT.md.
 // ---------------------------------------------------------------------------
 
 import * as fs from "node:fs";
 import { assertNoLeak } from "../linear/transform.ts";
 import { RoadmapJsonSchema, type RoadmapJson } from "../../src/lib/roadmap/schema.ts";
-import { buildResolvedWorkspace } from "./resolve.ts";
+import { buildResolvedWorkspace, resolveMilestone } from "./resolve.ts";
 import { buildDiff } from "./diff.ts";
-import { titleHash } from "./hash.ts";
 import {
   PROJECT_CREATE,
   PROJECT_LABEL_CREATE,
@@ -152,9 +151,12 @@ function withIssueIdentity(resolved: ResolvedWorkspace, map: LinearMap): Resolve
   for (const [planKey, entry] of Object.entries(map.issues)) {
     keyByStoredId.set(entry.id, planKey);
   }
+  // Stored map id first, description-marker fallback (CR-01) -- resolve.ts's
+  // readProjectIssues already recovers a marker-based identityKey per issue,
+  // so a map-loss re-run still resolves identity without a duplicate create.
   const issues = resolved.project.issues.map((issue) => ({
     ...issue,
-    identityKey: keyByStoredId.get(issue.id) ?? null,
+    identityKey: keyByStoredId.get(issue.id) ?? issue.identityKey ?? null,
   }));
   return { ...resolved, project: { ...resolved.project, issues } };
 }
@@ -310,12 +312,14 @@ async function executeOperations(
 
     // Seed the slug -> Linear-id map from what's already resolved (existing
     // milestones this run does NOT create), then fill in each new create.
+    // Stored map id first, title-hash fallback (WR-05) -- via resolve.ts's
+    // resolveMilestone, mirroring diff.ts's own findMatchingMilestone so a
+    // renamed-in-Linear-UI milestone is never re-created here either.
     const milestoneIdBySlug = new Map<string, string>();
     if (resolved.project) {
       for (const phase of model.phases) {
-        const hash = titleHash(phase.slug);
-        const existing = resolved.project.milestones.find((m) => titleHash(m.name) === hash);
-        if (existing) milestoneIdBySlug.set(phase.slug, existing.id);
+        const existing = resolveMilestone(resolved.project, phase.slug, map);
+        if (existing) milestoneIdBySlug.set(phase.slug, existing);
       }
     }
 
@@ -346,7 +350,11 @@ async function executeOperations(
         input: {
           teamId: resolved.teamId,
           title: plan.title,
-          description: plan.taskLines.join("\n"),
+          // Embeds the durable identity marker (CR-01) so a re-run can
+          // recover this issue's identity from readProjectIssues alone, even
+          // if linear-map.json is lost -- the title stays plan.title
+          // (D-06-01, human-readable) and never carries the identity key.
+          description: `${plan.taskLines.join("\n")}\n\n<!--gsd-key:${plan.key}-->`,
           projectId,
           projectMilestoneId: milestoneId,
           labelIds: issueLabelId ? [issueLabelId] : undefined,
@@ -377,7 +385,7 @@ export async function applyProject(
   opts: ApplyOpts
 ): Promise<DiffSummary> {
   const resolved = await resolveWorkspace(deps, model, map);
-  const diffSummary = buildDiff(model, resolved);
+  const diffSummary = buildDiff(model, resolved, map);
 
   const roadmapPath = opts.roadmapPath ?? DEFAULT_ROADMAP_PATH;
   const shouldPatchSnapshot = !opts.dryRun || opts.writeSnapshot === true;
@@ -392,7 +400,7 @@ export async function applyProject(
   // TOCTOU guard: re-resolve immediately before writing and abort if the
   // freshly-rebuilt operation set differs from what was just computed.
   const resolvedAgain = await resolveWorkspace(deps, model, map);
-  const diffAgain = buildDiff(model, resolvedAgain);
+  const diffAgain = buildDiff(model, resolvedAgain, map);
   if (canonicalOps(diffSummary.operations) !== canonicalOps(diffAgain.operations)) {
     throw new Error("Linear state changed since the diff was shown — re-run to review");
   }

@@ -58,6 +58,7 @@ export interface MockProjectMilestone {
 export interface MockIssue {
   id: string;
   title: string;
+  description: string | null;
   teamId: string;
   projectId: string;
   projectMilestoneId: string | null;
@@ -201,6 +202,7 @@ const handlers: Record<string, Handler> = {
       .map((i) => ({
         id: i.id,
         title: i.title,
+        description: i.description,
         projectMilestone: i.projectMilestoneId ? { id: i.projectMilestoneId } : null,
         labels: { nodes: i.labelIds.map((id) => ({ id })) },
       }));
@@ -321,6 +323,7 @@ const handlers: Record<string, Handler> = {
     const created: MockIssue = {
       id: nextId("issue"),
       title,
+      description: (input["description"] as string | undefined) ?? null,
       teamId: asString(input["teamId"]),
       projectId,
       projectMilestoneId: (input["projectMilestoneId"] as string | undefined) ?? null,

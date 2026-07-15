@@ -102,9 +102,11 @@ export interface IssueLabelsQueryResponse {
 
 /**
  * Target-scoped, cursor-paginated issue read for dedup. Filters to one
- * project.id and exposes only the fields the resolve-order (map -> label ->
- * title-hash) needs: id, title, milestone id, label ids. Pass `after: null`
- * first, then endCursor, until hasNextPage is false (same loop shape as
+ * project.id and exposes the fields the resolve-order (map id -> description
+ * marker -> title-hash) needs: id, title, description (carries the
+ * `<!--gsd-key:...-->` identity marker, see apply.ts's issueCreate and
+ * CR-01), milestone id, label ids. Pass `after: null` first, then endCursor,
+ * until hasNextPage is false (same loop shape as
  * scripts/linear/fetch-workspace.ts's ISSUES_QUERY pagination).
  */
 export const PROJECT_ISSUES_QUERY = `
@@ -113,6 +115,7 @@ export const PROJECT_ISSUES_QUERY = `
       nodes {
         id
         title
+        description
         projectMilestone { id }
         labels { nodes { id } }
       }
@@ -129,6 +132,7 @@ export interface ProjectIssuesQueryVariables {
 export interface ProjectIssueNode {
   id: string;
   title: string;
+  description: string | null;
   projectMilestone: { id: string } | null;
   labels: { nodes: { id: string }[] };
 }

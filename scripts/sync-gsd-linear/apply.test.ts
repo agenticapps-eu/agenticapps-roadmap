@@ -218,6 +218,45 @@ describe("applyProject idempotent re-run", () => {
 });
 
 // ---------------------------------------------------------------------------
+// CR-01: issue dedup survives total linear-map.json loss. The old title-hash
+// fallback could never match (issues are titled with plan.title, never
+// plan.key) -- this proves the description-marker tier does.
+// ---------------------------------------------------------------------------
+
+describe("applyProject survives linear-map.json loss (CR-01)", () => {
+  it("a second apply with a FRESH EMPTY map creates nothing (project/milestone/issue all re-resolve)", async () => {
+    const mock = createMutationMock();
+    const { deps } = spiedDeps(mock);
+    const roadmapPath = writeRoadmapFixture();
+
+    const first = await applyProject(deps, baseModel(), emptyMap(), {
+      dryRun: false,
+      roadmapPath,
+      mapPath: tmpMapPath(),
+    });
+    expect(first.operations.length).toBeGreaterThan(0);
+    expect(mock.state.projects).toHaveLength(1);
+    expect(mock.state.projectMilestones).toHaveLength(1);
+    expect(mock.state.issues).toHaveLength(1);
+    // apply.ts never titles an issue with its identity key (D-06-01).
+    expect(mock.state.issues[0]?.title).toBe("Alpha Plan");
+    expect(mock.state.issues[0]?.description).toContain(`<!--gsd-key:${PLAN_KEY}-->`);
+
+    // Simulate linear-map.json being lost/rebased: a brand-new, unrelated
+    // empty map object -- NOT the one `first` mutated in place.
+    const second = await applyProject(deps, baseModel(), emptyMap(), {
+      dryRun: false,
+      roadmapPath,
+      mapPath: tmpMapPath(),
+    });
+    expect(second.operations).toEqual([]);
+    expect(mock.state.projects).toHaveLength(1);
+    expect(mock.state.projectMilestones).toHaveLength(1);
+    expect(mock.state.issues).toHaveLength(1);
+  });
+});
+
+// ---------------------------------------------------------------------------
 // initiative-join: fires exactly once, uses resolved.initiativeId (not name)
 // ---------------------------------------------------------------------------
 

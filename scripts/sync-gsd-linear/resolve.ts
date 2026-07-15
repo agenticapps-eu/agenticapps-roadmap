@@ -2,13 +2,22 @@
 // SYNC-02 resolver: for every Linear write target (Team, ProjectLabel,
 // IssueLabel, Initiative, Project, ProjectMilestone, Issue) resolve to an
 // EXISTING record via the locked order — stored linear-map.json id -> the
-// roadmap:<repo> label -> title-hash fallback — before apply.ts (06-06) ever
-// considers a create. This is what makes SYNC-04's "re-run is a no-op" true.
+// roadmap:<repo> label / a durable identity marker -> title-hash fallback —
+// before apply.ts (06-06) ever considers a create. This is what makes
+// SYNC-04's "re-run is a no-op" true.
 //
 // Reuses the existing read plumbing (fetchAssembledWorkspace + mapWorkspace)
 // for the base MAIN_QUERY/ISSUES_QUERY workspace read. All NEW lookups
 // (teams, both label pools, the paginated per-project issue read) use the
 // typed queries already defined in mutations.ts (06-03).
+//
+// CR-01 — durable issue identity via a description marker: readProjectIssues
+// recovers `identityKey` by parsing a `<!--gsd-key:<plan.key>-->` marker
+// apply.ts's issueCreate embeds in every created issue's description (see
+// PROJECT_ISSUES_QUERY's `description` field). This makes issue dedup
+// (diff.ts's issue-create decision) survive a lost/rebased linear-map.json —
+// the map id is still consulted FIRST (apply.ts's withIssueIdentity), the
+// marker is the fallback tier, never the reverse.
 //
 // WHY resolveProjectByLabel is a small query defined LOCALLY in this file
 // (not mutations.ts, not a workspace scan): RawWorkspace's MAIN_QUERY read
@@ -234,8 +243,12 @@ export function resolveProject(
 // ---------------------------------------------------------------------------
 // Paginated, target-scoped issue read — the dedup identity surface
 // (06-REVIEWS.md Consensus item 1). Copies fetch-workspace.ts's cursor-loop
-// + endCursor invariant check.
+// + endCursor invariant check. Every returned issue's `identityKey` is
+// recovered from its description's `<!--gsd-key:...-->` marker (CR-01) —
+// null when the issue predates this CLI's marker convention.
 // ---------------------------------------------------------------------------
+
+const ISSUE_IDENTITY_MARKER_RE = /<!--gsd-key:([^>]+)-->/;
 
 export async function readProjectIssues(
   fetchFn: typeof fetch,
@@ -270,10 +283,11 @@ export async function readProjectIssues(
 
     const { nodes, pageInfo } = json.data.issues;
     for (const node of nodes) {
+      const marker = ISSUE_IDENTITY_MARKER_RE.exec(node.description ?? "");
       issues.push({
         id: node.id,
         title: node.title,
-        identityKey: null,
+        identityKey: marker?.[1] ?? null,
         projectId,
         milestoneId: node.projectMilestone?.id ?? null,
         labelIds: node.labels.nodes.map((l) => l.id),
@@ -291,11 +305,19 @@ export async function readProjectIssues(
 }
 
 // ---------------------------------------------------------------------------
-// Milestone / Issue: stored map id -> titleHash match. Issue identity hashes
-// the plan's stable KEY, never the display title (hash.ts's file-header
-// contract) — matched against titleHash(issue.title), i.e. apply.ts is the
-// module responsible for ever setting a Linear issue's title to that same
-// identity key so this match can succeed on re-run.
+// Milestone: stored map id -> titleHash match (WR-05). This is the single
+// implementation of that order — diff.ts's findMatchingMilestone and
+// apply.ts's executeOperations milestone seed both call this directly rather
+// than re-implementing the match inline, so a renamed-in-Linear-UI milestone
+// still resolves via its stored id instead of producing a duplicate
+// milestone-create (WR-03's "don't advertise a dedup tier that isn't wired
+// into the real path" applies here too).
+//
+// (There is no equivalent resolveIssue: issue identity is recovered via the
+// description marker in readProjectIssues / apply.ts's withIssueIdentity,
+// see CR-01 — a separate title-hash-of-planKey tier would just re-advertise
+// the same non-functional fallback WR-03 flagged, since a real issue's title
+// is never the plan key.)
 // ---------------------------------------------------------------------------
 
 export function resolveMilestone(
@@ -311,21 +333,6 @@ export function resolveMilestone(
   }
   const hash = titleHash(phaseSlug);
   const existing = project.milestones.find((m) => titleHash(m.name) === hash);
-  return existing?.id ?? null;
-}
-
-export function resolveIssue(
-  project: ResolvedProject,
-  planKey: string,
-  map: LinearMap
-): string | null {
-  const storedId = map.issues[planKey]?.id;
-  if (storedId) {
-    const stored = project.issues.find((i) => i.id === storedId);
-    if (stored) return stored.id;
-  }
-  const hash = titleHash(planKey);
-  const existing = project.issues.find((i) => titleHash(i.title) === hash);
   return existing?.id ?? null;
 }
 
