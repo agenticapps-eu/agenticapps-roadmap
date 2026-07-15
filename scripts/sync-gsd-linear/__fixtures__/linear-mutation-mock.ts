@@ -188,6 +188,24 @@ const handlers: Record<string, Handler> = {
       },
     },
   }),
+  // Target-scoped per-project issue read (PROJECT_ISSUES_QUERY, mutations.ts
+  // 06-03) -- resolve.ts's readProjectIssues, driving apply.ts's (06-06)
+  // idempotency re-resolve. Deliberately left out of 06-05's fixture scope
+  // (see resolve.test.ts's own comment) and added here since 06-06's
+  // "second apply is a no-op" proof calls buildResolvedWorkspace's full
+  // network path against an already-populated project.
+  ProjectIssues: (state, vars) => {
+    const projectId = asString(vars["projectId"]);
+    const nodes = state.issues
+      .filter((i) => i.projectId === projectId)
+      .map((i) => ({
+        id: i.id,
+        title: i.title,
+        projectMilestone: i.projectMilestoneId ? { id: i.projectMilestoneId } : null,
+        labels: { nodes: i.labelIds.map((id) => ({ id })) },
+      }));
+    return { data: { issues: { nodes, pageInfo: { hasNextPage: false, endCursor: null } } } };
+  },
 
   // ---- Creates (resolve-before-create; return existing id on duplicate) ----
   ProjectCreate: (state, vars) => {
