@@ -30,7 +30,6 @@ import type { RawPhaseDir } from "./walker.ts";
 // ---------------------------------------------------------------------------
 
 const FRONTMATTER_RE = /^---\r?\n[\s\S]*?\r?\n---\r?\n?/;
-const FENCE_RE = /^\s*(?:```|~~~)/;
 const H1_LINE_RE = /^#\s+(.+)$/;
 const GENERIC_HEADING_RE = /^Phase\s+\d+/i;
 const NUMBER_TOKEN_RE = /^(\d+(?:\.\d+)?)/;
@@ -44,20 +43,20 @@ function stripFrontmatter(content: string): string {
 }
 
 /**
- * First genuine markdown H1 in the body, ignoring `#`-comment lines inside
- * fenced (``` / ~~~) code blocks. A single-regex `/^#\s+/m` match wrongly
- * grabbed bash comments inside fences, yielding garbage plan titles.
+ * A plan's title is its LEADING H1 — the first non-blank body line, and only
+ * if that line is a genuine `# ` heading. Real GSD plans either open with such
+ * a heading or open with an `<objective>`/prose/frontmatter-driven body and
+ * carry no title heading at all. A prior `/^#\s+/m` match grabbed the first
+ * `#` line ANYWHERE — bash comments in (even unfenced) code snippets and
+ * inline `# Note:` asides deep in prose — yielding garbage titles. Restricting
+ * to the leading line means only a deliberate document heading can be a title;
+ * everything else falls back to the filename/slug.
  */
-function firstH1(body: string): string | null {
-  let inFence = false;
+function leadingH1(body: string): string | null {
   for (const line of body.split(/\r?\n/)) {
-    if (FENCE_RE.test(line)) {
-      inFence = !inFence;
-      continue;
-    }
-    if (inFence) continue;
+    if (line.trim() === "") continue;
     const match = line.match(H1_LINE_RE);
-    if (match) return match[1]!.trim();
+    return match ? match[1]!.trim() : null;
   }
   return null;
 }
@@ -78,15 +77,20 @@ function taskLinesFor(body: string): string[] {
  */
 function titleFor(planFile: string, content: string, slug: string): string {
   const hasFrontmatter = FRONTMATTER_RE.test(content);
-  const body = stripFrontmatter(content);
-  const heading = firstH1(body) ?? slug;
+  const heading = leadingH1(stripFrontmatter(content));
+  const fileName = basename(planFile);
+  const fallback = fileName === "PLAN.md" ? slug : basename(planFile, ".md");
 
+  // No leading heading at all -> use the stable filename/slug fallback.
+  if (heading === null) {
+    return fallback;
+  }
+  // A real, specific heading wins; a frontmatter-less generic "Phase N ..."
+  // heading is not descriptive, so it too falls back.
   if (hasFrontmatter || !GENERIC_HEADING_RE.test(heading)) {
     return heading;
   }
-
-  const fileName = basename(planFile);
-  return fileName === "PLAN.md" ? slug : basename(planFile, ".md");
+  return fallback;
 }
 
 /** True if a ROADMAP.md line marks this phase complete (`[x]`/`✅`). */

@@ -86,24 +86,44 @@ describe("parseRepo", () => {
     }
   });
 
-  it("ignores a '#'-comment inside a fenced code block when picking the H1 title", () => {
-    // Regression: H1 extraction matched the first `# ` line anywhere in the
-    // body, including bash comments inside ``` fences, producing garbage
-    // titles for real plans (verifier gap, phase 06). The title must be the
-    // genuine markdown H1, not the fenced comment that precedes it.
+  it("falls back to the filename when a '#' line is buried in prose/code, not a leading heading", () => {
+    // Regression (verifier gap, phase 06): title extraction matched the first
+    // `# ` line ANYWHERE in the body — a bash comment inside an (even unfenced)
+    // code snippet, or an inline `# Note:` aside deep in `<objective>` prose —
+    // producing garbage issue titles on real target repos. A `# ` line is a
+    // title only when it is the leading (first non-blank) body line; otherwise
+    // the stable filename/slug fallback is used. Mirrors the real 04-07 (Note
+    // aside) and 28-03 (unfenced bash comment) failures.
     const dir = mkdtempSync(path.join(tmpdir(), "sync-gsd-linear-parser-test-"));
     try {
-      const phasesDir = path.join(dir, "phases", "01-fenced");
+      const phasesDir = path.join(dir, "phases", "01-buried");
       mkdirSync(phasesDir, { recursive: true });
       writeFileSync(
         path.join(phasesDir, "01-01-PLAN.md"),
-        "---\nphase: 01\nplan: 01\n---\n\n" +
-          "```bash\n# CURRENT: numeric filters only (0001, 0005)\necho hi\n```\n\n" +
-          "# Real Plan Title\n\nBody prose.\n"
+        "---\nphase: 01\nplan: 01\n---\n\n<objective>\nWire the thing.\n" +
+          "# Note: 7 tasks acceptable here — design-hook checkpoints.\n</objective>\n\n" +
+          "<interfaces>\n# _SCRIPT_DIR=\"$(cd \"$(dirname \"${BASH_SOURCE[0]}\")\" && pwd)\"\n</interfaces>\n"
       );
       const raw = walkPlanning(dir);
       const model = parseRepo(raw, META);
-      expect(model.phases[0]?.plans[0]?.title).toBe("Real Plan Title");
+      expect(model.phases[0]?.plans[0]?.title).toBe("01-01-PLAN");
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("uses a leading '# ' heading as the title (first non-blank body line)", () => {
+    const dir = mkdtempSync(path.join(tmpdir(), "sync-gsd-linear-parser-test-"));
+    try {
+      const phasesDir = path.join(dir, "phases", "01-leading");
+      mkdirSync(phasesDir, { recursive: true });
+      writeFileSync(
+        path.join(phasesDir, "01-01-PLAN.md"),
+        "---\nphase: 01\nplan: 01\n---\n\n# Wire the health-check route\n\n- [ ] do it\n"
+      );
+      const raw = walkPlanning(dir);
+      const model = parseRepo(raw, META);
+      expect(model.phases[0]?.plans[0]?.title).toBe("Wire the health-check route");
     } finally {
       rmSync(dir, { recursive: true, force: true });
     }
