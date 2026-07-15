@@ -1,7 +1,243 @@
 {
-  "projects": {},
-  "milestones": {},
-  "issues": {},
-  "projectLabels": {},
-  "issueLabels": {}
+  "projects": {
+    "claude-workflow": {
+      "id": "28f29610-6662-46ad-a5d5-ca93a5c53872"
+    }
+  },
+  "milestones": {
+    "claude-workflow/01-go-routing": {
+      "id": "094eb141-d69a-4cf2-953b-46d5e2f94cd9"
+    },
+    "claude-workflow/01-gsd-bug-fixes": {
+      "id": "057e6076-1b2a-4f53-88f8-a8ccfeb798a0"
+    },
+    "claude-workflow/02-impeccable": {
+      "id": "8f12e4fd-57dc-48b2-bdd3-2a5c50e029f8"
+    },
+    "claude-workflow/02-programmatic-hooks": {
+      "id": "daa0259c-a417-4290-b4bd-37da76e0ce08"
+    },
+    "claude-workflow/03-database-sentinel": {
+      "id": "6524eae2-96ad-45e5-8b9e-f67eb88f87b4"
+    },
+    "claude-workflow/03-mattpocock-install": {
+      "id": "a749d9e6-9a8c-4530-a7f4-41865fed2c93"
+    },
+    "claude-workflow/04-migration-framework": {
+      "id": "9b7ec7db-50ae-45c9-b5c4-02fffcb8ad26"
+    },
+    "claude-workflow/04-scheduling": {
+      "id": "6bd4a4f1-161f-44b0-9678-e69819e710f3"
+    },
+    "claude-workflow/05-shipping": {
+      "id": "8a8bdf3b-168c-44a4-a52d-da2531dd2c36"
+    },
+    "claude-workflow/05-shipping-v1.4.0": {
+      "id": "a04b4985-52e8-47aa-abed-2ae05593d823"
+    },
+    "claude-workflow/06-vendor-claude-md-sections": {
+      "id": "8bc3f6b8-9fdd-4c00-b76a-cf3e5e7de6ad"
+    },
+    "claude-workflow/07-post-process-gsd-sections": {
+      "id": "dda11084-4a81-47f3-92b4-984b33603340"
+    },
+    "claude-workflow/08-multi-ai-review-enforcement": {
+      "id": "0f057abf-0ce4-4c1f-8ecd-45ccc2eeaf48"
+    },
+    "claude-workflow/09-llm-wiki-builder-integration": {
+      "id": "bd68b25f-f423-4428-9666-1e455b08e873"
+    },
+    "claude-workflow/10-gitnexus-code-graph-integration": {
+      "id": "7f18c4cd-ab48-46ae-b044-4d01efb7f645"
+    },
+    "claude-workflow/11-chain-gap-cleanup": {
+      "id": "c4a85302-085d-453f-92cf-419d8a75653b"
+    },
+    "claude-workflow/12-fix-0005-verify-path": {
+      "id": "cb7552d7-62d1-4da3-807e-75ae3fc8306c"
+    },
+    "claude-workflow/13-preflight-correctness-audit": {
+      "id": "f3555012-ac76-4881-a475-845b4bee1b69"
+    },
+    "claude-workflow/14-spec-10-9-enforcement": {
+      "id": "63b81513-8d50-43ce-91a0-d3f8222df67d"
+    },
+    "claude-workflow/15-init-and-slash-discovery": {
+      "id": "72567b38-e03e-49e2-9102-b965e11aafcb"
+    },
+    "claude-workflow/17-test-0001-baseline-fix": {
+      "id": "5680ee41-2b3a-41d8-a1ac-b5e99f5befd4"
+    },
+    "claude-workflow/18-test-0007-hermetic-sandbox": {
+      "id": "6ff48b45-ab57-4be8-aacb-02573e8e3e8f"
+    },
+    "claude-workflow/19-strict-preflight": {
+      "id": "a6df2897-bdbd-4f6c-9ee1-cd099e5e3f5e"
+    },
+    "claude-workflow/20-spec-0.4.0-absorption": {
+      "id": "13d8ddbc-fd99-47ad-a022-eb459860d13d"
+    },
+    "claude-workflow/21-axiom-logs-destination": {
+      "id": "48a2d68f-65db-4634-b02c-c75086925f61"
+    },
+    "claude-workflow/22-sentry-crons-healthz": {
+      "id": "9a92f7aa-e4a8-45a1-8f66-a00152cddfac"
+    },
+    "claude-workflow/23-observability-followups": {
+      "id": "3c89f56a-f87a-4caa-8064-4498808e70e3"
+    },
+    "claude-workflow/24-openrouter-integration": {
+      "id": "e1eceb05-d8d5-4beb-908f-0728d059e899"
+    },
+    "claude-workflow/25-fix-0019-engine-and-cron-wrappers": {
+      "id": "44a05c74-f9f7-4b00-83cf-1c3fd96022a6"
+    },
+    "claude-workflow/26-worker-template-hardening": {
+      "id": "a3771e16-833c-43de-badf-a0b970ca44ae"
+    },
+    "claude-workflow/27-1-21-0-stable-baseline-split-00-gate-close-wr-01-04-minimum-": {
+      "id": "a615d726-aff4-4908-a538-03623aad7dd6"
+    },
+    "claude-workflow/28-split-01-agenticapps-shared": {
+      "id": "b3bee7f1-aa5a-4967-a3a1-ebe3cc2835f5"
+    },
+    "claude-workflow/29-split-02-agenticapps-observability": {
+      "id": "594a2598-b52a-4f85-8ecb-3ad4fbfde4c0"
+    },
+    "claude-workflow/30-split-03-claude-workflow-2-0-0-follow-up": {
+      "id": "bb46e092-9586-4170-8ec0-1bbb2a87105a"
+    }
+  },
+  "issues": {
+    "claude-workflow/phases/06-vendor-claude-md-sections/PLAN.md": {
+      "id": "7c57d04d-2ba3-48dd-a072-a6f5ef34cca9"
+    },
+    "claude-workflow/phases/07-post-process-gsd-sections/PLAN.md": {
+      "id": "1ac7f2a4-7fc4-4a69-bc1f-0b64fde913e2"
+    },
+    "claude-workflow/phases/08-multi-ai-review-enforcement/PLAN.md": {
+      "id": "b1704712-2d52-4ab9-ae88-e7fe5f58e481"
+    },
+    "claude-workflow/phases/09-llm-wiki-builder-integration/PLAN.md": {
+      "id": "77cb4d71-c755-479d-9eba-795fccfad4c6"
+    },
+    "claude-workflow/phases/10-gitnexus-code-graph-integration/PLAN.md": {
+      "id": "89d61320-07c2-4220-9107-b6ab83644fae"
+    },
+    "claude-workflow/phases/14-spec-10-9-enforcement/PLAN.md": {
+      "id": "2b7225a9-ae69-4ab8-9ba4-a87ac80b42e9"
+    },
+    "claude-workflow/phases/15-init-and-slash-discovery/PLAN.md": {
+      "id": "a615c049-6f49-4853-ad69-e38cb4df7905"
+    },
+    "claude-workflow/phases/17-test-0001-baseline-fix/PLAN.md": {
+      "id": "9284e8f4-9eff-425c-b7bb-95303cc94be6"
+    },
+    "claude-workflow/phases/18-test-0007-hermetic-sandbox/PLAN.md": {
+      "id": "cd6364c7-3be5-4c91-b5f6-f349d8a9516c"
+    },
+    "claude-workflow/phases/19-strict-preflight/PLAN.md": {
+      "id": "6b0d3788-8369-4313-8718-a1f7221f9c6b"
+    },
+    "claude-workflow/phases/20-spec-0.4.0-absorption/PLAN.md": {
+      "id": "d334cd06-4dfa-440f-9cb6-acac07430f88"
+    },
+    "claude-workflow/phases/21-axiom-logs-destination/PLAN.md": {
+      "id": "d39daa29-69fa-474d-95ac-fbef1ebfafd0"
+    },
+    "claude-workflow/phases/22-sentry-crons-healthz/PLAN.md": {
+      "id": "a180a45b-9e39-43c6-99f2-ea9279c67268"
+    },
+    "claude-workflow/phases/23-observability-followups/PLAN.md": {
+      "id": "0354b6b1-ba87-44a7-8403-ce5ed53a94f7"
+    },
+    "claude-workflow/phases/24-openrouter-integration/PLAN.md": {
+      "id": "7859f716-2210-4a62-b281-c581483b7667"
+    },
+    "claude-workflow/phases/25-fix-0019-engine-and-cron-wrappers/25-01-PLAN.md": {
+      "id": "40d46cfe-4d28-449c-9545-6b3d4b1588ed"
+    },
+    "claude-workflow/phases/25-fix-0019-engine-and-cron-wrappers/25-02-PLAN.md": {
+      "id": "13fc366e-cd19-4f3a-b8de-d2271c396bf5"
+    },
+    "claude-workflow/phases/25-fix-0019-engine-and-cron-wrappers/25-03-PLAN.md": {
+      "id": "12e4d0b9-23ab-4bbf-84b8-3d867a6c5f50"
+    },
+    "claude-workflow/phases/25-fix-0019-engine-and-cron-wrappers/25-04-PLAN.md": {
+      "id": "07eec0c7-7eae-41e8-9e7d-3f69c4a4c7f6"
+    },
+    "claude-workflow/phases/25-fix-0019-engine-and-cron-wrappers/25-05-PLAN.md": {
+      "id": "b1bba89a-ed59-46c7-b0e2-0cb11948dac0"
+    },
+    "claude-workflow/phases/26-worker-template-hardening/26-01-PLAN.md": {
+      "id": "1e261121-6e8a-4437-8880-fb1113fa6add"
+    },
+    "claude-workflow/phases/26-worker-template-hardening/26-02-PLAN.md": {
+      "id": "7fe80a03-0b65-4d96-b730-434f1ebb0026"
+    },
+    "claude-workflow/phases/26-worker-template-hardening/26-03-PLAN.md": {
+      "id": "bec57e79-3ee3-4edf-a773-78684c34a667"
+    },
+    "claude-workflow/phases/27-1-21-0-stable-baseline-split-00-gate-close-wr-01-04-minimum-/27-01-PLAN.md": {
+      "id": "4179e9f5-3a7b-4746-b923-068f4c7a7f4c"
+    },
+    "claude-workflow/phases/27-1-21-0-stable-baseline-split-00-gate-close-wr-01-04-minimum-/27-02-PLAN.md": {
+      "id": "78110b7b-9b2b-4a7a-8a8b-24ff4b95b5aa"
+    },
+    "claude-workflow/phases/27-1-21-0-stable-baseline-split-00-gate-close-wr-01-04-minimum-/27-03-PLAN.md": {
+      "id": "f661e6c3-485c-41bd-bbcf-c8504f061945"
+    },
+    "claude-workflow/phases/27-1-21-0-stable-baseline-split-00-gate-close-wr-01-04-minimum-/27-04-PLAN.md": {
+      "id": "7691d43e-fc95-45e3-b083-7bf59be8fc09"
+    },
+    "claude-workflow/phases/27-1-21-0-stable-baseline-split-00-gate-close-wr-01-04-minimum-/27-05-PLAN.md": {
+      "id": "aad5dbe5-a645-4a2a-b471-fe8bef027184"
+    },
+    "claude-workflow/phases/27-1-21-0-stable-baseline-split-00-gate-close-wr-01-04-minimum-/27-06-PLAN.md": {
+      "id": "5abe6082-72a8-46f9-8bc5-003c4ca99256"
+    },
+    "claude-workflow/phases/28-split-01-agenticapps-shared/28-01-PLAN.md": {
+      "id": "b6549753-8316-458b-8137-e29674f0fe44"
+    },
+    "claude-workflow/phases/28-split-01-agenticapps-shared/28-02-PLAN.md": {
+      "id": "5c5076aa-4cc7-4576-bb1f-6e1dd09d5736"
+    },
+    "claude-workflow/phases/28-split-01-agenticapps-shared/28-03-PLAN.md": {
+      "id": "121e060f-b042-40d6-8e98-8cb37bc422aa"
+    },
+    "claude-workflow/phases/29-split-02-agenticapps-observability/29-01-PLAN.md": {
+      "id": "f917e57d-5c74-4193-bd77-4c6aed8f5346"
+    },
+    "claude-workflow/phases/29-split-02-agenticapps-observability/29-02-PLAN.md": {
+      "id": "266a4940-0eb5-4596-95ff-df94868c4bf4"
+    },
+    "claude-workflow/phases/29-split-02-agenticapps-observability/29-03-PLAN.md": {
+      "id": "5a7d2c49-ab0c-4fe9-862a-0683afe4b795"
+    },
+    "claude-workflow/phases/29-split-02-agenticapps-observability/29-04-PLAN.md": {
+      "id": "752a83dd-14c3-4647-b5bf-f771510621ff"
+    },
+    "claude-workflow/phases/29-split-02-agenticapps-observability/29-05-PLAN.md": {
+      "id": "e389f21e-e7d6-4b51-86e5-24e4e51bbdfe"
+    },
+    "claude-workflow/phases/30-split-03-claude-workflow-2-0-0-follow-up/30-01-PLAN.md": {
+      "id": "2d499b5e-566c-4950-9799-aa4065e39c71"
+    },
+    "claude-workflow/phases/30-split-03-claude-workflow-2-0-0-follow-up/30-02-PLAN.md": {
+      "id": "4dd660cb-4aaf-4c79-8d1f-1308a6adff7f"
+    },
+    "claude-workflow/phases/30-split-03-claude-workflow-2-0-0-follow-up/30-03-PLAN.md": {
+      "id": "814790bc-6f28-4187-a865-1026503ac5a0"
+    }
+  },
+  "projectLabels": {
+    "claude-workflow": {
+      "id": "8174ddc5-bb29-4f44-9ca8-328cbf9b1077"
+    }
+  },
+  "issueLabels": {
+    "claude-workflow": {
+      "id": "b2e5da35-664c-4c04-b672-dae1cfb4269d"
+    }
+  }
 }
