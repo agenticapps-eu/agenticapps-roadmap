@@ -180,22 +180,26 @@ Plans:
   2. A backfill applied via the UI appears in Linear and in the next snapshot.
   3. Writes are optimistic with error rollback; scheduled snapshot refresh runs.
 
-**Plans**: 5 plans · 3 waves · **Status**: Planned
+**Plans**: 6 plans · 4 waves · **Status**: Planned (revised per 07-REVIEWS cross-AI review)
 
 Plans:
 **Wave 1**
 
-- [ ] 07-01-PLAN.md — LIVE-01 Refresh: R-4 shouldRevalidate fix (TDD) + AppHeader Refresh button + freshness hint (Wave 1)
-- [ ] 07-02-PLAN.md — LIVE-02 write-path backend: dispatch + status Pages Functions (TDD) + backfill.yml CI workflow (Wave 1)
-- [ ] 07-05-PLAN.md — LIVE-03 verify+reuse snapshot.yml + consolidated Phase-8 HUMAN-UAT checklist (Wave 1)
+- [ ] 07-01-PLAN.md — LIVE-01 Refresh: R-4 shouldRevalidate fix (TDD) + AppHeader Refresh button + null-safe freshness hint (Wave 1)
+- [ ] 07-02-PLAN.md — LIVE-02 write-path backend: dispatch (allow-list + server-side preview-before-apply) + status (run→jobs→logs, identity verify, typed diff, correlation) Pages Functions (TDD) (Wave 1)
+- [ ] 07-06-PLAN.md — LIVE-02 CI workflows: backfill.yml (sibling checkout, env-var project, typed diff emit, sync:snapshot rebuild + commit both files) + snapshot.yml shared concurrency (Wave 1)
 
 **Wave 2** *(depend on 07-02 route contract)*
 
-- [ ] 07-03-PLAN.md — LIVE-02 client core: pure dispatch/poll/optimistic-rollback (TDD) + thin useBackfill hook (Wave 2)
+- [ ] 07-03-PLAN.md — LIVE-02 client core: pure dispatch/poll/optimistic-rollback with 204 correlation + transient-retry + all terminal conclusions (TDD) + explicit useBackfill hook (Wave 2)
 
 **Wave 3** *(depend on 07-03 hook)*
 
-- [ ] 07-04-PLAN.md — LIVE-02 optimistic UI: SyncBadge override + ProjectDrillDownDialog two-phase Backfill control + OverviewPage state owner (Wave 3, human-check)
+- [ ] 07-04-PLAN.md — LIVE-02 optimistic UI: BACKFILL_PROJECTS id→key eligibility map + SyncBadge override + ProjectDrillDownDialog typed-diff two-phase Backfill control + OverviewPage state owner (Wave 3, human-check)
+
+**Wave 4** *(depend on 07-01..07-04 + 07-06 finalized contracts)*
+
+- [ ] 07-05-PLAN.md — LIVE-03 verify+reuse snapshot.yml (structural, beyond substring) + LIVE-02/03 operationally-pending record + consolidated Phase-8 HUMAN-UAT checklist (Wave 4)
 
 ### Phase 8: Deploy, gate & document
 
