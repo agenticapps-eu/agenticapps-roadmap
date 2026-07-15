@@ -573,7 +573,7 @@ live GraphQL introspection]`, not assumptions — only *runtime behavior* not ob
 via introspection (e.g., "does creating a duplicate-named label error or succeed?") is
 flagged as assumed.
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **What exact string is the milestone/issue title-hash input — bare phase number, full
    directory slug, or the human-readable `ROADMAP.md` phase title?**
@@ -589,6 +589,7 @@ flagged as assumed.
      humanized version (slug → Title Case) in the diff/Linear UI for readability. Confirm
      this choice explicitly during planning since it affects the very first thing the
      resolver does.
+   - **RESOLVED:** hash input = the full phase directory slug (implemented in parser.ts / hash.ts, 06-02 + 06-03).
 
 2. **Does `fx-signal-agent`'s pre-existing Linear milestone naming (`M7`, `M8` — not
    phase-name-based) create a duplicate-milestone risk on first run?**
@@ -608,6 +609,7 @@ flagged as assumed.
      `fx-signal-agent` as a follow-up once its Linear structure is reconciled. Surface
      this explicitly to the user during planning — it's a real product decision, not a
      pure engineering one.
+   - **RESOLVED:** fx-signal-agent's pre-existing M7/M8 milestones are surfaced as a caution in 06-07's human-verify checkpoint plus a seedable linear-map.json (initial rollout scoped to claude-workflow + cparx).
 
 3. **Should the walker restrict itself to `phases/*` or also read the milestone-scoped
    `milestones/vX.Y.Z-ROADMAP.md` files seen in `fx-signal-agent` (and, by extension,
@@ -625,6 +627,7 @@ flagged as assumed.
      at the `.planning/` root for completion enrichment; treat `milestones/*` as
      out-of-scope for v1 (confirm during planning if OV-03-style drill-down ever wants
      richer milestone descriptions later — not this phase).
+   - **RESOLVED:** the walker is restricted to `phases/*`; nested `milestones/*` roadmaps are out of scope for v1.
 
 ## Environment Availability
 
