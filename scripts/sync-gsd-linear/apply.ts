@@ -45,11 +45,17 @@ import {
   PROJECT_MILESTONE_CREATE,
   ISSUE_CREATE,
   INITIATIVE_TO_PROJECT_CREATE,
+  type ProjectCreateInput,
   type ProjectCreateResponse,
+  type ProjectLabelCreateInput,
   type ProjectLabelCreateResponse,
+  type IssueLabelCreateInput,
   type IssueLabelCreateResponse,
+  type ProjectMilestoneCreateInput,
   type ProjectMilestoneCreateResponse,
+  type IssueCreateInput,
   type IssueCreateResponse,
+  type InitiativeToProjectCreateInput,
   type InitiativeToProjectCreateResponse,
 } from "./mutations.ts";
 import type {
@@ -252,9 +258,11 @@ async function executeOperations(
 
     let projectLabelId = resolved.projectLabelId;
     if (hasOp("project-label-create")) {
-      const data = await postGraphQL<ProjectLabelCreateResponse["data"]>(deps, PROJECT_LABEL_CREATE, {
-        input: { name: labelNameFor(model.repo) },
-      });
+      // IN-01: input literals are typed against mutations.ts's *Input
+      // interfaces so a shape drift (missing/extra/mistyped field) is a
+      // compile error at the call site, not just a runtime GraphQL error.
+      const input: ProjectLabelCreateInput = { name: labelNameFor(model.repo) };
+      const data = await postGraphQL<ProjectLabelCreateResponse["data"]>(deps, PROJECT_LABEL_CREATE, { input });
       const id = data.projectLabelCreate.projectLabel?.id;
       if (!id) throw new Error("projectLabelCreate returned no id");
       projectLabelId = id;
@@ -265,9 +273,11 @@ async function executeOperations(
 
     let issueLabelId = resolved.issueLabelId;
     if (hasOp("issue-label-create")) {
-      const data = await postGraphQL<IssueLabelCreateResponse["data"]>(deps, ISSUE_LABEL_CREATE, {
-        input: { name: labelNameFor(model.repo), teamId: resolved.teamId ?? undefined },
-      });
+      const input: IssueLabelCreateInput = {
+        name: labelNameFor(model.repo),
+        teamId: resolved.teamId ?? undefined,
+      };
+      const data = await postGraphQL<IssueLabelCreateResponse["data"]>(deps, ISSUE_LABEL_CREATE, { input });
       const id = data.issueLabelCreate.issueLabel?.id;
       if (!id) throw new Error("issueLabelCreate returned no id");
       issueLabelId = id;
@@ -279,13 +289,12 @@ async function executeOperations(
     let projectId = resolved.project?.id ?? null;
     let projectWasCreated = false;
     if (hasOp("project-create")) {
-      const data = await postGraphQL<ProjectCreateResponse["data"]>(deps, PROJECT_CREATE, {
-        input: {
-          name: model.projectName,
-          teamIds: resolved.teamId ? [resolved.teamId] : [],
-          labelIds: projectLabelId ? [projectLabelId] : undefined,
-        },
-      });
+      const input: ProjectCreateInput = {
+        name: model.projectName,
+        teamIds: resolved.teamId ? [resolved.teamId] : [],
+        labelIds: projectLabelId ? [projectLabelId] : undefined,
+      };
+      const data = await postGraphQL<ProjectCreateResponse["data"]>(deps, PROJECT_CREATE, { input });
       const id = data.projectCreate.project?.id;
       if (!id) throw new Error("projectCreate returned no id");
       projectId = id;
@@ -299,10 +308,11 @@ async function executeOperations(
     }
 
     if (hasOp("initiative-join") && projectWasCreated && resolved.initiativeId) {
+      const input: InitiativeToProjectCreateInput = { projectId, initiativeId: resolved.initiativeId };
       const data = await postGraphQL<InitiativeToProjectCreateResponse["data"]>(
         deps,
         INITIATIVE_TO_PROJECT_CREATE,
-        { input: { projectId, initiativeId: resolved.initiativeId } }
+        { input }
       );
       if (!data.initiativeToProjectCreate.success) {
         throw new Error("initiativeToProjectCreate did not report success");
@@ -326,13 +336,16 @@ async function executeOperations(
     for (const op of operations.filter((o) => o.kind === "milestone-create")) {
       const phase = findPhaseBySlug(model, op.identityKey);
       if (!phase) throw new Error(`milestone-create operation references unknown phase "${op.identityKey}"`);
-      const data = await postGraphQL<ProjectMilestoneCreateResponse["data"]>(deps, PROJECT_MILESTONE_CREATE, {
-        input: {
-          name: phase.slug,
-          projectId,
-          targetDate: phase.proposedDate ?? undefined,
-        },
-      });
+      const input: ProjectMilestoneCreateInput = {
+        name: phase.slug,
+        projectId,
+        targetDate: phase.proposedDate ?? undefined,
+      };
+      const data = await postGraphQL<ProjectMilestoneCreateResponse["data"]>(
+        deps,
+        PROJECT_MILESTONE_CREATE,
+        { input }
+      );
       const id = data.projectMilestoneCreate.projectMilestone?.id;
       if (!id) throw new Error("projectMilestoneCreate returned no id");
       milestoneIdBySlug.set(phase.slug, id);
@@ -346,20 +359,26 @@ async function executeOperations(
       if (!found) throw new Error(`issue-create operation references unknown plan "${op.identityKey}"`);
       const { phase, plan } = found;
       const milestoneId = milestoneIdBySlug.get(phase.slug);
-      const data = await postGraphQL<IssueCreateResponse["data"]>(deps, ISSUE_CREATE, {
-        input: {
-          teamId: resolved.teamId,
-          title: plan.title,
-          // Embeds the durable identity marker (CR-01) so a re-run can
-          // recover this issue's identity from readProjectIssues alone, even
-          // if linear-map.json is lost -- the title stays plan.title
-          // (D-06-01, human-readable) and never carries the identity key.
-          description: `${plan.taskLines.join("\n")}\n\n<!--gsd-key:${plan.key}-->`,
-          projectId,
-          projectMilestoneId: milestoneId,
-          labelIds: issueLabelId ? [issueLabelId] : undefined,
-        },
-      });
+      // IssueCreateInput.teamId is a required string (Pitfall 4) -- the
+      // earlier `needsTeam` guard only throws when hasOp("issue-create") is
+      // true, which TS can't correlate back to reaching this loop body, so
+      // narrow explicitly here (IN-01) rather than asserting past the type.
+      if (!resolved.teamId) {
+        throw new Error(`Linear team not resolved for teamKey "${model.teamKey}" -- cannot create records`);
+      }
+      const input: IssueCreateInput = {
+        teamId: resolved.teamId,
+        title: plan.title,
+        // Embeds the durable identity marker (CR-01) so a re-run can
+        // recover this issue's identity from readProjectIssues alone, even
+        // if linear-map.json is lost -- the title stays plan.title
+        // (D-06-01, human-readable) and never carries the identity key.
+        description: `${plan.taskLines.join("\n")}\n\n<!--gsd-key:${plan.key}-->`,
+        projectId,
+        projectMilestoneId: milestoneId,
+        labelIds: issueLabelId ? [issueLabelId] : undefined,
+      };
+      const data = await postGraphQL<IssueCreateResponse["data"]>(deps, ISSUE_CREATE, { input });
       const id = data.issueCreate.issue?.id;
       if (!id) throw new Error("issueCreate returned no id");
       map.issues[plan.key] = { id };
