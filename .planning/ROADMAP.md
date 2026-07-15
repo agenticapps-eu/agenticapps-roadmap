@@ -144,7 +144,30 @@ Plans:
   2. Applying one project creates milestones/issues with no duplicates on re-run (idempotent).
   3. Dates are proposed from phase order and confirmed before any write.
 
-**Plans**: TBD · **Status**: Pending
+**Plans**: 7 plans · 5 waves · **Status**: Planned
+
+Plans:
+**Wave 1**
+
+- [ ] 06-01-PLAN.md — Config/map/normalized-model schemas + Wave-0 fixtures + seed data files (Wave 1)
+
+**Wave 2** *(depend on 06-01 contracts)*
+
+- [ ] 06-02-PLAN.md — .planning/ walker + PLAN.md parser -> normalized model (Wave 2)
+- [ ] 06-03-PLAN.md — Stable title-hash + typed GraphQL read/write document set (Wave 2)
+- [ ] 06-04-PLAN.md — Date proposer (cadence-from-anchor) + diff engine (Wave 2)
+
+**Wave 3** *(depend on 06-03)*
+
+- [ ] 06-05-PLAN.md — Linear resolver: map->label->title-hash, two label pools, team (Wave 3)
+
+**Wave 4** *(depend on resolver + diff)*
+
+- [ ] 06-06-PLAN.md — Apply engine: idempotent upsert + map write-back + gated planAhead patch (Wave 4)
+
+**Wave 5** *(depend on apply + walker/parser)*
+
+- [ ] 06-07-PLAN.md — prompt + cli + entrypoint + sync:gsd script + live E2E human-verify (Wave 5, checkpoint)
 
 ### Phase 7: Live refresh & write-back
 
