@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-26T17:23:47.189Z",
+  "generatedAt": "2026-07-15T08:23:34.446Z",
   "initiatives": [
     {
       "id": "b3ee916d-dadb-4ca3-939a-452f1273edf2",
@@ -34,44 +34,58 @@
   ],
   "projects": [
     {
+      "id": "bfb14e0b-eae1-4257-acdb-0874b7756cee",
+      "name": "FBC Plattform – Roadmap (Phasen 1–4)",
+      "summary": "Roadmap nach Review 29.06.2026: UI-Politur, Monetarisierung, CRM/Matching v2/Admin, Ökosystem & Ventures.",
+      "url": "https://linear.app/agenticapps/project/fbc-plattform-roadmap-phasen-1-4-d4ab753d4f56",
+      "initiativeId": null,
+      "status": "Backlog",
+      "priority": 0,
+      "startDate": null,
+      "targetDate": null,
+      "milestones": [
+        {
+          "id": "7bd92023-467f-42ee-acdd-0270eff2ca82",
+          "name": "Phase 4 – Ökosystem & Ventures",
+          "targetDate": null
+        },
+        {
+          "id": "b08f1a8c-2bdd-4af7-8ad7-75af9062db99",
+          "name": "Phase 3 – CRM, Matching v2 & Admin",
+          "targetDate": null
+        },
+        {
+          "id": "791ed59f-901e-4bc8-a587-ecaa0b8d624f",
+          "name": "Phase 2 – Monetarisierung & Lifecycle",
+          "targetDate": null
+        },
+        {
+          "id": "ea2b5c55-844a-4bd7-8f7b-a37a5c299614",
+          "name": "Phase 1.5 – UI-Politur",
+          "targetDate": null
+        }
+      ],
+      "issueCounts": {
+        "backlog": 27,
+        "started": 0,
+        "done": 0
+      }
+    },
+    {
       "id": "268c0c07-d970-49c5-9ffe-57c9abcce654",
       "name": "AgenticApps Roadmap",
       "summary": "Private, filterable roadmap that reads all Linear projects/issues and syncs Linear with the repos' GSD plans. React on Cloudflare Pages, gated by Cloudflare Access.",
+      "url": "https://linear.app/agenticapps/project/agenticapps-roadmap-e4cbb4edf11a",
       "initiativeId": "e6eb41b8-eb1c-4729-97f4-073e5c1fcb90",
       "status": "Backlog",
       "priority": 2,
-      "startDate": "2026-06-22",
+      "startDate": null,
       "targetDate": "2026-08-17",
       "milestones": [
         {
-          "id": "a3e86ad4-5569-4bbf-adfb-a51ce8ecc4e5",
-          "name": "Phase 1 · Scaffold",
-          "targetDate": "2026-06-29"
-        },
-        {
-          "id": "a8688afd-8cde-4993-9f95-715857915958",
-          "name": "Phase 2 · Linear data layer & snapshot",
-          "targetDate": "2026-07-06"
-        },
-        {
-          "id": "45df666d-9c1a-4d06-9b20-7fdd22aaa72e",
-          "name": "Phase 3 · Functions proxy + Access",
-          "targetDate": "2026-07-13"
-        },
-        {
-          "id": "8654acc1-b02d-4038-84c3-e003de84abbb",
-          "name": "Phase 4 · Timeline UI",
-          "targetDate": "2026-07-20"
-        },
-        {
-          "id": "f7a522be-bea9-4bc9-a9c8-96294afb907f",
-          "name": "Phase 5 · Dashboard, filters & drill-down",
-          "targetDate": "2026-07-27"
-        },
-        {
-          "id": "75055f53-9659-40b5-a255-4168871952bd",
-          "name": "Phase 6 · sync-gsd-linear backfill",
-          "targetDate": "2026-08-03"
+          "id": "1b8bf0a8-ba49-4ecb-9a23-86de813fa597",
+          "name": "Phase 8 · Deploy, gate & document",
+          "targetDate": "2026-08-17"
         },
         {
           "id": "bf5afeef-916e-4a3a-b451-51720bf0072b",
@@ -79,9 +93,34 @@
           "targetDate": "2026-08-10"
         },
         {
-          "id": "1b8bf0a8-ba49-4ecb-9a23-86de813fa597",
-          "name": "Phase 8 · Deploy, gate & document",
-          "targetDate": "2026-08-17"
+          "id": "75055f53-9659-40b5-a255-4168871952bd",
+          "name": "Phase 6 · sync-gsd-linear backfill",
+          "targetDate": "2026-08-03"
+        },
+        {
+          "id": "f7a522be-bea9-4bc9-a9c8-96294afb907f",
+          "name": "Phase 5 · Dashboard, filters & drill-down",
+          "targetDate": "2026-07-27"
+        },
+        {
+          "id": "8654acc1-b02d-4038-84c3-e003de84abbb",
+          "name": "Phase 4 · Timeline UI",
+          "targetDate": "2026-07-20"
+        },
+        {
+          "id": "45df666d-9c1a-4d06-9b20-7fdd22aaa72e",
+          "name": "Phase 3 · Functions proxy + Access",
+          "targetDate": "2026-07-13"
+        },
+        {
+          "id": "a8688afd-8cde-4993-9f95-715857915958",
+          "name": "Phase 2 · Linear data layer & snapshot",
+          "targetDate": "2026-07-06"
+        },
+        {
+          "id": "a3e86ad4-5569-4bbf-adfb-a51ce8ecc4e5",
+          "name": "Phase 1 · Scaffold",
+          "targetDate": "2026-06-29"
         }
       ],
       "issueCounts": {
@@ -91,25 +130,53 @@
       }
     },
     {
-      "id": "476509d4-d5d6-4cef-a0a8-b1d11762b26d",
-      "name": "Dashboard: Codex host integration",
-      "summary": "Add `host: codex` detection to agenticapps-dashboard's HostAdapter so Codex-installed projects appear alongside Claude / pi.",
-      "initiativeId": "e6eb41b8-eb1c-4729-97f4-073e5c1fcb90",
-      "status": "Backlog",
-      "priority": 3,
+      "id": "5d0172df-c013-42ea-9df3-8cffed5d8e17",
+      "name": "FBC Plattform – Prototyp (abgeschlossen)",
+      "summary": "Vorführbarer Prototyp der Fair-Business-Club-Plattform: Profil, Verzeichnis, Matching-Hub, Feed, Events mit gestaffelten Rechten.",
+      "url": "https://linear.app/agenticapps/project/fbc-plattform-prototyp-abgeschlossen-abb91d9e8c99",
+      "initiativeId": null,
+      "status": "Completed",
+      "priority": 2,
       "startDate": null,
-      "targetDate": null,
-      "milestones": [],
+      "targetDate": "2026-07-06",
+      "milestones": [
+        {
+          "id": "b614ccdc-ea42-478c-a2b0-974ee6a6a4a4",
+          "name": "Phase 2 · Skalierung, Monetarisierung & Compliance",
+          "targetDate": null
+        },
+        {
+          "id": "7e4fd405-a2e3-4532-89f9-0869f44e2746",
+          "name": "W4 · Community & Demo",
+          "targetDate": "2026-06-16"
+        },
+        {
+          "id": "53bb834c-7eff-4975-b6fa-a6b2461a2524",
+          "name": "W3 · Matching & Kontakt",
+          "targetDate": "2026-06-29"
+        },
+        {
+          "id": "8f4957cd-f768-467e-a6fc-a63d576d5660",
+          "name": "W2 · Profil & Verzeichnis",
+          "targetDate": "2026-06-22"
+        },
+        {
+          "id": "ee6a1197-d302-4ccd-9e72-02102d6b309d",
+          "name": "W1 · Fundament",
+          "targetDate": "2026-06-15"
+        }
+      ],
       "issueCounts": {
-        "backlog": 1,
+        "backlog": 0,
         "started": 0,
-        "done": 0
+        "done": 24
       }
     },
     {
       "id": "1cabd30a-bcc1-43eb-b76c-8eee8295d8f4",
       "name": "Callbot — Operations & Runbook",
       "summary": "Laufender Betrieb: UptimeRobot-Monitoring, Sentry-Errors, 3-stufiger Failover-Plan, wöchentliches Transkript-Review, BAFA-Erinnerungen, Cost-Reviews, Runbook für Incidents.",
+      "url": "https://linear.app/agenticapps/project/callbot-operations-and-runbook-35eab5e4473e",
       "initiativeId": "b3ee916d-dadb-4ca3-939a-452f1273edf2",
       "status": "Backlog",
       "priority": 3,
@@ -125,7 +192,8 @@
     {
       "id": "1a3e71a5-3af2-40a4-a13d-dcfc7d369627",
       "name": "Callbot — Pilot Customer #2 (Non-Healthcare)",
-      "summary": "Zweiter Pilot in einer Non-Healthcare-Branche. Beweist Stack für nicht-medizinische Kunden.",
+      "summary": "Zweiter Pilot in einer Non-Healthcare-Branche (Restaurant/Handwerk/Friseur/Fahrschule). Beweist Stack für nicht-medizinische Kunden — kein C5-Pfad nötig, einfacherer Sales-Zyklus.",
+      "url": "https://linear.app/agenticapps/project/callbot-pilot-customer-2-non-healthcare-f7252dbd4451",
       "initiativeId": "b3ee916d-dadb-4ca3-939a-452f1273edf2",
       "status": "Backlog",
       "priority": 2,
@@ -141,7 +209,8 @@
     {
       "id": "f43815a6-d0f8-400f-8ba6-4730bf130c26",
       "name": "Callbot — Pilot Customer #1 (Hausarzt)",
-      "summary": "Erster zahlender Hausarzt-Pilot. Von Lead-Qualifikation über T1–T3 bis Go-Live + 2 Wochen Hypercare.",
+      "summary": "Erster zahlender Hausarzt-Pilot. Von Lead-Qualifikation über T1–T3 bis Go-Live + 2 Wochen Hypercare. Pilot-Preis 1.500 € Setup + 199 €/Mon, 6 Mo Beta-Rabatt-Optik.",
+      "url": "https://linear.app/agenticapps/project/callbot-pilot-customer-1-hausarzt-e2496008442a",
       "initiativeId": "b3ee916d-dadb-4ca3-939a-452f1273edf2",
       "status": "Backlog",
       "priority": 1,
@@ -158,6 +227,7 @@
       "id": "a90f04b2-b193-4bac-ba09-327d0fab61a9",
       "name": "Callbot — Sales Operations",
       "summary": "Bernards 3-Termin-Prozess operationalisieren: Sales-Material, BAFA-Choreografie, Lead-Pipeline, Asana-Onboarding-Template, Demo-Setup.",
+      "url": "https://linear.app/agenticapps/project/callbot-sales-operations-27d0562313e1",
       "initiativeId": "b3ee916d-dadb-4ca3-939a-452f1273edf2",
       "status": "Backlog",
       "priority": 2,
@@ -173,7 +243,8 @@
     {
       "id": "17e78750-2b8b-49e4-b1e2-830230966165",
       "name": "Callbot — Compliance & Legal",
-      "summary": "AV-Verträge mit allen Sub-Processors, DSFA-Template, anwaltlich geprüfte Vertragsklauseln, Versicherungen, GmbH/UG-Gründung, BAFA-Antragsbegleitung.",
+      "summary": "AV-Verträge mit allen Sub-Processors, DSFA-Template, anwaltlich geprüfte Vertragsklauseln, IT-Haftpflicht + Cyber + Produkthaftpflicht Versicherungen, GmbH/UG-Gründung, BAFA-Antragsbegleitung.",
+      "url": "https://linear.app/agenticapps/project/callbot-compliance-and-legal-595367b8f5ec",
       "initiativeId": "b3ee916d-dadb-4ca3-939a-452f1273edf2",
       "status": "Backlog",
       "priority": 1,
@@ -189,7 +260,8 @@
     {
       "id": "184e600e-134a-497c-852b-5a3d79072167",
       "name": "Callbot — Branche: Non-Healthcare (TBD)",
-      "summary": "Zweites Branchen-Template (Restaurant, Handwerk, Friseur, Fahrschule). Auswahl mit Bernard nach Lead-Pipeline.",
+      "summary": "Zweites Branchen-Template (Restaurant, Handwerk, Friseur, Fahrschule, …). Auswahl mit Bernard nach Lead-Pipeline. Kein C5-Pfad nötig — beweist Stack auf Non-Healthcare.",
+      "url": "https://linear.app/agenticapps/project/callbot-branche-non-healthcare-tbd-0aa7ba21baf1",
       "initiativeId": "b3ee916d-dadb-4ca3-939a-452f1273edf2",
       "status": "Backlog",
       "priority": 2,
@@ -205,7 +277,8 @@
     {
       "id": "27eb2c3f-2351-4ffc-bd71-d6d8dbac776a",
       "name": "Callbot — Branche: Hausarzt",
-      "summary": "Branchen-Template Hausarzt: System-Prompt, 8 Intents, Notfall-Trigger, BTM-Blacklist, Slot-Definitionen, 30+ Black-Box-Test-Szenarien, RAG-Eval.",
+      "summary": "Branchen-Template Hausarzt: System-Prompt, 8 Intents, Notfall-Trigger, BTM-Blacklist, Slot-Definitionen, 30+ Black-Box-Test-Szenarien, RAG-Eval auf 30 echten FAQ-Fragen.",
+      "url": "https://linear.app/agenticapps/project/callbot-branche-hausarzt-97c0ef5eb17d",
       "initiativeId": "b3ee916d-dadb-4ca3-939a-452f1273edf2",
       "status": "Backlog",
       "priority": 1,
@@ -221,7 +294,8 @@
     {
       "id": "a30409c6-f837-41ea-8555-358cbb98f963",
       "name": "Callbot — Admin UI MVP",
-      "summary": "Kleines internes Admin-UI für Bernard + Donald. CRUD für Tenants, Doctors, Opening Hours, FAQ, IGeL, Intents.",
+      "summary": "Kleines internes Admin-UI für Bernard + Donald (Vite/React/Tailwind/shadcn + Supabase Magic Link). CRUD für Tenants, Doctors, Opening Hours, FAQ, IGeL, Intents. KEIN Customer-facing Self-Service.",
+      "url": "https://linear.app/agenticapps/project/callbot-admin-ui-mvp-602d8733a313",
       "initiativeId": "b3ee916d-dadb-4ca3-939a-452f1273edf2",
       "status": "Backlog",
       "priority": 2,
@@ -237,7 +311,8 @@
     {
       "id": "5e5b86fe-8c66-4b76-b10d-cc037ceaf7ef",
       "name": "Callbot — Backend MVP",
-      "summary": "Hono-Worker auf Cloudflare: Vapi/Twilio Webhooks, Compliance-Module, RAG-Retrieval gegen pgvector, 30-Tage-Retention-Cron, Audit-Log.",
+      "summary": "Hono-Worker auf Cloudflare: Vapi/Twilio Webhooks, Compliance-Module (5-Sek-KI, Notfall, BTM), RAG-Retrieval gegen pgvector, 30-Tage-Retention-Cron, Audit-Log.",
+      "url": "https://linear.app/agenticapps/project/callbot-backend-mvp-ceaf6f0f0620",
       "initiativeId": "b3ee916d-dadb-4ca3-939a-452f1273edf2",
       "status": "Backlog",
       "priority": 1,
@@ -253,7 +328,8 @@
     {
       "id": "cc1dcbc9-2137-4755-ad9c-c4ac9d62dd08",
       "name": "Callbot — Infrastructure & Setup",
-      "summary": "Accounts & Secrets für Supabase Frankfurt, Vapi (EU), Sipgate, OpenRouter, Cloudflare Workers + Pages, GitHub.",
+      "summary": "Accounts & Secrets für Supabase Frankfurt, Vapi (EU), Twilio (EU + DE DID), OpenRouter, Cloudflare Workers + Pages, GitHub. End-to-end smoke-test.",
+      "url": "https://linear.app/agenticapps/project/callbot-infrastructure-and-setup-b0e8fa6b55d5",
       "initiativeId": "b3ee916d-dadb-4ca3-939a-452f1273edf2",
       "status": "Backlog",
       "priority": 1,
@@ -267,51 +343,27 @@
       }
     },
     {
-      "id": "adfc70f8-0425-49bd-90f0-cb032804704b",
-      "name": "cPARX Prototype",
-      "summary": "4-week prototype of the cPARX AI platform: document-based DD pipeline, mock Investment Readiness scoring, chatbot + case dashboard, architecture docs.",
-      "initiativeId": "b18933f6-f073-44b7-982e-2c801ced0866",
+      "id": "476509d4-d5d6-4cef-a0a8-b1d11762b26d",
+      "name": "Dashboard: Codex host integration",
+      "summary": "Add `host: codex` detection to agenticapps-dashboard's HostAdapter so Codex-installed projects appear alongside Claude / pi.",
+      "url": "https://linear.app/agenticapps/project/dashboard-codex-host-integration-5ff88976f82e",
+      "initiativeId": "e6eb41b8-eb1c-4729-97f4-073e5c1fcb90",
       "status": "Backlog",
-      "priority": 0,
-      "startDate": "2026-04-13",
-      "targetDate": "2026-05-08",
-      "milestones": [
-        {
-          "id": "53293d9c-e1ae-4db0-bd33-e6a6ca044b89",
-          "name": "Week 0 — Foundations",
-          "targetDate": "2026-04-17"
-        },
-        {
-          "id": "4f33b518-6c95-4a84-ab60-f07953a6cb4b",
-          "name": "Week 1 — Infrastructure & Data Model",
-          "targetDate": "2026-04-17"
-        },
-        {
-          "id": "eaf8e35c-406e-4c07-b23c-e776f438546b",
-          "name": "Week 2 — DD Pipeline & Mock Scoring",
-          "targetDate": "2026-04-25"
-        },
-        {
-          "id": "bf8e0cde-84bd-4399-844b-f47272089670",
-          "name": "Week 3 — UI (Chatbot + Dashboard)",
-          "targetDate": "2026-05-02"
-        },
-        {
-          "id": "cc786283-bd02-413f-8db3-d51f2370cebe",
-          "name": "Week 4 — Integration, Testing & Handover",
-          "targetDate": "2026-05-08"
-        }
-      ],
+      "priority": 3,
+      "startDate": null,
+      "targetDate": null,
+      "milestones": [],
       "issueCounts": {
-        "backlog": 12,
-        "started": 1,
-        "done": 82
+        "backlog": 1,
+        "started": 0,
+        "done": 0
       }
     },
     {
       "id": "5bdb6bd6-c3f4-4a2d-8358-f393cb926a75",
       "name": "fx-signals Web App V2",
       "summary": "Multi-tenant model, IA redesign, UI polish, security hardening, and global engine fixes.",
+      "url": "https://linear.app/agenticapps/project/fx-signals-web-app-v2-fb9104184260",
       "initiativeId": "26fe7e6e-2cc3-40d7-89ca-d84cacbe6ef9",
       "status": "Backlog",
       "priority": 0,
@@ -319,28 +371,13 @@
       "targetDate": null,
       "milestones": [
         {
-          "id": "aeb80842-e460-4a6a-82be-70e3a3467e05",
-          "name": "M1 — Tenant model in code",
-          "targetDate": null
+          "id": "c8a2c7fe-83ed-4b9f-b5bd-d5a00fa08092",
+          "name": "M8 — Security follow-ups",
+          "targetDate": "2026-06-12"
         },
         {
-          "id": "49113e1d-ce58-4364-9d3c-a1e16dad1042",
-          "name": "M2 — IA redesign",
-          "targetDate": null
-        },
-        {
-          "id": "491656cb-df30-4a67-89d9-4c91ee572de1",
-          "name": "M3 — UI polish",
-          "targetDate": null
-        },
-        {
-          "id": "537d0b4d-045e-4727-a3e7-6a919a0e1964",
-          "name": "M4 — Onboarding + metering",
-          "targetDate": null
-        },
-        {
-          "id": "ce45f1be-22dd-4937-ad11-286b5075b8b7",
-          "name": "M5 — Security + pen-test",
+          "id": "332f9fe5-5b20-4df1-8e0b-ef540f46c3a1",
+          "name": "M7 — Trading-agent integration expansion",
           "targetDate": null
         },
         {
@@ -349,14 +386,29 @@
           "targetDate": null
         },
         {
-          "id": "332f9fe5-5b20-4df1-8e0b-ef540f46c3a1",
-          "name": "M7 — Trading-agent integration expansion",
+          "id": "ce45f1be-22dd-4937-ad11-286b5075b8b7",
+          "name": "M5 — Security + pen-test",
           "targetDate": null
         },
         {
-          "id": "c8a2c7fe-83ed-4b9f-b5bd-d5a00fa08092",
-          "name": "M8 — Security follow-ups",
-          "targetDate": "2026-06-12"
+          "id": "537d0b4d-045e-4727-a3e7-6a919a0e1964",
+          "name": "M4 — Onboarding + metering",
+          "targetDate": null
+        },
+        {
+          "id": "491656cb-df30-4a67-89d9-4c91ee572de1",
+          "name": "M3 — UI polish",
+          "targetDate": null
+        },
+        {
+          "id": "49113e1d-ce58-4364-9d3c-a1e16dad1042",
+          "name": "M2 — IA redesign",
+          "targetDate": null
+        },
+        {
+          "id": "aeb80842-e460-4a6a-82be-70e3a3467e05",
+          "name": "M1 — Tenant model in code",
+          "targetDate": null
         }
       ],
       "issueCounts": {
@@ -366,9 +418,61 @@
       }
     },
     {
+      "id": "b8d03fa8-af5f-4699-8c68-7bfd6bd577e6",
+      "name": "cPARX v1",
+      "summary": "",
+      "url": "https://linear.app/agenticapps/project/cparx-v1-9dd96154d67c",
+      "initiativeId": null,
+      "status": "Backlog",
+      "priority": 0,
+      "startDate": null,
+      "targetDate": null,
+      "milestones": [],
+      "issueCounts": {
+        "backlog": 2,
+        "started": 0,
+        "done": 8
+      }
+    },
+    {
+      "id": "aedc33f2-5a9b-454b-b563-07458f09be2d",
+      "name": "Factiv website",
+      "summary": "",
+      "url": "https://linear.app/agenticapps/project/factiv-website-be9fe1f946c3",
+      "initiativeId": null,
+      "status": "Backlog",
+      "priority": 0,
+      "startDate": null,
+      "targetDate": null,
+      "milestones": [],
+      "issueCounts": {
+        "backlog": 0,
+        "started": 0,
+        "done": 0
+      }
+    },
+    {
+      "id": "d246284e-5c9f-4be3-932a-a495b1e9d591",
+      "name": "Factiv company setup",
+      "summary": "",
+      "url": "https://linear.app/agenticapps/project/factiv-company-setup-0dcde82ce404",
+      "initiativeId": null,
+      "status": "Backlog",
+      "priority": 0,
+      "startDate": null,
+      "targetDate": null,
+      "milestones": [],
+      "issueCounts": {
+        "backlog": 0,
+        "started": 0,
+        "done": 0
+      }
+    },
+    {
       "id": "02af7ad6-7b09-4e8e-974f-4587c0fe127a",
       "name": "fx-signals Website",
-      "summary": null,
+      "summary": "",
+      "url": "https://linear.app/agenticapps/project/fx-signals-website-5d7f1ec2cc22",
       "initiativeId": "26fe7e6e-2cc3-40d7-89ca-d84cacbe6ef9",
       "status": "Backlog",
       "priority": 0,
@@ -384,7 +488,8 @@
     {
       "id": "ef8077e1-2281-4207-bb2d-09b5908a7adb",
       "name": "fx-signals Web App V1",
-      "summary": null,
+      "summary": "",
+      "url": "https://linear.app/agenticapps/project/fx-signals-web-app-v1-fc08fcc3deaf",
       "initiativeId": "26fe7e6e-2cc3-40d7-89ca-d84cacbe6ef9",
       "status": "Backlog",
       "priority": 0,
@@ -395,6 +500,49 @@
         "backlog": 0,
         "started": 0,
         "done": 0
+      }
+    },
+    {
+      "id": "adfc70f8-0425-49bd-90f0-cb032804704b",
+      "name": "cPARX Prototype",
+      "summary": "4-week prototype of the cPARX AI platform: document-based DD pipeline, mock Investment Readiness scoring, chatbot + case dashboard, architecture docs. Budget EUR 6,800 (80h @ EUR 85/h).",
+      "url": "https://linear.app/agenticapps/project/cparx-prototype-379bb53e53f4",
+      "initiativeId": "b18933f6-f073-44b7-982e-2c801ced0866",
+      "status": "Backlog",
+      "priority": 0,
+      "startDate": null,
+      "targetDate": "2026-05-08",
+      "milestones": [
+        {
+          "id": "cc786283-bd02-413f-8db3-d51f2370cebe",
+          "name": "Week 4 — Integration, Testing & Handover",
+          "targetDate": "2026-05-08"
+        },
+        {
+          "id": "bf8e0cde-84bd-4399-844b-f47272089670",
+          "name": "Week 3 — UI (Chatbot + Dashboard)",
+          "targetDate": "2026-05-02"
+        },
+        {
+          "id": "eaf8e35c-406e-4c07-b23c-e776f438546b",
+          "name": "Week 2 — DD Pipeline & Mock Scoring",
+          "targetDate": "2026-04-25"
+        },
+        {
+          "id": "4f33b518-6c95-4a84-ab60-f07953a6cb4b",
+          "name": "Week 1 — Infrastructure & Data Model",
+          "targetDate": "2026-04-17"
+        },
+        {
+          "id": "53293d9c-e1ae-4db0-bd33-e6a6ca044b89",
+          "name": "Week 0 — Foundations",
+          "targetDate": "2026-04-17"
+        }
+      ],
+      "issueCounts": {
+        "backlog": 12,
+        "started": 1,
+        "done": 82
       }
     }
   ]
