@@ -24,7 +24,7 @@ are urgent insertions.
 - [x] **Phase 2: Linear data layer & static snapshot** — Sanitized token-free `roadmap.json`
 - [ ] **Phase 3: Linear proxy & Access** — Server-side GraphQL proxy + private gating (IN PROGRESS)
 - [ ] **Phase 4: Roadmap timeline UI** — Initiative swimlanes across a month axis
-- [ ] **Phase 5: Overview dashboard, filters & drill-down** — KPIs, shareable filters, Linear deep-links
+- [x] **Phase 5: Overview dashboard, filters & drill-down** — KPIs, shareable filters, Linear deep-links (completed 2026-07-15)
 - [ ] **Phase 6: sync-gsd-linear CLI** — Per-project, dry-run-first backfill engine
 - [ ] **Phase 7: Live refresh & write-back** — On-demand refresh + UI-triggered backfill
 - [ ] **Phase 8: Deploy, gate & document** — Production Pages + Access + runbook + v0.1.0
