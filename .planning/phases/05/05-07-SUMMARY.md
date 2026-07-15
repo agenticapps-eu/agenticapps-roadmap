@@ -94,3 +94,7 @@ None - no external service configuration required. Pure logic change, no new dep
 ---
 *Phase: 05-overview-dashboard*
 *Completed: 2026-07-15*
+
+## Self-Check: PASSED
+
+All claimed files exist on disk and all four commit hashes (bb488b2, b70b84c, 91fcc4c, cefa87f) are present in git log.
