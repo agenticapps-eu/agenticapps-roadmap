@@ -1,8 +1,9 @@
 ---
 phase: 06-sync-gsd-linear
-verified: 2026-07-15T16:30:00Z
-status: human_needed
+verified: 2026-07-15T19:05:00Z
+status: passed
 score: 11/11 must-haves verified
+human_verification_result: "PASSED — both live checks performed against real Linear (LINEAR_API_KEY from .dev.vars): dry-run diff accurate (34 milestones + 40 issues, correct titles); apply-twice idempotent (re-runs report 0/0/0; Linear holds exactly 34 milestones + 40 issues, no duplicates). Surfaced + fixed 3 live-only bugs: .planning path resolution (b268a4f), PROJECT_ISSUES_QUERY String!->ID! and paginated readProjectMilestones (7377a87)."
 overrides_applied: 0
 re_verification:
   previous_status: gaps_found
@@ -26,7 +27,7 @@ human_verification:
 **Phase Goal:** `sync-gsd-linear` CLI — per-project, dry-run-first backfill engine. Make Linear reflect the repos' GSD plans, per-project, dry-run-first. Done when: dry-run prints an accurate diff for target repos; applying one project creates milestones/issues with no duplicates on re-run (idempotency); idempotency test = apply twice → second run is a no-op.
 
 **Verified:** 2026-07-15T16:30:00Z
-**Status:** human_needed
+**Status:** passed (live human-verification completed — see human_verification_result)
 **Re-verification:** Yes — after gap closure (commits 236e1c3, fb1639b)
 
 ## What Changed Since Last Verification

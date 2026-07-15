@@ -1,33 +1,31 @@
 ---
-status: partial
+status: complete
 phase: 06-sync-gsd-linear
 source: [06-VERIFICATION.md, 06-VALIDATION.md]
 started: 2026-07-15T16:35:00Z
-updated: 2026-07-15T16:35:00Z
+updated: 2026-07-15T19:05:00Z
 ---
 
 ## Current Test
 
-[awaiting human testing — requires a real LINEAR_API_KEY and a live Linear workspace]
+[complete — both live checks performed against real Linear with LINEAR_API_KEY]
 
 ## Tests
 
 ### 1. Live dry-run diff accuracy
-expected: Running `LINEAR_API_KEY=<real key> pnpm sync:gsd -- --project claude-workflow` (dry-run is the default) prints a diff whose summary counts and per-record detail lines match what a human expects from the repo's `.planning/` phases/plans against the current Linear workspace, with no garbage titles.
-result: [pending]
-why_human: "Accurate" is a human judgment against live Linear state; LINEAR_API_KEY is unset in this environment so the Linear-dependent resolve step cannot be exercised end-to-end here. The parser/title half of this criterion is already fully verified by automated means (270 real plans, zero garbage titles).
+expected: `pnpm sync:gsd -- --project claude-workflow` prints a diff matching the repo's `.planning/` phases/plans, no garbage titles.
+result: passed — after fixing the `.planning` path resolution (commit b268a4f), the dry-run reported `+ 34 milestones, + 40 issues, + 2 labels` with correct titles (real H1s + filename fallbacks; the previously-garbage 28-03/04-07 cases clean). Token loaded from .dev.vars, never printed/committed.
 
 ### 2. Live apply-twice idempotency (no duplicates on re-run)
-expected: With LINEAR_API_KEY set, `pnpm sync:gsd -- --project <name> --apply` then approving the y/N prompt creates the records; re-running the same command yields an empty diff (`operations: []`) and Linear shows no duplicate project/milestones/issues.
-result: [pending]
-why_human: Writing to production Linear is deliberately approval-gated (D-06-07) and cannot be safely automated/repeated by the verifier. The underlying dedup logic — CR-01 issue-dedup-survives-map-loss (durable `<!--gsd-key:...-->` marker) and WR-05 milestone stored-id-first match — is proven by mocked-GraphQL integration tests; only the live wire against real Linear needs a human with the real token.
+expected: apply creates records; re-run yields an empty diff and no duplicates.
+result: passed — apply #1 created 1 project + 34 milestones + 40 issues + 2 labels; apply #2 and #3 each reported `+ 0 milestones, + 0 issues, + 0 labels`. Paginated Linear count confirms exactly 34 milestones + 40 issues (zero duplicates). Required two fixes surfaced live: PROJECT_ISSUES_QUERY `String!`→`ID!` and a paginated per-project `readProjectMilestones` (commit 7377a87).
 
 ## Summary
 
 total: 2
-passed: 0
+passed: 2
 issues: 0
-pending: 2
+pending: 0
 skipped: 0
 blocked: 0
 
