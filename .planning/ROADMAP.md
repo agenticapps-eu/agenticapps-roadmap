@@ -158,7 +158,7 @@ Plans:
 
 **Wave 3** *(depend on 06-03)*
 
-- [ ] 06-04-PLAN.md — Date proposer (cadence-from-anchor) + diff engine (full enumerated write set) (Wave 3)
+- [x] 06-04-PLAN.md — Date proposer (cadence-from-anchor) + diff engine (full enumerated write set) (Wave 3)
 - [ ] 06-05-PLAN.md — Linear resolver: map->label->title-hash, two label pools, team, issue-identity read (Wave 3)
 
 **Wave 4** *(depend on resolver + diff)*
