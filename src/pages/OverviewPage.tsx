@@ -89,7 +89,7 @@ export function OverviewPage() {
                   className="flex w-full items-center justify-between gap-4 p-3 text-left text-sm hover:bg-(--color-muted)"
                 >
                   <span className="flex min-w-0 items-center gap-2">
-                    <span className="truncate font-medium">
+                    <span className="truncate font-medium text-(--color-foreground)">
                       {project.name}
                     </span>
                     <span className="shrink-0 text-(--color-muted-foreground)">

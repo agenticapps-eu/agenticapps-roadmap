@@ -35,7 +35,7 @@ export function HealthStrip({
               className="h-2 w-2 shrink-0 rounded-full"
               style={{ backgroundColor: color }}
             />
-            <span className="w-32 shrink-0 truncate text-sm font-medium">
+            <span className="w-32 shrink-0 truncate text-sm font-medium text-(--color-foreground)">
               {name}
             </span>
             <span className="w-36 shrink-0 text-xs text-(--color-muted-foreground)">
