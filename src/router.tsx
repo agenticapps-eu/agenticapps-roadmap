@@ -2,7 +2,7 @@ import { createBrowserRouter } from "react-router-dom";
 import { RootLayout } from "./layouts/RootLayout";
 import { OverviewPage } from "./pages/OverviewPage";
 import { TimelinePage } from "./pages/TimelinePage";
-import { roadmapLoader } from "./lib/roadmap/loader";
+import { roadmapLoader, shouldRevalidateRoadmap } from "./lib/roadmap/loader";
 import { RoadmapError, RoadmapLoading } from "./components/RoadmapBoundaries";
 
 export const router = createBrowserRouter([
@@ -11,6 +11,7 @@ export const router = createBrowserRouter([
     path: "/",
     element: <RootLayout />,
     loader: roadmapLoader,
+    shouldRevalidate: shouldRevalidateRoadmap,
     errorElement: <RoadmapError />,
     HydrateFallback: RoadmapLoading,
     children: [
