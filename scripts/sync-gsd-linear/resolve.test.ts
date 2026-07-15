@@ -6,6 +6,7 @@ import {
   resolveProjectByLabel,
   resolveProject,
   readProjectIssues,
+  readProjectMilestones,
   resolveMilestone,
   buildResolvedWorkspace,
 } from "./resolve.ts";
@@ -23,7 +24,12 @@ import {
   workspaceWithProject,
 } from "./__fixtures__/linear-responses.ts";
 import { createMutationMock } from "./__fixtures__/linear-mutation-mock.ts";
-import { PROJECT_CREATE, PROJECT_MILESTONE_CREATE, ISSUE_CREATE } from "./mutations.ts";
+import {
+  PROJECT_CREATE,
+  PROJECT_MILESTONE_CREATE,
+  ISSUE_CREATE,
+  PROJECT_ISSUES_QUERY,
+} from "./mutations.ts";
 
 const ENDPOINT = "https://api.linear.app/graphql";
 const AUTH = "test-token";
@@ -388,6 +394,9 @@ describe("buildResolvedWorkspace", () => {
   };
 
   const noIssuesPage = { data: { issues: { nodes: [], pageInfo: { hasNextPage: false, endCursor: null } } } };
+  const noMilestonesPage = {
+    data: { project: { projectMilestones: { nodes: [], pageInfo: { hasNextPage: false, endCursor: null } } } },
+  };
 
   it("first run: empty workspace resolves project null, initiativeId null", async () => {
     const fetchFn = stubFetch({
@@ -430,6 +439,16 @@ describe("buildResolvedWorkspace", () => {
           },
         },
       },
+      ProjectMilestones: {
+        data: {
+          project: {
+            projectMilestones: {
+              nodes: [{ id: "ms-cw-01-go-routing", name: "01-go-routing", targetDate: "2026-06-15" }],
+              pageInfo: { hasNextPage: false, endCursor: null },
+            },
+          },
+        },
+      },
     });
 
     const resolved = await buildResolvedWorkspace(fetchFn, ENDPOINT, AUTH, baseEntry, emptyMap());
@@ -459,6 +478,7 @@ describe("buildResolvedWorkspace", () => {
       IssueLabelByName: issueLabelsExisting,
       ProjectByLabel: { data: { projects: { nodes: [{ id: "proj-cw-001" }] } } },
       ProjectIssues: noIssuesPage,
+      ProjectMilestones: noMilestonesPage,
     });
 
     const resolved = await buildResolvedWorkspace(fetchFn, ENDPOINT, AUTH, entryNoNameMatch, emptyMap());
@@ -475,6 +495,7 @@ describe("buildResolvedWorkspace", () => {
       IssueLabelByName: issueLabelsEmpty,
       ProjectByLabel: { data: { projects: { nodes: [] } } },
       ProjectIssues: noIssuesPage,
+      ProjectMilestones: noMilestonesPage,
     });
 
     const resolved = await buildResolvedWorkspace(fetchFn, ENDPOINT, AUTH, entryWithInitiative, emptyMap());
@@ -613,5 +634,44 @@ describe("CR-01: map-loss idempotency via the description marker", () => {
     // This is exactly the field diff.ts's issue-create decision matches on
     // (titleHash(issue.identityKey) === titleHash(plan.key)), so a re-run
     // against this workspace with an empty map must NOT emit issue-create.
+  });
+});
+
+describe("readProjectMilestones", () => {
+  it("paginates through ALL milestones (the MAIN_QUERY first:25 cap dropped the oldest)", async () => {
+    // Regression: milestones came from the shared MAIN_QUERY's capped
+    // projectMilestones(first:25) with no pagination, so a project with >25
+    // phases lost its oldest milestones from dedup and re-created them on a
+    // re-run ("name not unique"). This per-project read pages through them all.
+    let call = 0;
+    const fetchFn = (async () => {
+      call += 1;
+      const nodes =
+        call === 1
+          ? [{ id: "ms-a", name: "01-go-routing", targetDate: null }]
+          : [{ id: "ms-b", name: "02-impeccable", targetDate: "2026-08-01" }];
+      const pageInfo =
+        call === 1 ? { hasNextPage: true, endCursor: "cursor-1" } : { hasNextPage: false, endCursor: null };
+      return new Response(
+        JSON.stringify({ data: { project: { projectMilestones: { nodes, pageInfo } } } }),
+        { status: 200 }
+      );
+    }) as typeof fetch;
+
+    const milestones = await readProjectMilestones(fetchFn, ENDPOINT, AUTH, "proj-x");
+    expect(milestones.map((m) => m.id)).toEqual(["ms-a", "ms-b"]);
+    expect(milestones[1]?.targetDate).toBe("2026-08-01");
+  });
+});
+
+describe("PROJECT_ISSUES_QUERY", () => {
+  it("declares $projectId as ID! (an id-filter comparator position, not String!)", () => {
+    // Regression: `$projectId: String!` used in `id: { eq: ... }` (an
+    // IDComparator position) is rejected by Linear's API with HTTP 400
+    // ("used in position expecting type ID"). The mocked read path never
+    // type-checks GraphQL, so only the live apply-twice re-run (which fetches
+    // existing issues once the project exists) surfaced it.
+    expect(PROJECT_ISSUES_QUERY).toContain("$projectId: ID!");
+    expect(PROJECT_ISSUES_QUERY).not.toContain("$projectId: String!");
   });
 });

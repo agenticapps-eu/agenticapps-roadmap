@@ -45,16 +45,19 @@ import {
   PROJECT_LABELS_QUERY,
   ISSUE_LABELS_QUERY,
   PROJECT_ISSUES_QUERY,
+  PROJECT_MILESTONES_QUERY,
   type TeamsQueryResponse,
   type ProjectLabelsQueryResponse,
   type IssueLabelsQueryResponse,
   type ProjectIssuesQueryResponse,
+  type ProjectMilestonesQueryResponse,
 } from "./mutations.ts";
 import { titleHash } from "./hash.ts";
 import type {
   LinearMap,
   SyncConfigEntry,
   ResolvedIssue,
+  ResolvedMilestone,
   ResolvedProject,
   ResolvedWorkspace,
 } from "./config.ts";
@@ -305,6 +308,62 @@ export async function readProjectIssues(
 }
 
 // ---------------------------------------------------------------------------
+// Paginated, target-scoped milestone read — the milestone dedup surface. The
+// shared MAIN_QUERY caps nested projectMilestones at first:25 with no
+// pagination, so a project with >25 phases dropped its oldest milestones from
+// resolveMilestone's view and re-created them on a re-run ("name not unique").
+// This pages through ALL of them for the one target project, mirroring
+// readProjectIssues. Only called once the project already exists.
+// ---------------------------------------------------------------------------
+
+export async function readProjectMilestones(
+  fetchFn: typeof fetch,
+  endpoint: string,
+  auth: string,
+  projectId: string
+): Promise<ResolvedMilestone[]> {
+  const headers = { "Content-Type": "application/json", Authorization: auth };
+  const milestones: ResolvedMilestone[] = [];
+
+  let afterCursor: string | null = null;
+  let hasNextPage = true;
+
+  while (hasNextPage) {
+    const res = await fetchFn(endpoint, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({
+        query: PROJECT_MILESTONES_QUERY,
+        variables: { projectId, after: afterCursor },
+      }),
+    });
+    if (!res.ok) {
+      throw new Error(`Linear project-milestones request failed: ${res.status}`);
+    }
+    const json = (await res.json()) as ProjectMilestonesQueryResponse;
+    if (json.errors && json.errors.length > 0) {
+      throw new Error(
+        `Linear GraphQL errors (project-milestones): ${json.errors.map((e) => e.message).join(", ")}`
+      );
+    }
+
+    const connection = json.data.project?.projectMilestones;
+    if (!connection) break;
+    for (const node of connection.nodes) {
+      milestones.push({ id: node.id, name: node.name, targetDate: node.targetDate });
+    }
+
+    hasNextPage = connection.pageInfo.hasNextPage;
+    if (hasNextPage && connection.pageInfo.endCursor === null) {
+      throw new Error("Pagination invariant violated: hasNextPage=true but endCursor=null");
+    }
+    afterCursor = connection.pageInfo.endCursor;
+  }
+
+  return milestones;
+}
+
+// ---------------------------------------------------------------------------
 // Milestone: stored map id -> titleHash match (WR-05). This is the single
 // implementation of that order — diff.ts's findMatchingMilestone and
 // apply.ts's executeOperations milestone seed both call this directly rather
@@ -358,8 +417,14 @@ export async function buildResolvedWorkspace(
 
   let project = resolveProject(workspace, map, entry, labeledProjectId);
   if (project) {
-    const issues = await readProjectIssues(fetchFn, endpoint, auth, project.id);
-    project = { ...project, issues };
+    // The base workspace read (MAIN_QUERY) caps milestones at first:25 — fetch
+    // the complete, paginated set for this one project so dedup sees every
+    // stored milestone (issues are likewise read per-project, not from the cap).
+    const [issues, milestones] = await Promise.all([
+      readProjectIssues(fetchFn, endpoint, auth, project.id),
+      readProjectMilestones(fetchFn, endpoint, auth, project.id),
+    ]);
+    project = { ...project, issues, milestones };
   }
 
   return { teamId, project, projectLabelId, issueLabelId, initiativeId };

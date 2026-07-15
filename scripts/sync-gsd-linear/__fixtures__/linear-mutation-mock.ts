@@ -208,6 +208,20 @@ const handlers: Record<string, Handler> = {
       }));
     return { data: { issues: { nodes, pageInfo: { hasNextPage: false, endCursor: null } } } };
   },
+  // Target-scoped per-project milestone read (PROJECT_MILESTONES_QUERY) --
+  // resolve.ts's readProjectMilestones. Milestone dedup now reads the complete
+  // per-project set here rather than the shared MAIN_QUERY's first:25 cap, so
+  // a re-run correctly resolves every existing milestone (no "name not unique"
+  // re-create for projects with >25 phases).
+  ProjectMilestones: (state, vars) => {
+    const projectId = asString(vars["projectId"]);
+    const nodes = state.projectMilestones
+      .filter((m) => m.projectId === projectId)
+      .map((m) => ({ id: m.id, name: m.name, targetDate: m.targetDate }));
+    return {
+      data: { project: { projectMilestones: { nodes, pageInfo: { hasNextPage: false, endCursor: null } } } },
+    };
+  },
 
   // ---- Creates (resolve-before-create; return existing id on duplicate) ----
   ProjectCreate: (state, vars) => {

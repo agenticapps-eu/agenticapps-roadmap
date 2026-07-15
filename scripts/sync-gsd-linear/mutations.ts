@@ -110,7 +110,7 @@ export interface IssueLabelsQueryResponse {
  * scripts/linear/fetch-workspace.ts's ISSUES_QUERY pagination).
  */
 export const PROJECT_ISSUES_QUERY = `
-  query ProjectIssues($projectId: String!, $after: String) {
+  query ProjectIssues($projectId: ID!, $after: String) {
     issues(filter: { project: { id: { eq: $projectId } } }, first: 100, after: $after) {
       nodes {
         id
@@ -146,6 +146,51 @@ export interface ProjectIssuesPage {
 
 export interface ProjectIssuesQueryResponse {
   data: ProjectIssuesPage;
+  errors?: Array<{ message: string }>;
+}
+
+/**
+ * Complete, paginated milestone read for ONE project — the milestone dedup
+ * surface. The shared MAIN_QUERY (scripts/linear/query.ts) caps nested
+ * projectMilestones at `first: 25` with no pagination, so a project with more
+ * than 25 phases silently drops its oldest milestones from the resolve set and
+ * re-creates them on a re-run ("name not unique"). This target-scoped read
+ * pages through them all, mirroring PROJECT_ISSUES_QUERY. `project(id:)` takes
+ * a String! (only IDComparator filter positions require ID).
+ */
+export const PROJECT_MILESTONES_QUERY = `
+  query ProjectMilestones($projectId: String!, $after: String) {
+    project(id: $projectId) {
+      projectMilestones(first: 100, after: $after) {
+        nodes { id name targetDate }
+        pageInfo { hasNextPage endCursor }
+      }
+    }
+  }
+`;
+
+export interface ProjectMilestonesQueryVariables {
+  projectId: string;
+  after: string | null;
+}
+
+export interface ProjectMilestoneNode {
+  id: string;
+  name: string;
+  targetDate: string | null;
+}
+
+export interface ProjectMilestonesPage {
+  project: {
+    projectMilestones: {
+      nodes: ProjectMilestoneNode[];
+      pageInfo: { hasNextPage: boolean; endCursor: string | null };
+    };
+  } | null;
+}
+
+export interface ProjectMilestonesQueryResponse {
+  data: ProjectMilestonesPage;
   errors?: Array<{ message: string }>;
 }
 
