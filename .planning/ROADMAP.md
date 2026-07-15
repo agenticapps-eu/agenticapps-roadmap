@@ -153,7 +153,7 @@ Plans:
 
 **Wave 2** *(depend on 06-01 contracts)*
 
-- [ ] 06-02-PLAN.md — .planning/ walker + PLAN.md parser -> normalized model (key + taskLines) (Wave 2)
+- [x] 06-02-PLAN.md — .planning/ walker + PLAN.md parser -> normalized model (key + taskLines) (Wave 2)
 - [ ] 06-03-PLAN.md — Stable identity-hash + typed GraphQL read/write document set (incl. paginated issue read) (Wave 2)
 
 **Wave 3** *(depend on 06-03)*
