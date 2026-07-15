@@ -29,6 +29,7 @@
 // ---------------------------------------------------------------------------
 
 import { parseArgs } from "node:util";
+import { join } from "node:path";
 import {
   loadSyncConfig,
   loadLinearMap,
@@ -68,7 +69,11 @@ function buildModel(
   if (!entry.teamKey) {
     throw new Error(`Config entry "${entry.name}" has no teamKey configured`);
   }
-  const rawDirs = walkPlanning(entry.repoPath);
+  // repoPath is the sibling repo ROOT; the GSD plans live under its
+  // `.planning/` tree (walkPlanning looks for `<dir>/phases/`). Passing the
+  // bare repoPath found nothing on real repos (fixtures put phases/ at the
+  // root, masking this in unit tests).
+  const rawDirs = walkPlanning(join(entry.repoPath, ".planning"));
   const parsed = parseRepo(rawDirs, {
     repo: entry.name,
     projectName: entry.projectName ?? entry.name,

@@ -20,6 +20,7 @@ vi.mock("./apply.ts", () => ({ applyProject: vi.fn(), writeLinearMap: vi.fn() })
 vi.mock("./prompt.ts", () => ({ confirm: vi.fn() }));
 
 import { runCli } from "./cli.ts";
+import { walkPlanning } from "./walker.ts";
 import { loadSyncConfig, loadLinearMap } from "./config.ts";
 import { parseRepo } from "./parser.ts";
 import { applyProject, writeLinearMap } from "./apply.ts";
@@ -78,6 +79,16 @@ describe("runCli", () => {
     }
     expect(writeLinearMap).not.toHaveBeenCalled();
     expect(confirm).not.toHaveBeenCalled();
+  });
+
+  it("walks each repo's .planning/ dir, not the bare repo root (repoPath is the repo root)", async () => {
+    // Regression: the CLI passed entry.repoPath straight to walkPlanning, but
+    // GSD plans live under <repoPath>/.planning/phases. On real repos that
+    // yielded zero milestones/issues (a silently inaccurate diff); the mocked
+    // walker hid it in every other test here.
+    const code = await runCli(["--project", "repo-a"]);
+    expect(code).toBe(0);
+    expect(walkPlanning).toHaveBeenCalledWith("../repo-a/.planning");
   });
 
   it("a --project-less --dry-run warns and skips one misconfigured repo, previewing the rest (WR-04)", async () => {
