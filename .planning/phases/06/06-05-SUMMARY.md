@@ -118,3 +118,9 @@ None - no external service configuration required. `resolve.ts` is process-free/
 ---
 *Phase: 06-sync-gsd-linear-cli*
 *Completed: 2026-07-15*
+
+## Self-Check: PASSED
+
+All claimed files verified on disk (resolve.ts, resolve.test.ts, this
+SUMMARY.md) and both commit hashes (60e02d5, 52eaf7b) verified present
+in git log.
