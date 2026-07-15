@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v0.1.0
 milestone_name: milestone
-status: executing
-last_updated: "2026-07-15T13:04:36.192Z"
+status: verifying
+last_updated: "2026-07-15T13:19:39.632Z"
 last_activity: 2026-07-15
 progress:
   total_phases: 8
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 26
-  completed_plans: 26
-  percent: 25
+  completed_plans: 27
+  percent: 38
 ---
 
 # Project State
@@ -26,7 +26,7 @@ No `.planning/PROJECT.md` — design rationale lives in `docs/architecture.md` (
 
 Phase: 06 (sync-gsd-linear CLI) — EXECUTING
 Plan: 7 of 7
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-07-15
 
 Progress: [██████████] 100%
@@ -63,12 +63,14 @@ Execution mode: **sequential on main** (user-selected). Worktree isolation disab
 - [Phase 06]: 06-05: resolveProjectByLabel added as a file-local, soft-failing (null-on-error) lookup since RawWorkspace's MAIN_QUERY read omits per-project label attachment; resolveProject takes labeledProjectId as an explicit parameter rather than making its own network call.
 - [Phase 06]: 06-05: idempotency proof (resolve-before-create finds existing records, no duplicate) tested at the resolveProject/resolveMilestone/resolveIssue function level against linear-mutation-mock.ts's real create handlers + direct in-memory state reads, not through buildResolvedWorkspace's full network path.
 - [Phase 06]: 06-06: apply.ts (SYNC-04) -- create-only write engine with TOCTOU abort-on-drift, atomic per-create linear-map.json write-back (temp+rename), and a map-based (not title-hash-based) issue-identity dedup so Linear issue titles stay human-readable (D-06-01) while still satisfying diff.ts's identityKey-field matching contract. — PROJECT_ISSUES_QUERY has no description field to carry a hidden identity token, and hash.ts's contract forbids hashing the display title, so identity/dedup for issues is recovered via a reverse lookup through the already-persisted linear-map.json issues pool instead of overloading the Linear issue's title field.
+- [Phase 06]: 06-07: cli.ts's single-project apply path calls applyProject twice in one invocation (dryRun:true to render the y/N-gated diff, dryRun:false immediately after approval to execute) per 06-06's TOCTOU hand-off note; --project-less zero/multiple-match and --project-less-apply both throw the identical bulk-write-guard error string, while a wholly absent --project is only an error in apply mode (dry-run permits the zero-mutation multi-repo preview). Task 3 live-verify checkpoint deferred (LINEAR_API_KEY unset) -- documented under 'Human verification required' in 06-07-SUMMARY.md.
 
 ### Pending Todos / Open Items
 
 - `LINEAR_API_KEY` repo secret still unset → daily CI snapshot Action fails until set (GitHub → Settings → Secrets → Actions). Committed `roadmap.json` stays as real MCP-seeded data.
 - Phase 03 human checkpoints: 03-02 DONE (workers-types legitimacy approved), 03-04 DONE (live smoke APPROVED — 271 issues, no token leak, latent bugs fixed), 03-05 runbook DONE / **Access proof DEFERRED (BLOCKING)** — see `.planning/phases/03/03-HUMAN-UAT.md`.
 - **BLOCKING (Phase 03 completion gate):** capture `.planning/phases/03/03-ACCESS-PROOF.md` — deploy a Pages preview, configure Cloudflare Access (email allow-list over the domain AND `/api/*`), prove unauth `GET /api/linear/snapshot` → 302/403 and an allowed identity → 200. Runbook: `docs/access-setup.md`. Likely captured alongside Phase 08 deploy.
+- **BLOCKING (Phase 06 completion gate):** 06-07 Task 3 (`checkpoint:human-verify`) deferred — `LINEAR_API_KEY` is unset in the execution environment, so the live-wire verification could not run. A human must, with `LINEAR_API_KEY` exported: (1) run `pnpm sync:gsd -- --project claude-workflow` (dry-run) and judge the diff accurate against the real repo/Linear state, and (2) run a real apply for one project followed by an identical re-run and confirm the second run is a no-op (the binding SYNC-04 idempotency contract test). Full instructions: `.planning/phases/06/06-07-SUMMARY.md` § "Human verification required". Caution: do not apply `fx-signal-agent` first (pre-existing non-conforming M7/M8 milestones) without manually seeding `linear-map.json`.
 
 ## Completed Phases
 

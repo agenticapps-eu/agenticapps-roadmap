@@ -167,7 +167,7 @@ Plans:
 
 **Wave 5** *(depend on apply + walker/parser)*
 
-- [ ] 06-07-PLAN.md — prompt + cli (apply-mode truth table) + entrypoint + sync:gsd script + live E2E human-verify (Wave 5, checkpoint)
+- [x] 06-07-PLAN.md — prompt + cli (apply-mode truth table) + entrypoint + sync:gsd script + live E2E human-verify (Wave 5, checkpoint)
 
 ### Phase 7: Live refresh & write-back
 
