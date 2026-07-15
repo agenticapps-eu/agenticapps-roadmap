@@ -98,3 +98,7 @@ None - no external service configuration required.
 ---
 *Phase: 05-overview-dashboard*
 *Completed: 2026-07-15*
+
+## Self-Check: PASSED
+
+All created files found on disk; all task commit hashes (32f884a, 213c2ee) and the summary commit (3397c94) confirmed present in `git log --all`.
