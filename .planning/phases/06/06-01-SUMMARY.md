@@ -118,3 +118,10 @@ None - no external service configuration required. (`LINEAR_API_KEY` is required
 ---
 *Phase: 06-sync-gsd-linear-cli*
 *Completed: 2026-07-15*
+
+## Self-Check: PASSED
+
+All claimed files verified on disk (config.ts, config.test.ts, planning-trees/README.md,
+linear-responses.ts, linear-mutation-mock.ts, sync.config.json, linear-map.json, this
+SUMMARY.md) and all four task/docs commit hashes (c4c2c59, 10a9551, 0dd3203, 4920776)
+verified present in git log.
