@@ -149,7 +149,7 @@ Plans:
 Plans:
 **Wave 1**
 
-- [ ] 06-01-PLAN.md — Config/map/normalized-model schemas (plan identity key + taskLines, config name, ResolvedIssue, SyncOperation) + Wave-0 fixtures + seed data files (Wave 1)
+- [x] 06-01-PLAN.md — Config/map/normalized-model schemas (plan identity key + taskLines, config name, ResolvedIssue, SyncOperation) + Wave-0 fixtures + seed data files (Wave 1)
 
 **Wave 2** *(depend on 06-01 contracts)*
 

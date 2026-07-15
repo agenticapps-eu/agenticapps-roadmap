@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v0.1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-07-15T11:29:02.837Z"
-last_activity: 2026-07-15 -- Phase 06 planning complete
+last_updated: "2026-07-15T11:47:36.845Z"
+last_activity: 2026-07-15
 progress:
   total_phases: 8
   completed_phases: 2
   total_plans: 26
-  completed_plans: 20
+  completed_plans: 21
   percent: 25
 ---
 
@@ -20,16 +20,16 @@ progress:
 No `.planning/PROJECT.md` — design rationale lives in `docs/architecture.md` (decided 2026-06-22).
 
 **Core value:** A private, snapshot-default roadmap dashboard that reads Linear and syncs with the repos' GSD `.planning/` plans, keeping the Linear token server-side at all times.
-**Current focus:** Phase 06
+**Current focus:** Phase 06 — sync-gsd-linear CLI
 
 ## Current Position
 
-Phase: 06
-Plan: Not started
+Phase: 06 (sync-gsd-linear CLI) — EXECUTING
+Plan: 2 of 7
 Status: Ready to execute
-Last activity: 2026-07-15 -- Phase 06 planning complete
+Last activity: 2026-07-15
 
-Progress: [████████░░] 80% (4/5 plans; phase blocked on proof)
+Progress: [████████░░] 81%
 
 ## Phase 3 Wave Plan
 
@@ -55,6 +55,8 @@ Execution mode: **sequential on main** (user-selected). Worktree isolation disab
 - 2026-06-29 (03-03): Full GqlResponse fixture contract confirmed — gqlClean/gqlWithEmail carry top-level `data` key; stubs return directly (no double-wrap). Single try/catch body-handling stretch maps any throw (malformed JSON, assertNoLeak, schema parse) to generic 502. transform.ts process-guard ported to globalThis cast — typechecks under both node and workers-types tsconfigs. REQ-PROXY-1..4 all green (13/13 tests).
 - 2026-06-30 (03-05): Access enforcement proof DEFERRED as a blocking HUMAN-UAT item (user decision). The console-only runbook (`docs/access-setup.md`) is committed, but the captured proof needs a deployed Pages env + Access config (dashboard-only), pulled forward from Phase 08. Phase 03 stays at 4/5 and is NOT marked complete until `03-ACCESS-PROOF.md` records a blocked unauth result.
 - 2026-06-29 (03-04): Two-part Linear fetch design chosen — MAIN_QUERY (bounded, no issues) + ISSUES_QUERY (cursor-paginated, flat top-level) assembled in fetch-workspace.ts to avoid Linear "Query too complex" at production data volumes; map.ts/transform.ts/schema.ts unchanged. Live field names corrected to live schema (Initiative.status, Project.initiatives.nodes[].id, Project.status). Both fixes also correct the Phase-02 CI snapshot path once LINEAR_API_KEY secret is set. REQ-LOADER satisfied; live smoke passed (271 issues, 5 initiatives, 20 projects; no token/PII in responses).
+- [Phase 06]: 06-01: SyncConfigSchema is a flat z.array(...); resolved-state/operation contracts (ResolvedIssue/ResolvedProject/ResolvedWorkspace/SyncOperation/DiffSummary) are plain TS interfaces, not Zod-validated (internal computed state, not untrusted input).
+- [Phase 06]: 06-01: linear-mutation-mock.ts's dup-create resolve check approximates the CLI's title-hash step by exact name/title string match, since hash.ts doesn't exist yet in Wave 0 (same name always yields the same hash).
 
 ### Pending Todos / Open Items
 

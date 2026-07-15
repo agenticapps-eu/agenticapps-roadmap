@@ -51,10 +51,10 @@
 
 ### sync-gsd-linear CLI (Phase 6)
 
-- [ ] **SYNC-01**: `.planning/` walker + `PLAN.md` parser producing a normalized `{ repo, phases[], tasks[] }` model.
+- [x] **SYNC-01**: `.planning/` walker + `PLAN.md` parser producing a normalized `{ repo, phases[], tasks[] }` model.
 - [ ] **SYNC-02**: Linear resolver — stored `linear-map.json` first, then `roadmap:<repo>` label, then title-hash fallback — with no duplicate records.
 - [ ] **SYNC-03**: Per-project diff engine + date proposer (relative dates from phase order, shown for confirmation).
-- [ ] **SYNC-04**: `--dry-run` default and `--project <name>` apply path with explicit approval; idempotent upsert (re-run is a no-op).
+- [x] **SYNC-04**: `--dry-run` default and `--project <name>` apply path with explicit approval; idempotent upsert (re-run is a no-op).
 
 ### Live refresh & write-back (Phase 7)
 
