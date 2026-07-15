@@ -180,7 +180,22 @@ Plans:
   2. A backfill applied via the UI appears in Linear and in the next snapshot.
   3. Writes are optimistic with error rollback; scheduled snapshot refresh runs.
 
-**Plans**: TBD · **Status**: Pending
+**Plans**: 5 plans · 3 waves · **Status**: Planned
+
+Plans:
+**Wave 1**
+
+- [ ] 07-01-PLAN.md — LIVE-01 Refresh: R-4 shouldRevalidate fix (TDD) + AppHeader Refresh button + freshness hint (Wave 1)
+- [ ] 07-02-PLAN.md — LIVE-02 write-path backend: dispatch + status Pages Functions (TDD) + backfill.yml CI workflow (Wave 1)
+- [ ] 07-05-PLAN.md — LIVE-03 verify+reuse snapshot.yml + consolidated Phase-8 HUMAN-UAT checklist (Wave 1)
+
+**Wave 2** *(depend on 07-02 route contract)*
+
+- [ ] 07-03-PLAN.md — LIVE-02 client core: pure dispatch/poll/optimistic-rollback (TDD) + thin useBackfill hook (Wave 2)
+
+**Wave 3** *(depend on 07-03 hook)*
+
+- [ ] 07-04-PLAN.md — LIVE-02 optimistic UI: SyncBadge override + ProjectDrillDownDialog two-phase Backfill control + OverviewPage state owner (Wave 3, human-check)
 
 ### Phase 8: Deploy, gate & document
 
@@ -194,4 +209,3 @@ Plans:
   3. README + `docs/runbook.md` cover deploy, token rotation, snapshot refresh, and backfill; `v0.1.0` tagged with a hosting/sync ADR.
 
 **Plans**: TBD · **Status**: Pending
-</content>
