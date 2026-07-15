@@ -154,9 +154,22 @@ export async function runCli(argv: string[]): Promise<number> {
   let cadenceWeeks: number | undefined;
   if (values.cadence !== undefined) {
     cadenceWeeks = Number(values.cadence);
-    if (!Number.isFinite(cadenceWeeks)) {
-      throw new Error(`--cadence "${values.cadence}" is not a valid number of weeks`);
+    // IN-04: zero collapses every not-completed phase onto the same date;
+    // negative walks dates backwards from the anchor -- neither is a
+    // meaningful cadence.
+    if (!Number.isFinite(cadenceWeeks) || cadenceWeeks <= 0) {
+      throw new Error(`--cadence "${values.cadence}" is not a valid positive number of weeks`);
     }
+  }
+
+  // WR-02: an invalid --anchor would otherwise flow all the way to
+  // proposeDates' `new Date(...)` as Invalid Date -> "NaN-NaN-NaN", and on a
+  // real apply into PROJECT_MILESTONE_CREATE's targetDate.
+  if (
+    values.anchor !== undefined &&
+    Number.isNaN(new Date(`${values.anchor}T00:00:00.000Z`).getTime())
+  ) {
+    throw new Error(`--anchor "${values.anchor}" is not a valid YYYY-MM-DD date`);
   }
 
   const opts: CliOptions = {

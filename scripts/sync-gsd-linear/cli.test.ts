@@ -150,4 +150,30 @@ describe("runCli", () => {
     await expect(runCli(["--dry-run"])).rejects.toThrow(/LINEAR_API_KEY/);
     expect(loadSyncConfig).not.toHaveBeenCalled();
   });
+
+  it("throws a clear error for a malformed --anchor before any I/O (WR-02)", async () => {
+    await expect(runCli(["--dry-run", "--anchor", "xyz"])).rejects.toThrow(
+      /--anchor "xyz" is not a valid YYYY-MM-DD date/
+    );
+    expect(loadSyncConfig).not.toHaveBeenCalled();
+  });
+
+  it("accepts a well-formed --anchor", async () => {
+    const code = await runCli(["--dry-run", "--anchor", "2026-08-01"]);
+    expect(code).toBe(0);
+  });
+
+  it("throws a clear error for --cadence 0 (IN-04)", async () => {
+    await expect(runCli(["--dry-run", "--cadence", "0"])).rejects.toThrow(
+      /--cadence "0" is not a valid positive number of weeks/
+    );
+    expect(loadSyncConfig).not.toHaveBeenCalled();
+  });
+
+  it("throws a clear error for a negative --cadence (IN-04)", async () => {
+    await expect(runCli(["--dry-run", "--cadence=-2"])).rejects.toThrow(
+      /is not a valid positive number of weeks/
+    );
+    expect(loadSyncConfig).not.toHaveBeenCalled();
+  });
 });
