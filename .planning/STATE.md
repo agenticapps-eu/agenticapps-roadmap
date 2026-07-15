@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v0.1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-07-15T12:05:09.389Z"
+last_updated: "2026-07-15T12:13:11.423Z"
 last_activity: 2026-07-15
 progress:
   total_phases: 8
   completed_phases: 2
   total_plans: 26
-  completed_plans: 22
+  completed_plans: 23
   percent: 25
 ---
 
@@ -25,11 +25,11 @@ No `.planning/PROJECT.md` — design rationale lives in `docs/architecture.md` (
 ## Current Position
 
 Phase: 06 (sync-gsd-linear CLI) — EXECUTING
-Plan: 3 of 7
+Plan: 4 of 7
 Status: Ready to execute
 Last activity: 2026-07-15
 
-Progress: [█████████░] 85%
+Progress: [█████████░] 88%
 
 ## Phase 3 Wave Plan
 
@@ -58,6 +58,7 @@ Execution mode: **sequential on main** (user-selected). Worktree isolation disab
 - [Phase 06]: 06-01: SyncConfigSchema is a flat z.array(...); resolved-state/operation contracts (ResolvedIssue/ResolvedProject/ResolvedWorkspace/SyncOperation/DiffSummary) are plain TS interfaces, not Zod-validated (internal computed state, not untrusted input).
 - [Phase 06]: 06-01: linear-mutation-mock.ts's dup-create resolve check approximates the CLI's title-hash step by exact name/title string match, since hash.ts doesn't exist yet in Wave 0 (same name always yields the same hash).
 - [Phase 06]: 06-02: Walker sorts phase-dir/plan-file listings alphabetically for deterministic output; parser.ts helpers stay module-private (transform.ts style); completionStatusFor ROADMAP match checks both full slug and number-stripped suffix.
+- [Phase 06]: 06-03: titleHash() is identity-agnostic; slug-not-title / plan-key-not-title contract lives in the file header. mutations.ts adds target-scoped paginated PROJECT_ISSUES_QUERY beyond scripts/linear/query.ts's workflow-state-only ISSUES_QUERY, plus PROJECT_UPDATE/PROJECT_MILESTONE_UPDATE/ISSUE_UPDATE beyond RESEARCH's verified *_CREATE examples (same id+input pattern; may go uncalled by 06-06's create-only v1 apply).
 
 ### Pending Todos / Open Items
 
