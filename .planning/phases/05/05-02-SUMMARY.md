@@ -99,3 +99,11 @@ None — no external service configuration required.
 ---
 *Phase: 05-overview-dashboard*
 *Completed: 2026-07-15*
+
+## Self-Check: PASSED
+
+- FOUND: src/lib/overview/selectors.ts
+- FOUND: src/lib/overview/selectors.test.ts
+- FOUND: .planning/phases/05/05-02-SUMMARY.md
+- FOUND commits: 0f2c467, fce8bb5, f7ac51f, 94d7cb4, 9d04682
+- Verification rerun: `CI=true npx vitest run src/lib/overview/selectors.test.ts && npx tsc -b --noEmit && npx eslint src/lib/overview` — all green (35/35 tests)
