@@ -130,7 +130,10 @@ export function parseRepo(
       const body = stripFrontmatter(content);
       const title = titleFor(planFile, content, raw.slug);
       const relativePlanPath = `phases/${raw.slug}/${basename(planFile)}`;
-      const key = `${meta.repo}/${raw.slug}/${relativePlanPath}`;
+      // IN-02: relativePlanPath already contains raw.slug -- prepending it
+      // again doubled the slug (repo/slug/phases/slug/file), contradicting
+      // config.ts's documented `repo/relativePlanPath` key shape.
+      const key = `${meta.repo}/${relativePlanPath}`;
       const taskLines = taskLinesFor(body);
 
       return { file: planFile, title, key, taskLines };

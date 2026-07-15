@@ -4,10 +4,13 @@
 // This is the single source of truth for every shape downstream stages
 // (walker, parser, resolve, diff, dates, apply) consume — Wave 1 of Phase 6,
 // hardened per 06-REVIEWS.md Consensus items 1-4:
-//   - NormalizedPlan carries a stable identity `key` (repo/phaseSlug/relativePlanPath)
-//     used for title-hashing, plus `taskLines` for the issue description. `title`
-//     stays a separate display-only field so a generic-H1 collision never collapses
-//     two distinct plans onto the same hash.
+//   - NormalizedPlan carries a stable identity `key` (repo/relativePlanPath --
+//     relativePlanPath itself already embeds the phase slug, i.e.
+//     phases/<slug>/<file>, so the phase slug is never prepended a second
+//     time; IN-02) used for title-hashing, plus `taskLines` for the issue
+//     description. `title` stays a separate display-only field so a
+//     generic-H1 collision never collapses two distinct plans onto the same
+//     hash.
 //   - SyncConfigEntry carries `name`, the key `--project` matches against.
 //   - The resolved read surface (ResolvedProject/ResolvedIssue) carries issue
 //     identity so dedup / second-run-no-op is expressible against real fields.
@@ -79,8 +82,9 @@ export const NormalizedPlanSchema = z.object({
   // Display title only — pulled from frontmatter/H1/slug fallback. NEVER used
   // as the hash/identity input (generic H1s like "# Phase 09 — PLAN" collide).
   title: z.string(),
-  // Stable identity key: repo/phaseSlug/relativePlanPath. Used for title-hashing
-  // and as the linear-map.json issues-pool key.
+  // Stable identity key: repo/relativePlanPath (relativePlanPath already
+  // embeds the phase slug -- IN-02). Used for title-hashing and as the
+  // linear-map.json issues-pool key.
   key: z.string(),
   // Task/checklist lines from the plan body — becomes the issue description.
   taskLines: z.array(z.string()),

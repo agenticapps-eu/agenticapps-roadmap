@@ -31,10 +31,12 @@ describe("parseRepo", () => {
     const phase = model.phases.find((p) => p.slug === "20-execution");
     const keys = phase?.plans.map((p) => p.key) ?? [];
     expect(new Set(keys).size).toBe(keys.length);
+    // IN-02: key is `${repo}/${relativePlanPath}` -- relativePlanPath already
+    // contains the phase slug, so it is never prepended a second time.
     expect(keys).toEqual(
       expect.arrayContaining([
-        "claude-workflow/20-execution/phases/20-execution/20-01-PLAN.md",
-        "claude-workflow/20-execution/phases/20-execution/20-02-PLAN.md",
+        "claude-workflow/phases/20-execution/20-01-PLAN.md",
+        "claude-workflow/phases/20-execution/20-02-PLAN.md",
       ])
     );
   });

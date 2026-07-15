@@ -2,7 +2,8 @@ import { describe, it, expect } from "vitest";
 import { buildDiff, renderDiff } from "./diff.ts";
 import type { LinearMap, NormalizedModel, NormalizedPhase, ResolvedWorkspace } from "./config.ts";
 
-const PLAN_KEY = "test-repo/01-alpha/phases/01-alpha/01-01-PLAN.md";
+// IN-02: key is `${repo}/${relativePlanPath}`, never a doubled slug.
+const PLAN_KEY = "test-repo/phases/01-alpha/01-01-PLAN.md";
 
 function emptyMap(): LinearMap {
   return { projects: {}, milestones: {}, issues: {}, projectLabels: {}, issueLabels: {} };
