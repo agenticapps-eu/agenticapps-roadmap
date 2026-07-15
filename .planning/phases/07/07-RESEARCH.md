@@ -697,7 +697,9 @@ maintained platforms with no relevant deprecations affecting this phase's design
 
 **If this table is empty:** N/A — assumptions listed above.
 
-## Open Questions
+## Open Questions (RESOLVED)
+
+> Resolved during the reviews replan: Q1 (`return_run_details` / 204) is fully coded server- and client-side (07-02 dispatch+status, 07-03 client, 07-06 run-name correlation); Q2 (project-identity mapping) is resolved by the `BACKFILL_PROJECTS` id→config-key map + server allow-list (07-04) — superseding this section's earlier "render unconditionally" recommendation per review finding #4; Q3 (job-logs timestamp prefix / live proof) is deferred to the Phase-8 HUMAN-UAT checklist (07-05).
 
 1. **Does `return_run_details` actually work on this org/repo's current GitHub plan?**
    - What we know: Documented in the Feb 2026 GitHub changelog and REST API docs.

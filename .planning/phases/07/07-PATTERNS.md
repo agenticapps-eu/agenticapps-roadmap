@@ -13,7 +13,7 @@
 | `functions/api/backfill/dispatch.test.ts` (NEW) | test | request-response | `functions/api/linear/[[path]].test.ts` | exact (context-helper + `vi.stubGlobal("fetch")` fixture shape) |
 | `functions/api/backfill/status.test.ts` (NEW) | test | request-response | `functions/api/linear/[[path]].test.ts` | exact |
 | `src/lib/backfill/useBackfill.ts` (NEW) | hook | event-driven (optimistic flip + poll + rollback) | `src/lib/roadmap/loader.ts` (single try/catch + fallback shape) + `src/pages/OverviewPage.tsx` (local `useState`/URL-param pattern) | role-match (no existing hook in the codebase — see "No Analog Found") |
-| `src/lib/backfill/useBackfill.test.ts` (NEW) | test | event-driven | `src/lib/roadmap/loader.test.ts` | role-match (`vi.stubGlobal("fetch")`, `vi.useFakeTimers()` for poll-interval tests) |
+| `src/lib/backfill/backfill.test.ts` (NEW — covers both the pure core and the `useBackfill` cleanup test; the standalone `useBackfill.test.ts` was consolidated here in the reviews replan) | test | event-driven | `src/lib/roadmap/loader.test.ts` | role-match (`vi.stubGlobal("fetch")`, `vi.useFakeTimers()` for poll-interval tests) |
 | `src/components/AppHeader.tsx` (MODIFY) | component | request-response (revalidate trigger) | itself (existing Snapshot/Live toggle in the same file) | exact |
 | `src/lib/roadmap/loader.ts` (MODIFY) | utility (router loader + revalidation gate) | request-response | itself | exact |
 | `src/lib/roadmap/loader.test.ts` (MODIFY/extend) | test | request-response | itself | exact |
@@ -219,7 +219,7 @@ file's own header comment).
 
 ---
 
-### `src/lib/backfill/useBackfill.test.ts` (test, event-driven)
+### `src/lib/backfill/backfill.test.ts` (test, event-driven — includes the `useBackfill` cleanup test)
 
 **Analog:** `src/lib/roadmap/loader.test.ts` (full file read, 250 lines)
 
@@ -626,8 +626,8 @@ across every status code must be asserted free of the token value/shape.
 ### `vi.stubGlobal("fetch")` fixture pattern
 **Source:** `functions/api/linear/[[path]].test.ts` lines 78-100, 311-322; also
 `src/lib/roadmap/loader.test.ts` lines 51-79
-**Apply to:** all four new/extended test files (`dispatch.test.ts`, `status.test.ts`,
-`useBackfill.test.ts`, extended `loader.test.ts`)
+**Apply to:** all new/extended test files (`dispatch.test.ts`, `status.test.ts`,
+`backfill.test.ts`, new `freshness.test.ts`, extended `loader.test.ts`)
 ```typescript
 vi.stubGlobal("fetch", vi.fn().mockImplementation(() => Promise.resolve(payload)));
 // afterEach(() => vi.unstubAllGlobals());
