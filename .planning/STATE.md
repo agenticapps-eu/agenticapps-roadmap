@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v0.1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-07-15T12:42:35.501Z"
+last_updated: "2026-07-15T13:04:36.192Z"
 last_activity: 2026-07-15
 progress:
   total_phases: 8
   completed_phases: 2
   total_plans: 26
-  completed_plans: 25
+  completed_plans: 26
   percent: 25
 ---
 
@@ -25,11 +25,11 @@ No `.planning/PROJECT.md` — design rationale lives in `docs/architecture.md` (
 ## Current Position
 
 Phase: 06 (sync-gsd-linear CLI) — EXECUTING
-Plan: 6 of 7
+Plan: 7 of 7
 Status: Ready to execute
 Last activity: 2026-07-15
 
-Progress: [██████████] 96%
+Progress: [██████████] 100%
 
 ## Phase 3 Wave Plan
 
@@ -62,6 +62,7 @@ Execution mode: **sequential on main** (user-selected). Worktree isolation disab
 - [Phase 06-04]: comparePhaseNumber orders decimal phase numbers component-wise (never whole-string float coercion); proposeDates re-sorts before assigning dates and leaves completed phases untouched. buildDiff(model, resolved) emits the full enumerated SyncOperation[] write set matched by titleHash of identity; drifted existing-milestone dates surface as informational only (v1 apply is create-only).
 - [Phase 06]: 06-05: resolveProjectByLabel added as a file-local, soft-failing (null-on-error) lookup since RawWorkspace's MAIN_QUERY read omits per-project label attachment; resolveProject takes labeledProjectId as an explicit parameter rather than making its own network call.
 - [Phase 06]: 06-05: idempotency proof (resolve-before-create finds existing records, no duplicate) tested at the resolveProject/resolveMilestone/resolveIssue function level against linear-mutation-mock.ts's real create handlers + direct in-memory state reads, not through buildResolvedWorkspace's full network path.
+- [Phase 06]: 06-06: apply.ts (SYNC-04) -- create-only write engine with TOCTOU abort-on-drift, atomic per-create linear-map.json write-back (temp+rename), and a map-based (not title-hash-based) issue-identity dedup so Linear issue titles stay human-readable (D-06-01) while still satisfying diff.ts's identityKey-field matching contract. — PROJECT_ISSUES_QUERY has no description field to carry a hidden identity token, and hash.ts's contract forbids hashing the display title, so identity/dedup for issues is recovered via a reverse lookup through the already-persisted linear-map.json issues pool instead of overloading the Linear issue's title field.
 
 ### Pending Todos / Open Items
 

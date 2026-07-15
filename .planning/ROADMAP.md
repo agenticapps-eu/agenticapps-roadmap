@@ -163,7 +163,7 @@ Plans:
 
 **Wave 4** *(depend on resolver + diff)*
 
-- [ ] 06-06-PLAN.md — Apply engine: create-only idempotent upsert + atomic per-create map write-back + gated planAhead patch (Wave 4)
+- [x] 06-06-PLAN.md — Apply engine: create-only idempotent upsert + atomic per-create map write-back + gated planAhead patch (Wave 4)
 
 **Wave 5** *(depend on apply + walker/parser)*
 
