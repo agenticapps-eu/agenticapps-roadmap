@@ -26,7 +26,7 @@ are urgent insertions.
 - [ ] **Phase 4: Roadmap timeline UI** — Initiative swimlanes across a month axis
 - [x] **Phase 5: Overview dashboard, filters & drill-down** — KPIs, shareable filters, Linear deep-links (completed 2026-07-15)
 - [x] **Phase 6: sync-gsd-linear CLI** — Per-project, dry-run-first backfill engine (completed 2026-07-15)
-- [ ] **Phase 7: Live refresh & write-back** — On-demand refresh + UI-triggered backfill
+- [x] **Phase 7: Live refresh & write-back** — On-demand refresh + UI-triggered backfill (completed 2026-07-16)
 - [ ] **Phase 8: Deploy, gate & document** — Production Pages + Access + runbook + v0.1.0
 
 ## Phase Details
@@ -199,7 +199,7 @@ Plans:
 
 **Wave 4** *(depend on 07-01..07-04 + 07-06 finalized contracts)*
 
-- [ ] 07-05-PLAN.md — LIVE-03 verify+reuse snapshot.yml (structural, beyond substring) + LIVE-02/03 operationally-pending record + consolidated Phase-8 HUMAN-UAT checklist (Wave 4)
+- [x] 07-05-PLAN.md — LIVE-03 verify+reuse snapshot.yml (structural, beyond substring) + LIVE-02/03 operationally-pending record + consolidated Phase-8 HUMAN-UAT checklist (Wave 4)
 
 ### Phase 8: Deploy, gate & document
 
