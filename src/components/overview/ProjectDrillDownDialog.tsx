@@ -41,7 +41,7 @@ export function ProjectDrillDownDialog({
     ? (data.projects.find((p) => p.id === projectId) ?? null)
     : null;
 
-  const { startPreview, applyBackfill, diffFor, errorFor, clearError } =
+  const { startPreview, applyBackfill, diffFor, statusFor, errorFor, clearError } =
     useBackfill(setBackfillState);
 
   function handleOpenChange(open: boolean) {
@@ -76,6 +76,11 @@ export function ProjectDrillDownDialog({
   const previewDiff = backfillKey ? diffFor(backfillKey) : undefined;
   const applyDiff = project ? diffFor(project.id) : undefined;
   const diff = applyDiff ?? previewDiff;
+
+  // WR-03/IN-01: statusFor is keyed by backfillKey pre-apply (see
+  // useBackfill.ts's key-space comment above) — it's how the Preview button
+  // knows a dry-run dispatch is in flight.
+  const previewing = backfillKey ? statusFor(backfillKey) === "previewing" : false;
 
   const previewError = backfillKey ? errorFor(backfillKey) : undefined;
   const applyError = project ? errorFor(project.id) : undefined;
@@ -187,9 +192,10 @@ export function ProjectDrillDownDialog({
                     type="button"
                     variant="outline"
                     size="xs"
+                    disabled={previewing}
                     onClick={() => startPreview(backfillKey)}
                   >
-                    Preview
+                    {previewing ? "Previewing…" : "Preview"}
                   </Button>
                   <Button
                     type="button"
