@@ -18,6 +18,7 @@
 
 interface Env {
   GH_BACKFILL_TOKEN: string;
+  BACKFILL_NONCE: KVNamespace; // D-08-06
 }
 
 const GITHUB_API = "https://api.github.com";
@@ -94,10 +95,9 @@ function isWorkflowRunIdResponse(value: unknown): value is { workflow_run_id: nu
 // review's fix guidance calls for rejecting anything older than this bound.
 const MAX_PREVIEW_AGE_MS = 15 * 60 * 1000;
 
-// TODO(phase-8): one-time-use nonce for previewRunId needs a KV/D1 binding
-// (none exists in wrangler.toml today) to mark a previewRunId "consumed"
-// after it authorizes one apply. Deferred until that binding is added —
-// see 07-HUMAN-UAT.md's Phase-8 items.
+// D-08-06: consume-once nonce TTL. 900s matches MAX_PREVIEW_AGE_MS (15 min) —
+// the nonce never needs to outlive the recency bound above.
+const NONCE_TTL_SECONDS = 900;
 
 // WR-04: escape regex metacharacters before anchoring a value into a
 // dynamically-built RegExp (project is allow-list-validated already, but
@@ -228,6 +228,18 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
       if (!isValidPreviewRun(previewRunJson, project)) {
         return textResponse("preview verification failed", 403);
       }
+
+      // D-08-06: best-effort sequential replay suppression. Not atomic (KV
+      // has no compare-and-swap), so this is a co-mitigation alongside the
+      // 15-min recency bound above, not an exactly-once guarantee.
+      const nonceKey = `previewRunId:${previewRunId}`;
+      const consumed = await env.BACKFILL_NONCE.get(nonceKey);
+      if (consumed !== null) {
+        return textResponse("preview already applied", 403);
+      }
+      await env.BACKFILL_NONCE.put(nonceKey, "1", {
+        expirationTtl: NONCE_TTL_SECONDS,
+      });
     }
 
     const correlationId = crypto.randomUUID();
