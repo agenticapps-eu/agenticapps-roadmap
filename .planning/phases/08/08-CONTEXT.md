@@ -65,6 +65,11 @@ standing "Out of Scope" item); a public GitHub Pages mirror (see Deferred Ideas)
   first goes live. This supersedes the current recency-only mitigation (15-min bound stays as
   defense-in-depth). Resolves `07-HUMAN-UAT.md` item #13. **Rejected:** ship recency-only and
   defer the nonce (a recent-but-reused preview could authorize multiple applies in-window).
+  - *Annotation (2026-07-16, cross-AI review R6):* Workers KV is eventually consistent and has
+    no atomic compare-and-set, so the delivered mechanism is **best-effort sequential replay
+    suppression**, not a literal "exactly one" guarantee — a duplicate apply remains possible
+    within KV's consistency window (the 15-min recency bound is the co-mitigation). The decision
+    to add the KV nonce stands; only the strength claim is corrected to match the primitive.
 
 ### Claude's Discretion
 - Runbook/README structure and ADR prose (DEPLOY-03/04) — standard doc craft; the ADR records
