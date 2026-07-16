@@ -6,20 +6,43 @@
 // NOT list individual issues (D-05-03; the snapshot stores aggregate counts
 // only). Closing deletes the param with { replace: true } so Back doesn't
 // re-open it, and preserves co-resident filter params (05-RESEARCH Pitfall 2).
+//
+// 07-04 (LIVE-02): also owns the `useBackfill` hook instance and renders an
+// eligibility-gated (BACKFILL_PROJECTS) two-phase Backfill control in a
+// sibling footer section — Preview (dry-run, typed-diff render) then Apply
+// (gated on a successful preview), optimistically flipping the
+// OverviewPage-owned `backfillState` Map and surfacing a dismissible inline
+// error on failure/cancelled.
 
 import { useSearchParams } from "react-router-dom";
 import { PRIORITY_LABELS } from "@/lib/overview/selectors";
 import type { RoadmapJson } from "@/lib/roadmap/schema";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { SyncBadge } from "@/components/overview/SyncBadge";
+import { useBackfill } from "@/lib/backfill/useBackfill";
+import type { BackfillStateMap } from "@/lib/backfill/backfill";
+import { BACKFILL_PROJECTS } from "@/lib/backfill/projects";
+import { X } from "lucide-react";
 
-export function ProjectDrillDownDialog({ data }: { data: RoadmapJson }) {
+export function ProjectDrillDownDialog({
+  data,
+  backfillState,
+  setBackfillState,
+}: {
+  data: RoadmapJson;
+  backfillState: BackfillStateMap;
+  setBackfillState: (updater: (prev: BackfillStateMap) => BackfillStateMap) => void;
+}) {
   const [searchParams, setSearchParams] = useSearchParams();
   const projectId = searchParams.get("project");
   const project = projectId
     ? (data.projects.find((p) => p.id === projectId) ?? null)
     : null;
+
+  const { startPreview, applyBackfill, diffFor, errorFor, clearError } =
+    useBackfill(setBackfillState);
 
   function handleOpenChange(open: boolean) {
     if (!open) {
@@ -39,6 +62,31 @@ export function ProjectDrillDownDialog({ data }: { data: RoadmapJson }) {
       project.issueCounts.done
     : 0;
 
+  // Eligibility gate (07-REVIEWS finding #4): only projects with a known
+  // Linear-id -> sync.config-key mapping get a Backfill control, and the
+  // control dispatches the config KEY, never `project.name`.
+  const backfillKey = project ? BACKFILL_PROJECTS[project.id] : undefined;
+  const entry = project ? backfillState.get(project.id) : undefined;
+
+  // Key-space per useBackfill.ts's header comment (07-03 key-decisions):
+  // startPreview stores its diff/status/error under `backfillKey`;
+  // applyBackfill re-keys under `project.id` afterward. Prefer the
+  // post-apply (projectId-keyed) view when present, else fall back to the
+  // pre-apply (backfillKey-keyed) preview.
+  const previewDiff = backfillKey ? diffFor(backfillKey) : undefined;
+  const applyDiff = project ? diffFor(project.id) : undefined;
+  const diff = applyDiff ?? previewDiff;
+
+  const previewError = backfillKey ? errorFor(backfillKey) : undefined;
+  const applyError = project ? errorFor(project.id) : undefined;
+  const visibleError = applyError ?? previewError;
+
+  function dismissBackfillError() {
+    if (!project) return;
+    if (applyError) clearError(project.id);
+    else if (previewError && backfillKey) clearError(backfillKey);
+  }
+
   return (
     <Dialog open={project !== null} onOpenChange={handleOpenChange}>
       {project && (
@@ -50,7 +98,11 @@ export function ProjectDrillDownDialog({ data }: { data: RoadmapJson }) {
               <Badge variant="outline">
                 {PRIORITY_LABELS[project.priority] ?? "—"}
               </Badge>
-              <SyncBadge project={project} />
+              <SyncBadge
+                project={project}
+                planAheadOverride={entry?.planAheadOverride}
+                pending={entry?.pendingBackfill}
+              />
             </div>
           </div>
 
@@ -117,6 +169,59 @@ export function ProjectDrillDownDialog({ data }: { data: RoadmapJson }) {
               >
                 Open in Linear ↗
               </a>
+            </div>
+          )}
+
+          {/* Backfill (LIVE-02, 07-04) — eligibility-gated on BACKFILL_PROJECTS
+              (07-REVIEWS finding #4); dispatches the config KEY, never
+              project.name. Two-phase: Preview (dry-run typed diff) then
+              Apply, disabled until a successful preview exists. */}
+          {backfillKey && (
+            <div className="border-t border-(--color-border) pt-2">
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-xs font-semibold">
+                  Backfill: {project.name}
+                </span>
+                <div className="flex shrink-0 gap-1">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="xs"
+                    onClick={() => startPreview(backfillKey)}
+                  >
+                    Preview
+                  </Button>
+                  <Button
+                    type="button"
+                    size="xs"
+                    disabled={!previewDiff || entry?.pendingBackfill === true}
+                    onClick={() => applyBackfill(project.id, backfillKey)}
+                  >
+                    Apply
+                  </Button>
+                </div>
+              </div>
+
+              {diff && (
+                <p className="mt-1 text-xs text-(--color-muted-foreground)">
+                  + {diff.milestones} milestones, + {diff.issues} issues,{" "}
+                  + {diff.labels} labels, ~ {diff.dates} dates
+                </p>
+              )}
+
+              {visibleError && (
+                <div className="mt-1 flex items-center gap-2">
+                  <Badge variant="destructive">{visibleError}</Badge>
+                  <button
+                    type="button"
+                    onClick={dismissBackfillError}
+                    aria-label="Dismiss backfill error"
+                    className="text-(--color-muted-foreground) hover:text-(--color-foreground)"
+                  >
+                    <X className="size-3" />
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </DialogContent>

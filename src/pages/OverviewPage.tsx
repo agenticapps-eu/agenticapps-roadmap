@@ -1,5 +1,7 @@
 import { useRouteLoaderData, useSearchParams } from "react-router-dom";
+import { useState } from "react";
 import type { RoadmapLoaderData } from "@/lib/roadmap/loader";
+import type { BackfillStateMap } from "@/lib/backfill/backfill";
 import {
   decodeFilters,
   resolveRange,
@@ -27,6 +29,11 @@ export function OverviewPage() {
   // needs two, so both must precede the guard).
   const loaderData = useRouteLoaderData("root") as RoadmapLoaderData | null;
   const [searchParams, setSearchParams] = useSearchParams();
+  // Ephemeral, client-only optimistic backfill state (LIVE-02, 07-04):
+  // Map<projectId, { pendingBackfill; planAheadOverride }>. OverviewPage owns
+  // it and threads it unconditionally into SyncBadge (project list row) and
+  // ProjectDrillDownDialog (which also owns the useBackfill hook instance).
+  const [backfillState, setBackfillState] = useState<BackfillStateMap>(new Map());
 
   // The snapshot loader throws on genuine failure (RoadmapError renders), so
   // a null here is the defensive out-of-band case — surface the muted error
@@ -96,7 +103,11 @@ export function OverviewPage() {
                       {project.status}
                     </span>
                   </span>
-                  <SyncBadge project={project} />
+                  <SyncBadge
+                    project={project}
+                    planAheadOverride={backfillState.get(project.id)?.planAheadOverride}
+                    pending={backfillState.get(project.id)?.pendingBackfill}
+                  />
                 </button>
               </li>
             ))}
@@ -106,7 +117,11 @@ export function OverviewPage() {
 
       {/* Mounted OUTSIDE the empty-state branch so a shared ?project= link
           still opens even when active filters exclude that project. */}
-      <ProjectDrillDownDialog data={data} />
+      <ProjectDrillDownDialog
+        data={data}
+        backfillState={backfillState}
+        setBackfillState={setBackfillState}
+      />
     </section>
   );
 }
