@@ -159,9 +159,14 @@ Phase-8 manual/dashboard step per `docs/access-setup.md`'s existing pattern for
    — extend the existing unit-test assertion pattern (REQ-PROXY-1..4 style) to a real
    deployed request/response pair, inspected via browser devtools Network tab.
 
-9. **[BLOCKED — secrets unbound]** Exercise the 204 `return_run_details` fallback: if
-   GitHub's dispatch API returns 204 for this org/repo/plan (Open Question A3), confirm
-   `dispatch.ts`'s `{ runId: null, correlationId }` path and `backfill.yml`'s
+9. **[BLOCKED — secrets unbound]** (WR-05) Record explicitly which HTTP status code the
+   real `POST /repos/{owner}/{repo}/actions/workflows/backfill.yml/dispatches` call
+   returns for this org/repo/plan with `return_run_details: true` set — **200** (with a
+   `{ workflow_run_id }` body, exercising `dispatch.ts:155-158`'s branch) or **204** (Open
+   Question A3, exercising the correlationId fallback). If it is confirmed **204** here,
+   flag `dispatch.ts`'s 200-branch as dead code for a follow-up cleanup PR. Then exercise
+   the 204 `return_run_details` fallback: confirm `dispatch.ts`'s
+   `{ runId: null, correlationId }` path and `backfill.yml`'s
    `run-name: backfill [proj:...] [mode:...] [cid:...]` correlation-id-in-run-name
    mechanism together let `status.ts` resolve the run via `?correlationId=` list-and-match.
 
