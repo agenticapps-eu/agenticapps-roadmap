@@ -181,14 +181,22 @@ Phase-8 manual/dashboard step per `docs/access-setup.md`'s existing pattern for
     correctly tolerates whatever line-prefixing GitHub's `jobs/{id}/logs` endpoint
     actually applies in this account's configuration.
 
+13. **[BLOCKED — secrets unbound]** (CR-01 follow-up) `dispatch.ts`'s `isValidPreviewRun`
+    now enforces a 15-minute recency bound on `previewRunId` (using
+    `run_started_at ?? created_at`), but has no one-time-use/consumption tracking — a
+    single approved preview can still authorize more than one `apply` within that
+    window. Add a KV or D1 binding (none exists in `wrangler.toml` today) to mark a
+    `previewRunId` consumed after its first successful apply, and reject a repeat use.
+    This is a Phase-8 infrastructure addition, not a Phase-7 code change.
+
 ## Summary
 
-total: 12
+total: 13
 passed: 0
 issues: 0
-pending: 12
+pending: 13
 skipped: 0
-blocked: 12
+blocked: 13
 
 ## Gaps
 

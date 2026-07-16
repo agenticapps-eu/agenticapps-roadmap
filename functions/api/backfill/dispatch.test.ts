@@ -51,6 +51,7 @@ function goodPreviewRun(project: string) {
       status: "completed",
       conclusion: "success",
       name: `backfill [proj:${project}] [mode:dry-run] [cid:11111111-1111-1111-1111-111111111111]`,
+      run_started_at: new Date().toISOString(),
     }),
   };
 }
@@ -220,6 +221,51 @@ describe("apply with invalid preview run (403, no dispatch)", () => {
 
     expect(res.status).toBe(403);
     expect(mockFetch).toHaveBeenCalledTimes(1);
+  });
+
+  // CR-01: a previewRunId older than the recency bound (15 min) must be
+  // rejected, even if every other check passes.
+  it("rejects a preview run older than the 15-minute recency bound", async () => {
+    const staleTimestamp = new Date(Date.now() - 20 * 60 * 1000).toISOString();
+    const mockFetch = stubFetchSequence([
+      {
+        ok: true,
+        status: 200,
+        json: async () => ({
+          ...(await goodPreviewRun("cparx").json()),
+          run_started_at: staleTimestamp,
+        }),
+      },
+    ]);
+
+    const res = await onRequestPost(
+      ctx({ project: "cparx", mode: "apply", previewRunId: 42 })
+    );
+
+    expect(res.status).toBe(403);
+    expect(mockFetch).toHaveBeenCalledTimes(1);
+  });
+
+  it("accepts a preview run within the recency bound using created_at when run_started_at is absent", async () => {
+    const recentTimestamp = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+    const mockFetch = stubFetchSequence([
+      {
+        ok: true,
+        status: 200,
+        json: async () => {
+          const { run_started_at: _dropped, ...rest } = await goodPreviewRun("cparx").json();
+          return { ...rest, created_at: recentTimestamp };
+        },
+      },
+      { ok: true, status: 200, json: async () => ({ workflow_run_id: 7 }) },
+    ]);
+
+    const res = await onRequestPost(
+      ctx({ project: "cparx", mode: "apply", previewRunId: 42 })
+    );
+
+    expect(res.status).toBe(200);
+    expect(mockFetch).toHaveBeenCalledTimes(2);
   });
 });
 

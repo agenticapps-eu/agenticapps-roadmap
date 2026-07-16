@@ -60,15 +60,29 @@ interface PreviewRun {
   status: string;
   conclusion: string | null;
   name: string;
+  run_started_at?: string;
+  created_at?: string;
 }
+
+// CR-01: a previewRunId must be recent — an arbitrarily old successful
+// dry-run no longer reflects the current sibling-repo/Linear state, and the
+// review's fix guidance calls for rejecting anything older than this bound.
+const MAX_PREVIEW_AGE_MS = 15 * 60 * 1000;
+
+// TODO(phase-8): one-time-use nonce for previewRunId needs a KV/D1 binding
+// (none exists in wrangler.toml today) to mark a previewRunId "consumed"
+// after it authorizes one apply. Deferred until that binding is added —
+// see 07-HUMAN-UAT.md's Phase-8 items.
 
 /**
  * Server-side verification that a previewRunId is a real, successful,
- * matching-project dry-run of THIS workflow on `main` (finding #5, T-07-10).
- * The run-name contract (set by backfill.yml, 07-06) is the only channel
- * exposing a run's project/mode.
+ * matching-project, RECENT dry-run of THIS workflow on `main` (finding #5,
+ * T-07-10; CR-01 recency bound). The run-name contract (set by
+ * backfill.yml, 07-06) is the only channel exposing a run's project/mode.
  */
 function isValidPreviewRun(run: PreviewRun, project: string): boolean {
+  const startedAt = new Date(run.run_started_at ?? run.created_at ?? 0).getTime();
+  const ageMs = Date.now() - startedAt;
   return (
     run.path === ".github/workflows/backfill.yml" &&
     run.head_branch === "main" &&
@@ -76,7 +90,10 @@ function isValidPreviewRun(run: PreviewRun, project: string): boolean {
     run.status === "completed" &&
     run.conclusion === "success" &&
     run.name.includes(`[proj:${project}]`) &&
-    run.name.includes("[mode:dry-run]")
+    run.name.includes("[mode:dry-run]") &&
+    Number.isFinite(startedAt) &&
+    ageMs >= 0 &&
+    ageMs <= MAX_PREVIEW_AGE_MS
   );
 }
 
