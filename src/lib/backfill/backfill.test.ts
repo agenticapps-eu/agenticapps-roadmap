@@ -48,13 +48,11 @@ describe("dispatchBackfill", () => {
   });
 
   it("passes previewRunId through in the request body for apply mode", async () => {
-    const fetchMock = vi.fn(async (_input: URL | RequestInfo, _init?: RequestInit) =>
-      jsonRes({ runId: 99 }),
-    );
+    const fetchMock = vi.fn(async () => jsonRes({ runId: 99 }));
     await dispatchBackfill(fetchMock, "claude-workflow", "apply", 42);
 
-    const [, init] = fetchMock.mock.calls[0];
-    const body = JSON.parse((init as RequestInit).body as string);
+    const [, init] = fetchMock.mock.calls[0] as unknown as [string, RequestInit];
+    const body = JSON.parse(init.body as string);
     expect(body).toEqual({ project: "claude-workflow", mode: "apply", previewRunId: 42 });
   });
 
