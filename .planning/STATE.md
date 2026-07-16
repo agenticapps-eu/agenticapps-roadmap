@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v0.1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-07-15T20:57:26.391Z"
-last_activity: 2026-07-15 -- Phase 07 planning complete
+last_updated: "2026-07-16T06:05:05.947Z"
+last_activity: 2026-07-16
 progress:
   total_phases: 8
   completed_phases: 3
   total_plans: 32
-  completed_plans: 27
+  completed_plans: 28
   percent: 38
 ---
 
@@ -20,16 +20,16 @@ progress:
 No `.planning/PROJECT.md` — design rationale lives in `docs/architecture.md` (decided 2026-06-22).
 
 **Core value:** A private, snapshot-default roadmap dashboard that reads Linear and syncs with the repos' GSD `.planning/` plans, keeping the Linear token server-side at all times.
-**Current focus:** Phase 07
+**Current focus:** Phase 07 — Live refresh & write-back
 
 ## Current Position
 
-Phase: 07
-Plan: Not started
+Phase: 07 (Live refresh & write-back) — EXECUTING
+Plan: 2 of 6
 Status: Ready to execute
-Last activity: 2026-07-15 -- Phase 07 planning complete
+Last activity: 2026-07-16
 
-Progress: [██████████] 100%
+Progress: [█████████░] 88%
 
 ## Phase 3 Wave Plan
 
@@ -64,9 +64,11 @@ Execution mode: **sequential on main** (user-selected). Worktree isolation disab
 - [Phase 06]: 06-05: idempotency proof (resolve-before-create finds existing records, no duplicate) tested at the resolveProject/resolveMilestone/resolveIssue function level against linear-mutation-mock.ts's real create handlers + direct in-memory state reads, not through buildResolvedWorkspace's full network path.
 - [Phase 06]: 06-06: apply.ts (SYNC-04) -- create-only write engine with TOCTOU abort-on-drift, atomic per-create linear-map.json write-back (temp+rename), and a map-based (not title-hash-based) issue-identity dedup so Linear issue titles stay human-readable (D-06-01) while still satisfying diff.ts's identityKey-field matching contract. — PROJECT_ISSUES_QUERY has no description field to carry a hidden identity token, and hash.ts's contract forbids hashing the display title, so identity/dedup for issues is recovered via a reverse lookup through the already-persisted linear-map.json issues pool instead of overloading the Linear issue's title field.
 - [Phase 06]: 06-07: cli.ts's single-project apply path calls applyProject twice in one invocation (dryRun:true to render the y/N-gated diff, dryRun:false immediately after approval to execute) per 06-06's TOCTOU hand-off note; --project-less zero/multiple-match and --project-less-apply both throw the identical bulk-write-guard error string, while a wholly absent --project is only an error in apply mode (dry-run permits the zero-mutation multi-repo preview). Task 3 live-verify checkpoint deferred (LINEAR_API_KEY unset) -- documented under 'Human verification required' in 06-07-SUMMARY.md.
+- [Phase 07]: 07-01: Kept both branches of shouldRevalidateRoadmap (source-mode-flip AND identical-URL) -- additive R-4 fix, not a reversion; freshness hint tracks client-side lastRefreshedAt (seeded from initial load, bumped on revalidator loading-to-idle), not the live projection's own generatedAt, since the latter is always 'just now' in live mode.
 
 ### Pending Todos / Open Items
 
+- **Phase 07 human-check (07-01):** Task 2's browser verification not yet run (no browser tool available to the executor) — in `pnpm dev` with `?source=live`, confirm the Refresh button + freshness hint appear, click Refresh and confirm a `/api/linear/snapshot` Network call fires (the unique proof a click re-pulls data), and confirm no Refresh button renders in Snapshot mode. See `.planning/phases/07/07-01-SUMMARY.md` § "Human Verification Required".
 - `LINEAR_API_KEY` repo secret still unset → daily CI snapshot Action fails until set (GitHub → Settings → Secrets → Actions). Committed `roadmap.json` stays as real MCP-seeded data.
 - Phase 03 human checkpoints: 03-02 DONE (workers-types legitimacy approved), 03-04 DONE (live smoke APPROVED — 271 issues, no token leak, latent bugs fixed), 03-05 runbook DONE / **Access proof DEFERRED (BLOCKING)** — see `.planning/phases/03/03-HUMAN-UAT.md`.
 - **BLOCKING (Phase 03 completion gate):** capture `.planning/phases/03/03-ACCESS-PROOF.md` — deploy a Pages preview, configure Cloudflare Access (email allow-list over the domain AND `/api/*`), prove unauth `GET /api/linear/snapshot` → 302/403 and an allowed identity → 200. Runbook: `docs/access-setup.md`. Likely captured alongside Phase 08 deploy.
