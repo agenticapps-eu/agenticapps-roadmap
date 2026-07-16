@@ -195,7 +195,7 @@ Plans:
 
 **Wave 3** *(depend on 07-03 hook)*
 
-- [ ] 07-04-PLAN.md — LIVE-02 optimistic UI: BACKFILL_PROJECTS id→key eligibility map + SyncBadge override + ProjectDrillDownDialog typed-diff two-phase Backfill control + OverviewPage state owner (Wave 3, human-check)
+- [x] 07-04-PLAN.md — LIVE-02 optimistic UI: BACKFILL_PROJECTS id→key eligibility map + SyncBadge override + ProjectDrillDownDialog typed-diff two-phase Backfill control + OverviewPage state owner (Wave 3, human-check)
 
 **Wave 4** *(depend on 07-01..07-04 + 07-06 finalized contracts)*
 
