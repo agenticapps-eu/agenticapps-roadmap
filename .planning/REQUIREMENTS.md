@@ -59,7 +59,7 @@
 ### Live refresh & write-back (Phase 7)
 
 - [x] **LIVE-01**: "Refresh from Linear" in live mode reconciles live data into the snapshot view.
-- [x] **LIVE-02**: UI-triggered per-project backfill (behind Access) with optimistic UI + error rollback.
+- [ ] **LIVE-02**: UI-triggered per-project backfill (behind Access) with optimistic UI + error rollback. Code-complete and unit-tested (dispatch/status Functions, client core, optimistic UI, CI workflow); left unchecked per 07-05-PLAN.md's explicit must_haves ("07-05 does NOT claim [LIVE-02] complete") — the live write path (dispatch → Actions → git push → Linear) is unproven until secrets + Access are bound. Check off only after Phase-8 HUMAN-UAT items pass (see `.planning/phases/07/07-HUMAN-UAT.md`).
 - [ ] **LIVE-03**: Scheduled snapshot refresh (CI cron or Pages cron). Mechanism verified structurally (see `.planning/phases/07/07-HUMAN-UAT.md`); left unchecked per 07-05-PLAN.md's explicit must_haves ("07-05 does NOT claim [LIVE-03] complete") — a real scheduled cron run has not yet fired. Check off only after Phase-8 HUMAN-UAT item #11 passes.
 
 ### Deploy, gate & document (Phase 8)
