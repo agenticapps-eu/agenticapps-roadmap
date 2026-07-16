@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-15T08:23:34.446Z",
+  "generatedAt": "2026-07-16T08:22:50.046Z",
   "initiatives": [
     {
       "id": "b3ee916d-dadb-4ca3-939a-452f1273edf2",
@@ -34,6 +34,149 @@
   ],
   "projects": [
     {
+      "id": "28f29610-6662-46ad-a5d5-ca93a5c53872",
+      "name": "claude-workflow",
+      "summary": "",
+      "url": "https://linear.app/agenticapps/project/claude-workflow-013b1ac568bd",
+      "initiativeId": null,
+      "status": "Backlog",
+      "priority": 0,
+      "startDate": null,
+      "targetDate": null,
+      "milestones": [
+        {
+          "id": "bb46e092-9586-4170-8ec0-1bbb2a87105a",
+          "name": "30-split-03-claude-workflow-2-0-0-follow-up",
+          "targetDate": null
+        },
+        {
+          "id": "594a2598-b52a-4f85-8ecb-3ad4fbfde4c0",
+          "name": "29-split-02-agenticapps-observability",
+          "targetDate": null
+        },
+        {
+          "id": "b3bee7f1-aa5a-4967-a3a1-ebe3cc2835f5",
+          "name": "28-split-01-agenticapps-shared",
+          "targetDate": null
+        },
+        {
+          "id": "a615d726-aff4-4908-a538-03623aad7dd6",
+          "name": "27-1-21-0-stable-baseline-split-00-gate-close-wr-01-04-minimum-",
+          "targetDate": null
+        },
+        {
+          "id": "a3771e16-833c-43de-badf-a0b970ca44ae",
+          "name": "26-worker-template-hardening",
+          "targetDate": null
+        },
+        {
+          "id": "44a05c74-f9f7-4b00-83cf-1c3fd96022a6",
+          "name": "25-fix-0019-engine-and-cron-wrappers",
+          "targetDate": null
+        },
+        {
+          "id": "e1eceb05-d8d5-4beb-908f-0728d059e899",
+          "name": "24-openrouter-integration",
+          "targetDate": null
+        },
+        {
+          "id": "3c89f56a-f87a-4caa-8064-4498808e70e3",
+          "name": "23-observability-followups",
+          "targetDate": null
+        },
+        {
+          "id": "9a92f7aa-e4a8-45a1-8f66-a00152cddfac",
+          "name": "22-sentry-crons-healthz",
+          "targetDate": null
+        },
+        {
+          "id": "48a2d68f-65db-4634-b02c-c75086925f61",
+          "name": "21-axiom-logs-destination",
+          "targetDate": "2026-07-29"
+        },
+        {
+          "id": "13d8ddbc-fd99-47ad-a022-eb459860d13d",
+          "name": "20-spec-0.4.0-absorption",
+          "targetDate": "2026-07-15"
+        },
+        {
+          "id": "a6df2897-bdbd-4f6c-9ee1-cd099e5e3f5e",
+          "name": "19-strict-preflight",
+          "targetDate": null
+        },
+        {
+          "id": "6ff48b45-ab57-4be8-aacb-02573e8e3e8f",
+          "name": "18-test-0007-hermetic-sandbox",
+          "targetDate": null
+        },
+        {
+          "id": "5680ee41-2b3a-41d8-a1ac-b5e99f5befd4",
+          "name": "17-test-0001-baseline-fix",
+          "targetDate": null
+        },
+        {
+          "id": "72567b38-e03e-49e2-9102-b965e11aafcb",
+          "name": "15-init-and-slash-discovery",
+          "targetDate": null
+        },
+        {
+          "id": "63b81513-8d50-43ce-91a0-d3f8222df67d",
+          "name": "14-spec-10-9-enforcement",
+          "targetDate": null
+        },
+        {
+          "id": "f3555012-ac76-4881-a475-845b4bee1b69",
+          "name": "13-preflight-correctness-audit",
+          "targetDate": null
+        },
+        {
+          "id": "cb7552d7-62d1-4da3-807e-75ae3fc8306c",
+          "name": "12-fix-0005-verify-path",
+          "targetDate": null
+        },
+        {
+          "id": "c4a85302-085d-453f-92cf-419d8a75653b",
+          "name": "11-chain-gap-cleanup",
+          "targetDate": null
+        },
+        {
+          "id": "7f18c4cd-ab48-46ae-b044-4d01efb7f645",
+          "name": "10-gitnexus-code-graph-integration",
+          "targetDate": null
+        },
+        {
+          "id": "bd68b25f-f423-4428-9666-1e455b08e873",
+          "name": "09-llm-wiki-builder-integration",
+          "targetDate": null
+        },
+        {
+          "id": "0f057abf-0ce4-4c1f-8ecd-45ccc2eeaf48",
+          "name": "08-multi-ai-review-enforcement",
+          "targetDate": null
+        },
+        {
+          "id": "dda11084-4a81-47f3-92b4-984b33603340",
+          "name": "07-post-process-gsd-sections",
+          "targetDate": null
+        },
+        {
+          "id": "8bc3f6b8-9fdd-4c00-b76a-cf3e5e7de6ad",
+          "name": "06-vendor-claude-md-sections",
+          "targetDate": null
+        },
+        {
+          "id": "a04b4985-52e8-47aa-abed-2ae05593d823",
+          "name": "05-shipping-v1.4.0",
+          "targetDate": null
+        }
+      ],
+      "issueCounts": {
+        "backlog": 40,
+        "started": 0,
+        "done": 0
+      }
+    },
+    {
       "id": "bfb14e0b-eae1-4257-acdb-0874b7756cee",
       "name": "FBC Plattform – Roadmap (Phasen 1–4)",
       "summary": "Roadmap nach Review 29.06.2026: UI-Politur, Monetarisierung, CRM/Matching v2/Admin, Ökosystem & Ventures.",
@@ -66,9 +209,9 @@
         }
       ],
       "issueCounts": {
-        "backlog": 27,
-        "started": 0,
-        "done": 0
+        "backlog": 26,
+        "started": 1,
+        "done": 3
       }
     },
     {
