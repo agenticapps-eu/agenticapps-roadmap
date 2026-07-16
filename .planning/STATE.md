@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v0.1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-07-16T12:06:18.889Z"
+last_updated: "2026-07-16T12:17:35.459Z"
 last_activity: 2026-07-16
 progress:
   total_phases: 8
   completed_phases: 4
   total_plans: 35
-  completed_plans: 34
+  completed_plans: 35
   percent: 50
 ---
 
@@ -25,11 +25,11 @@ No `.planning/PROJECT.md` — design rationale lives in `docs/architecture.md` (
 ## Current Position
 
 Phase: 08 (Deploy, gate & document) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 Status: Ready to execute
 Last activity: 2026-07-16
 
-Progress: [██████████] 97%
+Progress: [██████████] 100%
 
 ## Phase 3 Wave Plan
 
@@ -72,6 +72,9 @@ Execution mode: **sequential on main** (user-selected). Worktree isolation disab
 - [Phase 07]: 07-04: Apply-button gating uses previewDiff (backfillKey-keyed), not diffFor(project.id) directly, resolving the projectId/projectKey key-space per useBackfill.ts's documented contract — The plan action text's literal diffFor(project.id) Apply-gate is circular (that key can never be populated before Apply is first clicked); 07-03's handoff explicitly flagged this for 07-04 to resolve using the hook's key-space contract
 - [Phase 07]: 07-05: LIVE-02/LIVE-03 recorded OPERATIONALLY PENDING; consolidated 07-HUMAN-UAT.md (12-item Phase-8 checklist) supersedes scattered deferred items from 07-01/07-04; snapshot.yml + backfill.yml re-verified structurally (beyond substring) with no workflow file modified
 - [Phase 08-01]: D-08-06 implemented: check-then-set KV nonce on the apply branch (get -> 403 if present, else put with 900s TTL) inside the existing single try/catch; ctx() env widened to Record<string, unknown> so ~30 existing test call sites needed zero changes
+- [Phase 08-02]: Production-only-secrets boundary documented in ADR/runbook v1: LINEAR_API_KEY and GH_BACKFILL_TOKEN bind to Cloudflare Pages Production only, never Preview (consequence of D-08-02 ungated preview + single [[kv_namespaces]] binding applying to both environments).
+- [Phase 08-02]: docs/access-setup.md reconciled to D-08-01: single whole-domain Access application (empty path) replaces the prior separate /api/* application requirement.
+- [Phase 08-02]: docs/architecture.md's scheduled snapshot refresh restated as the settled CI cron (snapshot.yml), no longer an open/optional choice.
 
 ### Pending Todos / Open Items
 
