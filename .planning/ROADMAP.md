@@ -191,7 +191,7 @@ Plans:
 
 **Wave 2** *(depend on 07-02 route contract)*
 
-- [ ] 07-03-PLAN.md — LIVE-02 client core: pure dispatch/poll/optimistic-rollback with 204 correlation + transient-retry + all terminal conclusions (TDD) + explicit useBackfill hook (Wave 2)
+- [x] 07-03-PLAN.md — LIVE-02 client core: pure dispatch/poll/optimistic-rollback with 204 correlation + transient-retry + all terminal conclusions (TDD) + explicit useBackfill hook (Wave 2)
 
 **Wave 3** *(depend on 07-03 hook)*
 
