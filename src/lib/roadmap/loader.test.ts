@@ -246,4 +246,14 @@ describe("shouldRevalidateRoadmap", () => {
       shouldRevalidateRoadmap(rargs("/?source=live", "/")),
     ).toBe(true);
   });
+
+  it("returns true for an explicit same-URL revalidate in live mode", () => {
+    expect(
+      shouldRevalidateRoadmap(rargs("/?source=live", "/?source=live")),
+    ).toBe(true);
+  });
+
+  it("returns true for an explicit same-URL revalidate in snapshot mode", () => {
+    expect(shouldRevalidateRoadmap(rargs("/", "/"))).toBe(true);
+  });
 });

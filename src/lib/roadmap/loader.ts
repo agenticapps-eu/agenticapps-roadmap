@@ -87,5 +87,12 @@ export function shouldRevalidateRoadmap({
   // EXACT mirror of the loader's own source check above — must not drift.
   const sourceMode = (u: URL) =>
     u.searchParams.get("source") === "live" ? "live" : "snapshot";
-  return sourceMode(currentUrl) !== sourceMode(nextUrl);
+  if (sourceMode(currentUrl) !== sourceMode(nextUrl)) {
+    return true; // existing behavior: toggle flips source — unchanged
+  }
+  // An explicit revalidator.revalidate() re-navigates to the CURRENT location
+  // unchanged, so pathname+search are IDENTICAL between currentUrl/nextUrl.
+  // A filter/?project navigation always changes search, so stays false there.
+  const asString = (u: URL) => u.pathname + u.search;
+  return asString(currentUrl) === asString(nextUrl);
 }
