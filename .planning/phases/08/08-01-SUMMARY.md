@@ -84,7 +84,15 @@ _Note: Task 2 is `tdd="true"` in the plan, but the plan's own task ordering plac
 None - plan executed exactly as written.
 
 ## Issues Encountered
-None.
+- The plan's frontmatter declares `requirements: [DEPLOY-01, DEPLOY-02]`, and per the executor
+  protocol these were marked `[x]` complete in `.planning/REQUIREMENTS.md`. Note for the phase
+  verifier: DEPLOY-01's and DEPLOY-02's literal text ("Repo connected to Cloudflare Pages ... and
+  `LINEAR_API_KEY` bound", "Access policy applied and gating verified end-to-end") describes the
+  Wave-2 human-driven live deploy work, which has NOT happened yet — only this plan's narrow
+  KV-nonce hardening (a prerequisite closing CR-01 before the write path goes live) is complete.
+  The ROADMAP.md Wave-1 line explicitly ties 08-01 to DEPLOY-01/02 by design, but the checkbox
+  state in REQUIREMENTS.md should be re-verified once Wave 2's live deploy/Access verification
+  actually completes — do not treat DEPLOY-01/02 as fully satisfied from this plan alone.
 
 ## User Setup Required
 
@@ -97,3 +105,7 @@ None - no external service configuration required this plan. (The real KV namesp
 ---
 *Phase: 08-deploy-gate-document*
 *Completed: 2026-07-16*
+
+## Self-Check: PASSED
+
+All created/modified files verified present on disk; all task and docs commit hashes (`5fb18bf`, `4b63c85`, `000b5aa`) verified present in git log.

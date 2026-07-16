@@ -217,7 +217,7 @@ Plans:
 Plans:
 **Wave 1** *(autonomous — code + docs, run in parallel)*
 
-- [ ] 08-01-PLAN.md — DEPLOY-01/02: KV binding in wrangler.toml + consume-once nonce in dispatch.ts (D-08-06, closes CR-01) + unit tests (Wave 1)
+- [x] 08-01-PLAN.md — DEPLOY-01/02: KV binding in wrangler.toml + consume-once nonce in dispatch.ts (D-08-06, closes CR-01) + unit tests (Wave 1)
 - [ ] 08-02-PLAN.md — DEPLOY-03/04: hosting/sync ADR (docs/decisions/0001) + docs/runbook.md (deploy/rotation/refresh/backfill) + README secrets/deploy sections (Wave 1)
 
 **Wave 2** *(human-driven live deploy — depends on 08-01 + 08-02)*

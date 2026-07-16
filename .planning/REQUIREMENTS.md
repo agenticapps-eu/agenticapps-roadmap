@@ -64,8 +64,8 @@
 
 ### Deploy, gate & document (Phase 8)
 
-- [ ] **DEPLOY-01**: Repo connected to Cloudflare Pages with production + preview builds and `LINEAR_API_KEY` bound.
-- [ ] **DEPLOY-02**: Cloudflare Access policy (email allow-list) applied and gating verified end-to-end.
+- [x] **DEPLOY-01**: Repo connected to Cloudflare Pages with production + preview builds and `LINEAR_API_KEY` bound.
+- [x] **DEPLOY-02**: Cloudflare Access policy (email allow-list) applied and gating verified end-to-end.
 - [ ] **DEPLOY-03**: README + `docs/runbook.md` cover deploy, token rotation, snapshot refresh, and backfill.
 - [ ] **DEPLOY-04**: `v0.1.0` tagged with an ADR recording the hosting/sync decision.
 

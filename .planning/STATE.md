@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v0.1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-07-16T11:27:05.314Z"
-last_activity: 2026-07-16 -- Phase 8 planning complete
+last_updated: "2026-07-16T12:06:18.889Z"
+last_activity: 2026-07-16
 progress:
   total_phases: 8
   completed_phases: 4
   total_plans: 35
-  completed_plans: 33
+  completed_plans: 34
   percent: 50
 ---
 
@@ -20,16 +20,16 @@ progress:
 No `.planning/PROJECT.md` — design rationale lives in `docs/architecture.md` (decided 2026-06-22).
 
 **Core value:** A private, snapshot-default roadmap dashboard that reads Linear and syncs with the repos' GSD `.planning/` plans, keeping the Linear token server-side at all times.
-**Current focus:** Phase 08
+**Current focus:** Phase 08 — Deploy, gate & document
 
 ## Current Position
 
-Phase: 08
-Plan: Not started
+Phase: 08 (Deploy, gate & document) — EXECUTING
+Plan: 2 of 3
 Status: Ready to execute
-Last activity: 2026-07-16 -- Phase 8 planning complete
+Last activity: 2026-07-16
 
-Progress: [██████████] 100%
+Progress: [██████████] 97%
 
 ## Phase 3 Wave Plan
 
@@ -71,6 +71,7 @@ Execution mode: **sequential on main** (user-selected). Worktree isolation disab
 - [Phase 07]: 07-03: useBackfill resolves projectId/projectKey key-space ambiguity by keying hook-local state by whichever string is passed at each call site (startPreview keys by projectKey; applyBackfill re-keys by projectId afterward) — 07-REVIEWS finding MEDIUM flagged this as underspecified; the interface as literally written (startPreview only receives projectKey, diffFor/statusFor/errorFor only receive projectId) has no other internally consistent resolution without an extra parameter
 - [Phase 07]: 07-04: Apply-button gating uses previewDiff (backfillKey-keyed), not diffFor(project.id) directly, resolving the projectId/projectKey key-space per useBackfill.ts's documented contract — The plan action text's literal diffFor(project.id) Apply-gate is circular (that key can never be populated before Apply is first clicked); 07-03's handoff explicitly flagged this for 07-04 to resolve using the hook's key-space contract
 - [Phase 07]: 07-05: LIVE-02/LIVE-03 recorded OPERATIONALLY PENDING; consolidated 07-HUMAN-UAT.md (12-item Phase-8 checklist) supersedes scattered deferred items from 07-01/07-04; snapshot.yml + backfill.yml re-verified structurally (beyond substring) with no workflow file modified
+- [Phase 08-01]: D-08-06 implemented: check-then-set KV nonce on the apply branch (get -> 403 if present, else put with 900s TTL) inside the existing single try/catch; ctx() env widened to Record<string, unknown> so ~30 existing test call sites needed zero changes
 
 ### Pending Todos / Open Items
 
