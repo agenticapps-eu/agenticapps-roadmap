@@ -97,6 +97,37 @@ function isValidPreviewRun(run: PreviewRun, project: string): boolean {
   );
 }
 
+// ---------------------------------------------------------------------------
+// Per-isolate fixed-window rate limit (WR-01) — mirrors
+// functions/api/linear/[[path]].ts's isRateLimited(). Cloudflare Access is
+// the primary auth control for this route; this is defense-in-depth in
+// case Access is ever misconfigured for this specific path. A tighter
+// window than the read-only Linear proxy is used here because this route
+// can push commits to `main` and write to a production Linear workspace.
+// ---------------------------------------------------------------------------
+
+const LIMIT = 10;
+const WINDOW_MS = 60_000;
+
+let windowStart = Date.now();
+let requestCount = 0;
+
+function isRateLimited(): boolean {
+  const now = Date.now();
+  if (now - windowStart > WINDOW_MS) {
+    windowStart = now;
+    requestCount = 0;
+  }
+  requestCount += 1;
+  return requestCount > LIMIT;
+}
+
+/** Resets the in-memory rate-limit counters. For test use only. */
+export function _resetRateLimitForTest(): void {
+  windowStart = Date.now();
+  requestCount = 0;
+}
+
 const NO_STORE = { "Cache-Control": "no-store" };
 
 function jsonResponse(body: unknown, status: number): Response {
@@ -130,12 +161,17 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     return textResponse("apply requires a valid previewRunId", 400);
   }
 
-  // 2. Env check — generic 500 before any fetch (fail closed).
+  // 2. Rate limit (WR-01, defense-in-depth) — before any fetch.
+  if (isRateLimited()) {
+    return textResponse("rate limited", 429);
+  }
+
+  // 3. Env check — generic 500 before any fetch (fail closed).
   if (!env.GH_BACKFILL_TOKEN) {
     return textResponse("internal error", 500);
   }
 
-  // 3. Single try/catch around the entire GitHub-call stretch. ANY failure
+  // 4. Single try/catch around the entire GitHub-call stretch. ANY failure
   //    (network throw, non-ok, malformed body) collapses to a generic 502.
   try {
     if (mode === "apply") {

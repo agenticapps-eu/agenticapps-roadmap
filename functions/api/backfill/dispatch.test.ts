@@ -11,8 +11,8 @@
  *   and must never contain the token value or a GH-PAT-shaped string.
  */
 
-import { describe, it, expect, vi, afterEach } from "vitest";
-import { onRequestPost } from "./dispatch.ts";
+import { describe, it, expect, vi, afterEach, beforeEach } from "vitest";
+import { onRequestPost, _resetRateLimitForTest } from "./dispatch.ts";
 
 const TEST_TOKEN = "ghp_TESTTOKEN000";
 const TOKEN_REGEX = /ghp_|github_pat_/;
@@ -58,6 +58,7 @@ function goodPreviewRun(project: string) {
 
 afterEach(() => {
   vi.unstubAllGlobals();
+  _resetRateLimitForTest();
 });
 
 // ---------------------------------------------------------------------------
@@ -466,5 +467,45 @@ describe("token never present in any response body", () => {
     const body = await bodyOf(await onRequestPost(ctx({ project: "cparx", mode: "dry-run" })));
     expect(body).not.toContain(TEST_TOKEN);
     expect(body).not.toMatch(TOKEN_REGEX);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// WR-01: 429 rate limit (tighter LIMIT=10 than the read-only Linear proxy)
+// ---------------------------------------------------------------------------
+
+describe("429 rate limit", () => {
+  beforeEach(() => {
+    _resetRateLimitForTest();
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: false, status: 503 }));
+  });
+
+  it("10th request is not rate limited but 11th is (> LIMIT off-by-one)", async () => {
+    for (let i = 0; i < 9; i++) {
+      await onRequestPost(ctx({ project: "cparx", mode: "dry-run" }));
+    }
+
+    const res10 = await onRequestPost(ctx({ project: "cparx", mode: "dry-run" }));
+    expect(res10.status).not.toBe(429);
+
+    const res11 = await onRequestPost(ctx({ project: "cparx", mode: "dry-run" }));
+    expect(res11.status).toBe(429);
+    expect(await res11.text()).toBe("rate limited");
+  });
+
+  it("allows requests again after the window resets", async () => {
+    vi.useFakeTimers();
+    try {
+      for (let i = 0; i < 11; i++) {
+        await onRequestPost(ctx({ project: "cparx", mode: "dry-run" }));
+      }
+
+      vi.advanceTimersByTime(60_001);
+
+      const res = await onRequestPost(ctx({ project: "cparx", mode: "dry-run" }));
+      expect(res.status).not.toBe(429);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });

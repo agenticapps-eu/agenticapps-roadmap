@@ -13,8 +13,8 @@
  *   token value or a GH-PAT-shaped string.
  */
 
-import { describe, it, expect, vi, afterEach } from "vitest";
-import { onRequestGet } from "./status.ts";
+import { describe, it, expect, vi, afterEach, beforeEach } from "vitest";
+import { onRequestGet, _resetRateLimitForTest } from "./status.ts";
 
 const TEST_TOKEN = "ghp_TESTTOKEN000";
 const TOKEN_REGEX = /ghp_|github_pat_/;
@@ -58,6 +58,7 @@ function runPayload(overrides: Record<string, unknown> = {}) {
 
 afterEach(() => {
   vi.unstubAllGlobals();
+  _resetRateLimitForTest();
 });
 
 // ---------------------------------------------------------------------------
@@ -376,5 +377,45 @@ describe("token never present in any response body", () => {
     const body = await bodyOf(await onRequestGet(ctx("https://x/api/backfill/status?run=123")));
     expect(body).not.toContain(TEST_TOKEN);
     expect(body).not.toMatch(TOKEN_REGEX);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// WR-01: 429 rate limit
+// ---------------------------------------------------------------------------
+
+describe("429 rate limit", () => {
+  beforeEach(() => {
+    _resetRateLimitForTest();
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: false, status: 503 }));
+  });
+
+  it("30th request is not rate limited but 31st is (> LIMIT off-by-one)", async () => {
+    for (let i = 0; i < 29; i++) {
+      await onRequestGet(ctx("https://x/api/backfill/status?run=123"));
+    }
+
+    const res30 = await onRequestGet(ctx("https://x/api/backfill/status?run=123"));
+    expect(res30.status).not.toBe(429);
+
+    const res31 = await onRequestGet(ctx("https://x/api/backfill/status?run=123"));
+    expect(res31.status).toBe(429);
+    expect(await res31.text()).toBe("rate limited");
+  });
+
+  it("allows requests again after the window resets", async () => {
+    vi.useFakeTimers();
+    try {
+      for (let i = 0; i < 31; i++) {
+        await onRequestGet(ctx("https://x/api/backfill/status?run=123"));
+      }
+
+      vi.advanceTimersByTime(60_001);
+
+      const res = await onRequestGet(ctx("https://x/api/backfill/status?run=123"));
+      expect(res.status).not.toBe(429);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });
