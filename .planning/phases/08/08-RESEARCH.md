@@ -525,19 +525,24 @@ are stable as documented.
 | A3 | The GitHub fine-grained PAT correctly needs `Contents: Read` + `Actions: Read and write` (not `Actions: Write` alone, since `status.ts` needs read on runs/jobs/logs too) | Pitfall 2, Pattern 3 | If under-scoped, `status.ts` polling would 403/502 against real GitHub calls — caught immediately by HUMAN-UAT item 4 (dry-run preview) and easy to fix (re-issue token with corrected permission). |
 | A4 | Cloudflare Pages "production branch" for this not-yet-created project should be set to `main` during setup | Summary/Pitfall 1 | If set to a different branch, Access gating + production deploy would target the wrong branch; standard Cloudflare Pages convention and this repo's existing `git-integration` assumption (README/`.github/workflows` all reference `main`) make this a very low-risk assumption but it is a dashboard choice made during setup, not something this session could execute or verify directly. |
 
-## Open Questions
+## Open Questions (RESOLVED)
+
+> All three questions are resolved by Phase-8 plan tasks; each carries an inline RESOLVED note below.
 
 1. **Will the real `POST .../dispatches` call actually return 200 with `workflow_run_id` for this specific org/repo/PAT combination?**
+   - RESOLVED: closed by 08-03 Task 3 (07-HUMAN-UAT item #9) — the plan records the observed live status (200 with `workflow_run_id`, or 204 correlationId fallback) against the real org/repo/PAT; also logged in 08-VALIDATION.md.
    - What we know: The feature is documented and GA as of 2026-02-19 per GitHub's official changelog and REST reference. `dispatch.ts` already codes for both branches (200 and 204 fallback via correlationId).
    - What's unclear: Whether any account/plan-tier restriction applies (not found in available docs), and whether the fine-grained PAT's scopes affect this response shape (unlikely, but unverified).
    - Recommendation: Treat as HIGH-confidence-expected-200, but keep HUMAN-UAT item #9 in the plan as the actual live confirmation — do not skip it on the strength of this research alone.
 
 2. **Does Cloudflare Pages require a separate dashboard-side KV binding configuration for the Preview environment, independent of `wrangler.toml`?**
+   - RESOLVED: deprioritized per D-08-02 (preview-scope exclusion) and D-08-07 (Preview builds only render the static app, no live secrets/`/api/*` dependency). 08-03 Task 2 proves the preview build serves the static app at a `*.pages.dev` URL with the single top-level `[[kv_namespaces]]` block; no separate Preview KV entry is required for this phase's scope.
    - What we know: Pages docs describe dashboard-based binding configuration "for production and preview environments" as one path, and wrangler.toml as another; the two are not fully documented as mutually exclusive or as automatically syncing.
    - What's unclear: Whether a wrangler.toml-declared `[[kv_namespaces]]` block (no env split) automatically applies to a Pages project's Preview deployments too, or whether the dashboard needs an explicit second entry.
    - Recommendation: Since D-08-02 defers Preview-environment Access gating anyway (Preview URLs are out of this phase's proof scope), this is low-priority — verify only if a Preview-deployment KV error surfaces during setup; do not block the phase on it.
 
 3. **Does the existing `docs/access-setup.md` Access-application setup need to be re-created for this not-yet-existing Pages project, or does gating happen only after the project exists?**
+   - RESOLVED: 08-03 Task 2 treats Access-application creation as genuinely NEW work (step 4), sequenced after Pages-project creation — not a "verify existing" step.
    - What we know: `docs/access-setup.md` was written against Phase 3's plan when a Pages project was assumed to already exist (Phase 3 deferred its own Access proof to Phase 8, per `STATE.md`).
    - What's unclear: Whether the Access application referenced in that doc was ever actually created in the Cloudflare dashboard, given no Pages project exists yet (an Access "Self-hosted" application needs a domain to target, which needs the Pages project to exist first).
    - Recommendation: Treat Access application creation as a genuinely new Phase 8 task (not "verify existing"), sequenced after Pages project creation, even though the runbook text already exists.

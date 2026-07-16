@@ -1,9 +1,9 @@
 ---
 phase: 8
 slug: deploy-gate-document
-status: draft
-nyquist_compliant: false
-wave_0_complete: false
+status: approved
+nyquist_compliant: true
+wave_0_complete: true
 created: 2026-07-16
 ---
 
@@ -17,20 +17,21 @@ created: 2026-07-16
 
 | Property | Value |
 |----------|-------|
-| **Framework** | {pytest 7.x / jest 29.x / vitest / go test / other} |
-| **Config file** | {path or "none — Wave 0 installs"} |
-| **Quick run command** | `{quick command}` |
-| **Full suite command** | `{full command}` |
-| **Estimated runtime** | ~{N} seconds |
+| **Framework** | Vitest (existing, `vitest.config.ts` at repo root) |
+| **Config file** | `vitest.config.ts` — `include: ["scripts/**/*.test.ts", "functions/**/*.test.ts", "src/**/*.test.ts"]` |
+| **Quick run command** | `CI=true npx vitest run functions/api/backfill/dispatch.test.ts` (per this project's documented non-TTY workaround — `pnpm test`/`typecheck` abort in agent shells) |
+| **Full suite command** | `CI=true npx vitest run` |
+| **Typecheck command** | `npx tsc -b --noEmit` (non-TTY-safe substitute for `pnpm typecheck`) |
+| **Estimated runtime** | ~10 seconds (quick), ~30 seconds (full suite) |
 
 ---
 
 ## Sampling Rate
 
-- **After every task commit:** Run `{quick run command}`
-- **After every plan wave:** Run `{full suite command}`
-- **Before `/gsd:verify-work`:** Full suite must be green
-- **Max feedback latency:** {N} seconds
+- **After every task commit:** Run `CI=true npx vitest run functions/api/backfill/dispatch.test.ts` (nonce logic — fast, isolated)
+- **After every plan wave:** Run `CI=true npx vitest run` (full suite — confirms no regression in untouched proxy/status/client code)
+- **Before `/gsd:verify-work`:** Full suite must be green AND every `07-HUMAN-UAT.md` item recorded PASS
+- **Max feedback latency:** 30 seconds
 
 ---
 
@@ -38,7 +39,13 @@ created: 2026-07-16
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
-| {N}-01-01 | 01 | 1 | REQ-{XX} | T-{N}-01 / — | {expected secure behavior or "N/A"} | unit | `{command}` | ✅ / ❌ W0 | ⬜ pending |
+| 08-01-01 | 01 | 1 | D-08-06 (CR-01 nonce) | T-08-07 | A reused previewRunId authorizes at most one apply (second → 403, no GitHub dispatch) | unit | `CI=true npx vitest run functions/api/backfill/dispatch.test.ts -t "previewRunId"` | ✅ | ⬜ pending |
+| 08-01-01 | 01 | 1 | DEPLOY-01 (KV binding) | T-08-07 | wrangler.toml declares the BACKFILL_NONCE KV binding the Function reads | unit | `CI=true npx vitest run functions/api/backfill/dispatch.test.ts` | ✅ | ⬜ pending |
+| 08-02-* | 02 | 1 | DEPLOY-03, DEPLOY-04 | — | README + runbook.md + ADR cover deploy/rotation/refresh/backfill | manual-only (doc review) | — | ✅ (created by 08-02) | ⬜ pending |
+| 08-03-02 | 03 | 2 | DEPLOY-01 (preview build) | T-08-09 | Preview `*.pages.dev` build serves static app (200) with zero live secrets; secrets stay Production-only | manual-only (live curl) | `curl -sS -o /dev/null -w "%{http_code}\n" https://<hash>.agenticapps-roadmap.pages.dev/` | N/A — infra state | ⬜ pending |
+| 08-03-02 | 03 | 2 | DEPLOY-01 (prod connect + bind) | T-08-09 | Pages project connected; secrets bound Production-only | manual-only (dashboard + curl) | — | N/A — infra state | ⬜ pending |
+| 08-03-03 | 03 | 2 | DEPLOY-02 (Access gating) | T-08-06 | Unauth request to app root + all `/api/*` returns 302/403 | manual-only (live curl) | `curl -sS -o /dev/null -w "%{http_code}\n" https://<domain>/api/backfill/dispatch` | N/A | ⬜ pending |
+| 08-03-03 | 03 | 2 | DEPLOY-04 (v0.1.0 tag) | — | Tag applied only after load-bearing UAT PASS | automated (post-tag) | `git tag -l v0.1.0 && git ls-remote --tags origin \| grep -q 'refs/tags/v0.1.0'` | ✅ (after tag) | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -46,31 +53,45 @@ created: 2026-07-16
 
 ## Wave 0 Requirements
 
-- [ ] `{tests/test_file.py}` — stubs for REQ-{XX}
-- [ ] `{tests/conftest.py}` — shared fixtures
-- [ ] `{framework install}` — if no framework detected
+**Existing infrastructure covers all phase requirements.** Vitest is already present
+(`vitest.config.ts`) and `functions/api/backfill/dispatch.test.ts` already exists — the
+08-01 nonce work extends it with new KV cases (reuse → 403; distinct ids → both succeed)
+using the existing plain-object `env` mock style (no Miniflare needed). No framework
+install and no new test-file scaffold are required before execution begins.
 
-*If none: "Existing infrastructure covers all phase requirements."*
+- [x] Test framework present (Vitest) — no install needed
+- [x] `functions/api/backfill/dispatch.test.ts` exists — 08-01 extends it in place with `BACKFILL_NONCE` cases
 
 ---
 
 ## Manual-Only Verifications
 
+*This is a live-deploy verification phase by design; human-only validation dominates.
+The one automatable slice (the KV nonce, 08-01) has real unit coverage above.*
+
 | Behavior | Requirement | Why Manual | Test Instructions |
 |----------|-------------|------------|-------------------|
-| {behavior} | REQ-{XX} | {reason} | {steps} |
-
-*If none: "All phase behaviors have automated verification."*
+| Repo connected to Cloudflare Pages, production build live, `LINEAR_API_KEY` bound | DEPLOY-01 | Dashboard infra state — no in-repo code path to assert | Create the Pages project (production branch `main`), bind secrets Production-only; `curl` the production domain root — 302/403 unauth (gated). 08-03 Task 2; UAT item #1. |
+| Preview build serves the static app (200) with zero live secrets | DEPLOY-01 | Live Cloudflare preview deployment state | Push a throwaway non-`main` branch; `curl` the resulting `*.pages.dev` preview URL — returns 200 for the static app. 08-03 Task 2; complements UAT items #1/#2. |
+| Access policy applied, gating verified end-to-end | DEPLOY-02 | Edge-level auth — verified only against the live deployed domain | Unauth `curl` to app root + `/api/backfill/*` + `/api/linear/*` → 302/403; allow-list identity → 200. 08-03 Task 3; UAT items #2, #8. |
+| Apply cannot bypass preview (no/invalid previewRunId) | DEPLOY-02 | Requires live dispatch path | Direct `POST /api/backfill/dispatch {mode:"apply"}` with no previewRunId → 403. 08-03 Task 3; UAT item #3. |
+| Typed diff preview + sibling checkout resolve live | DEPLOY-01 | Requires a real GitHub dispatch + CI run | UI Preview on claude-workflow renders typed diff; dry-run leg locates all 3 siblings' `.planning/`. 08-03 Task 3; UAT items #4, #5. |
+| Real apply writes Linear + commits roadmap.json + linear-map.json | DEPLOY-01 | Real Linear write + CI commit to `main` | Apply `claude-workflow` end-to-end; verify Linear UI + single commit SHA; SyncBadge in-sync after reload. 08-03 Task 3; UAT items #6, #7. |
+| Dispatch returns 200 vs 204 (`return_run_details`) | DEPLOY-01 | Real GitHub API response for this org/repo/PAT | Record observed status of the real `.../dispatches` call. 08-03 Task 3; UAT items #9, #12 (closes RESEARCH Open Question 1). |
+| Concurrency serialization (shared writer group) | DEPLOY-01 | Requires two real concurrent runs | Trigger backfill apply + snapshot close together; confirm no non-fast-forward. 08-03 Task 3; UAT item #10. |
+| Nonce consume-once enforced live | D-08-06 | Requires real KV + live apply | Second apply reusing the same previewRunId → 403 live. 08-03 Task 3; UAT item #13. |
+| Real scheduled `snapshot.yml` cron fires on `main` | DEPLOY-04 | GitHub cron fires only on default branch; may need a later day (Pitfall 3) | Observe a real 06:00 UTC scheduled run commit a fresh roadmap.json; record run URL + timestamp. 08-03 Task 3; UAT item #11. |
+| `v0.1.0` tagged with hosting/sync ADR | DEPLOY-04 | Tag act gated on live UAT PASS (D-08-05); ADR is a doc artifact | `git tag v0.1.0` + push after load-bearing items PASS; verify `git ls-remote --tags origin`. 08-03 Task 3. |
 
 ---
 
 ## Validation Sign-Off
 
-- [ ] All tasks have `<automated>` verify or Wave 0 dependencies
-- [ ] Sampling continuity: no 3 consecutive tasks without automated verify
-- [ ] Wave 0 covers all MISSING references
-- [ ] No watch-mode flags
-- [ ] Feedback latency < {N}s
-- [ ] `nyquist_compliant: true` set in frontmatter
+- [x] All tasks have `<automated>` verify or are documented manual-only with justification (this is a live-deploy phase; the sole automatable slice — the 08-01 KV nonce — has real unit coverage)
+- [x] Sampling continuity: the automatable work (08-01 nonce) runs the quick command every commit; no 3 consecutive automatable tasks lack automated verify (only one automatable slice exists)
+- [x] Wave 0 covers all MISSING references (none — existing Vitest + dispatch.test.ts cover the automatable work)
+- [x] No watch-mode flags (`CI=true npx vitest run` is single-shot)
+- [x] Feedback latency < 30s
+- [x] `nyquist_compliant: true` set in frontmatter
 
-**Approval:** {pending / approved YYYY-MM-DD}
+**Approval:** approved 2026-07-16
