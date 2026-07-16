@@ -64,6 +64,31 @@ interface PreviewRun {
   created_at?: string;
 }
 
+// WR-02: runtime shape validation for GitHub API responses, matching the
+// isDispatchResponse/isStatusResponse guard style already used client-side
+// in src/lib/backfill/backfill.ts — no `any`, no blind `as` casts on
+// untrusted upstream data.
+function isPreviewRun(value: unknown): value is PreviewRun {
+  if (typeof value !== "object" || value === null) return false;
+  const v = value as Record<string, unknown>;
+  return (
+    typeof v.path === "string" &&
+    typeof v.head_branch === "string" &&
+    typeof v.event === "string" &&
+    typeof v.status === "string" &&
+    (v.conclusion === null || typeof v.conclusion === "string") &&
+    typeof v.name === "string" &&
+    (v.run_started_at === undefined || typeof v.run_started_at === "string") &&
+    (v.created_at === undefined || typeof v.created_at === "string")
+  );
+}
+
+function isWorkflowRunIdResponse(value: unknown): value is { workflow_run_id: number } {
+  if (typeof value !== "object" || value === null) return false;
+  const v = value as Record<string, unknown>;
+  return typeof v.workflow_run_id === "number";
+}
+
 // CR-01: a previewRunId must be recent — an arbitrarily old successful
 // dry-run no longer reflects the current sibling-repo/Linear state, and the
 // review's fix guidance calls for rejecting anything older than this bound.
@@ -182,8 +207,11 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
       if (!previewRes.ok) {
         throw new Error("preview run fetch failed");
       }
-      const previewRun = (await previewRes.json()) as PreviewRun;
-      if (!isValidPreviewRun(previewRun, project)) {
+      const previewRunJson: unknown = await previewRes.json();
+      if (!isPreviewRun(previewRunJson)) {
+        throw new Error("malformed preview run response");
+      }
+      if (!isValidPreviewRun(previewRunJson, project)) {
         return textResponse("preview verification failed", 403);
       }
     }
@@ -206,8 +234,11 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     );
 
     if (dispatchRes.status === 200) {
-      const dispatched = (await dispatchRes.json()) as { workflow_run_id: number };
-      return jsonResponse({ runId: dispatched.workflow_run_id }, 200);
+      const dispatchedJson: unknown = await dispatchRes.json();
+      if (!isWorkflowRunIdResponse(dispatchedJson)) {
+        throw new Error("malformed dispatch response");
+      }
+      return jsonResponse({ runId: dispatchedJson.workflow_run_id }, 200);
     }
     if (dispatchRes.status === 204) {
       return jsonResponse({ runId: null, correlationId }, 200);

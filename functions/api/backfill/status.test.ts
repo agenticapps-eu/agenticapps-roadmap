@@ -299,6 +299,35 @@ describe("generic 502 on upstream failure", () => {
 
     expect(res.status).toBe(502);
   });
+
+  // WR-02: a malformed (missing-field) GitHub response fails the runtime
+  // shape guard and collapses to the generic 502 path, not a crash.
+  it("returns 502 when the run response is malformed (missing fields)", async () => {
+    stubFetchSequence([{ ok: true, status: 200, json: async () => ({ unexpected: true }) }]);
+
+    const res = await onRequestGet(ctx("https://x/api/backfill/status?run=123"));
+
+    expect(res.status).toBe(502);
+  });
+
+  it("returns 502 when the runs-list response is malformed", async () => {
+    stubFetchSequence([{ ok: true, status: 200, json: async () => ({ nonsense: true }) }]);
+
+    const res = await onRequestGet(ctx(`https://x/api/backfill/status?correlationId=${CID}`));
+
+    expect(res.status).toBe(502);
+  });
+
+  it("returns 502 when the jobs response is malformed for a completed run", async () => {
+    stubFetchSequence([
+      runPayload({ status: "completed", conclusion: "success" }),
+      { ok: true, status: 200, json: async () => ({ nonsense: true }) },
+    ]);
+
+    const res = await onRequestGet(ctx("https://x/api/backfill/status?run=123"));
+
+    expect(res.status).toBe(502);
+  });
 });
 
 // ---------------------------------------------------------------------------

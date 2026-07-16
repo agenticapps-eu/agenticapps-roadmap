@@ -48,6 +48,55 @@ interface DiffCounts {
   dates: number;
 }
 
+// WR-02: runtime shape validation for GitHub API responses, matching the
+// isDispatchResponse/isStatusResponse guard style already used client-side
+// in src/lib/backfill/backfill.ts — no `any`, no blind `as` casts on
+// untrusted upstream data.
+function isRun(value: unknown): value is Run {
+  if (typeof value !== "object" || value === null) return false;
+  const v = value as Record<string, unknown>;
+  return (
+    typeof v.path === "string" &&
+    typeof v.head_branch === "string" &&
+    typeof v.event === "string" &&
+    typeof v.status === "string" &&
+    (v.conclusion === null || typeof v.conclusion === "string") &&
+    typeof v.name === "string"
+  );
+}
+
+function isRunsListResponse(
+  value: unknown,
+): value is { workflow_runs: Array<{ id: number; name: string }> } {
+  if (typeof value !== "object" || value === null) return false;
+  const v = value as Record<string, unknown>;
+  return (
+    Array.isArray(v.workflow_runs) &&
+    v.workflow_runs.every(
+      (r) =>
+        typeof r === "object" &&
+        r !== null &&
+        typeof (r as Record<string, unknown>).id === "number" &&
+        typeof (r as Record<string, unknown>).name === "string",
+    )
+  );
+}
+
+function isJobsResponse(value: unknown): value is { jobs: Array<{ id: number; name: string }> } {
+  if (typeof value !== "object" || value === null) return false;
+  const v = value as Record<string, unknown>;
+  return (
+    Array.isArray(v.jobs) &&
+    v.jobs.every(
+      (j) =>
+        typeof j === "object" &&
+        j !== null &&
+        typeof (j as Record<string, unknown>).id === "number" &&
+        typeof (j as Record<string, unknown>).name === "string",
+    )
+  );
+}
+
 /** Identity verification (finding #7) — BEFORE reading any jobs/logs. */
 function isIdentityValid(run: Run): boolean {
   return (
@@ -149,8 +198,11 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
       if (!listRes.ok) {
         throw new Error("runs list fetch failed");
       }
-      const list = (await listRes.json()) as { workflow_runs: Array<{ id: number; name: string }> };
-      const match = list.workflow_runs.find((r) => r.name.includes(`[cid:${correlationId}]`));
+      const listJson: unknown = await listRes.json();
+      if (!isRunsListResponse(listJson)) {
+        throw new Error("malformed runs list response");
+      }
+      const match = listJson.workflow_runs.find((r) => r.name.includes(`[cid:${correlationId}]`));
       if (!match) {
         return jsonResponse({ status: "queued", conclusion: null }, 200);
       }
@@ -164,7 +216,11 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
     if (!runRes.ok) {
       throw new Error("run fetch failed");
     }
-    const run = (await runRes.json()) as Run;
+    const runJson: unknown = await runRes.json();
+    if (!isRun(runJson)) {
+      throw new Error("malformed run response");
+    }
+    const run = runJson;
     if (!isIdentityValid(run)) {
       return textResponse("run identity verification failed", 403);
     }
@@ -180,8 +236,11 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
     if (!jobsRes.ok) {
       throw new Error("jobs fetch failed");
     }
-    const jobs = (await jobsRes.json()) as { jobs: Array<{ id: number; name: string }> };
-    const job = jobs.jobs[0];
+    const jobsJson: unknown = await jobsRes.json();
+    if (!isJobsResponse(jobsJson)) {
+      throw new Error("malformed jobs response");
+    }
+    const job = jobsJson.jobs[0];
     if (!job) {
       return jsonResponse({ status: run.status, conclusion: run.conclusion }, 200);
     }
