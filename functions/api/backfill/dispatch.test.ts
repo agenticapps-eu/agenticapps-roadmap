@@ -17,9 +17,23 @@ import { onRequestPost, _resetRateLimitForTest } from "./dispatch.ts";
 const TEST_TOKEN = "ghp_TESTTOKEN000";
 const TOKEN_REGEX = /ghp_|github_pat_/;
 
+/** Map-backed fake KVNamespace exposing only the get/put methods dispatch.ts calls. */
+function createFakeKv() {
+  const store = new Map<string, string>();
+  return {
+    get: vi.fn(async (key: string) => store.get(key) ?? null),
+    put: vi.fn(async (key: string, value: string) => {
+      store.set(key, value);
+    }),
+  };
+}
+
 function ctx(
   body: Record<string, unknown>,
-  env: Record<string, string> = { GH_BACKFILL_TOKEN: TEST_TOKEN }
+  env: Record<string, unknown> = {
+    GH_BACKFILL_TOKEN: TEST_TOKEN,
+    BACKFILL_NONCE: createFakeKv(),
+  }
 ) {
   const request = new Request("https://x/api/backfill/dispatch", {
     method: "POST",
@@ -341,6 +355,74 @@ describe("apply dispatch success", () => {
 });
 
 // ---------------------------------------------------------------------------
+// D-08-06: consume-once nonce — best-effort sequential replay suppression
+// ---------------------------------------------------------------------------
+
+describe("consume-once nonce (D-08-06)", () => {
+  it("rejects a sequential reuse of the same previewRunId with exactly one dispatch POST", async () => {
+    const kv = createFakeKv();
+    const env = { GH_BACKFILL_TOKEN: TEST_TOKEN, BACKFILL_NONCE: kv };
+
+    const mockFetch = stubFetchSequence([
+      goodPreviewRun("cparx"),
+      { ok: true, status: 200, json: async () => ({ workflow_run_id: 55 }) },
+      goodPreviewRun("cparx"),
+    ]);
+
+    const first = await onRequestPost(
+      ctx({ project: "cparx", mode: "apply", previewRunId: 42 }, env)
+    );
+    expect(first.status).toBe(200);
+
+    const second = await onRequestPost(
+      ctx({ project: "cparx", mode: "apply", previewRunId: 42 }, env)
+    );
+    expect(second.status).toBe(403);
+    expect(await second.text()).toBe("preview already applied");
+
+    // Total fetches = 3: two preview-run GETs + exactly one dispatch POST.
+    expect(mockFetch).toHaveBeenCalledTimes(3);
+    const dispatchCalls = mockFetch.mock.calls.filter(([url]) =>
+      String(url).includes("/dispatches")
+    );
+    expect(dispatchCalls).toHaveLength(1);
+
+    expect(kv.put).toHaveBeenCalledWith(
+      "previewRunId:42",
+      "1",
+      expect.objectContaining({ expirationTtl: 900 })
+    );
+  });
+
+  it("authorizes two distinct previewRunIds independently (both dispatch)", async () => {
+    const kv = createFakeKv();
+    const env = { GH_BACKFILL_TOKEN: TEST_TOKEN, BACKFILL_NONCE: kv };
+
+    const mockFetch = stubFetchSequence([
+      goodPreviewRun("cparx"),
+      { ok: true, status: 200, json: async () => ({ workflow_run_id: 1 }) },
+      goodPreviewRun("cparx"),
+      { ok: true, status: 200, json: async () => ({ workflow_run_id: 2 }) },
+    ]);
+
+    const first = await onRequestPost(
+      ctx({ project: "cparx", mode: "apply", previewRunId: 42 }, env)
+    );
+    expect(first.status).toBe(200);
+
+    const second = await onRequestPost(
+      ctx({ project: "cparx", mode: "apply", previewRunId: 43 }, env)
+    );
+    expect(second.status).toBe(200);
+
+    const dispatchCalls = mockFetch.mock.calls.filter(([url]) =>
+      String(url).includes("/dispatches")
+    );
+    expect(dispatchCalls).toHaveLength(2);
+  });
+});
+
+// ---------------------------------------------------------------------------
 // Generic 502 on any GitHub failure
 // ---------------------------------------------------------------------------
 
@@ -435,6 +517,21 @@ describe("Cache-Control: no-store on every response", () => {
     expect(res.headers.get("Cache-Control")).toBe("no-store");
   });
 
+  it("sets no-store on a 403 from a consumed nonce", async () => {
+    const kv = createFakeKv();
+    const env = { GH_BACKFILL_TOKEN: TEST_TOKEN, BACKFILL_NONCE: kv };
+    stubFetchSequence([
+      goodPreviewRun("cparx"),
+      { ok: true, status: 200, json: async () => ({ workflow_run_id: 1 }) },
+      goodPreviewRun("cparx"),
+    ]);
+    await onRequestPost(ctx({ project: "cparx", mode: "apply", previewRunId: 42 }, env));
+    const res = await onRequestPost(
+      ctx({ project: "cparx", mode: "apply", previewRunId: 42 }, env)
+    );
+    expect(res.headers.get("Cache-Control")).toBe("no-store");
+  });
+
   it("sets no-store on a 502", async () => {
     stubFetchSequence([{ ok: false, status: 500 }]);
     const res = await onRequestPost(ctx({ project: "cparx", mode: "dry-run" }));
@@ -507,6 +604,22 @@ describe("token never present in any response body", () => {
   it("502 body has no token", async () => {
     stubFetchSequence([{ ok: false, status: 500 }]);
     const body = await bodyOf(await onRequestPost(ctx({ project: "cparx", mode: "dry-run" })));
+    expect(body).not.toContain(TEST_TOKEN);
+    expect(body).not.toMatch(TOKEN_REGEX);
+  });
+
+  it("403-consumed body has no token", async () => {
+    const kv = createFakeKv();
+    const env = { GH_BACKFILL_TOKEN: TEST_TOKEN, BACKFILL_NONCE: kv };
+    stubFetchSequence([
+      goodPreviewRun("cparx"),
+      { ok: true, status: 200, json: async () => ({ workflow_run_id: 1 }) },
+      goodPreviewRun("cparx"),
+    ]);
+    await onRequestPost(ctx({ project: "cparx", mode: "apply", previewRunId: 42 }, env));
+    const body = await bodyOf(
+      await onRequestPost(ctx({ project: "cparx", mode: "apply", previewRunId: 42 }, env))
+    );
     expect(body).not.toContain(TEST_TOKEN);
     expect(body).not.toMatch(TOKEN_REGEX);
   });
