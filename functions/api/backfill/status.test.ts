@@ -165,6 +165,59 @@ describe("completed run with typed diff marker", () => {
 // (c) completed run whose logs lack the marker — diff undefined
 // ---------------------------------------------------------------------------
 
+// WR-06: the job is matched by name, not position — a job that runs
+// before "backfill" must not be mistaken for it.
+describe("completed run with a non-backfill job first in the jobs list", () => {
+  it("matches the 'backfill' job by name, ignoring an earlier unrelated job", async () => {
+    const diffPayload = { milestones: 4, issues: 1, labels: 2, dates: 0 };
+    const mockFetch = stubFetchSequence([
+      runPayload({ status: "completed", conclusion: "success" }),
+      {
+        ok: true,
+        status: 200,
+        json: async () => ({
+          jobs: [
+            { id: 111, name: "lint" },
+            { id: 999, name: "backfill" },
+          ],
+        }),
+      },
+      {
+        ok: true,
+        status: 200,
+        text: async () =>
+          `___DIFF_JSON___${JSON.stringify(diffPayload)}___END_DIFF___\n`,
+      },
+    ]);
+
+    const res = await onRequestGet(ctx("https://x/api/backfill/status?run=123"));
+
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as { diff: typeof diffPayload };
+    expect(body.diff).toEqual(diffPayload);
+    // The 3rd fetch call must be for job id 999 (the "backfill" job's logs),
+    // not job id 111 (the positionally-first "lint" job).
+    expect(mockFetch.mock.calls[2]?.[0]).toBe(
+      "https://api.github.com/repos/agenticapps-eu/agenticapps-roadmap/actions/jobs/999/logs",
+    );
+  });
+
+  it("fails closed (no diff, no error) when no job is named 'backfill'", async () => {
+    const mockFetch = stubFetchSequence([
+      runPayload({ status: "completed", conclusion: "success" }),
+      { ok: true, status: 200, json: async () => ({ jobs: [{ id: 111, name: "lint" }] }) },
+    ]);
+
+    const res = await onRequestGet(ctx("https://x/api/backfill/status?run=123"));
+
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as { status: string; diff?: unknown };
+    expect(body.status).toBe("completed");
+    expect(body.diff).toBeUndefined();
+    expect(mockFetch).toHaveBeenCalledTimes(2);
+  });
+});
+
 describe("completed run without a diff marker", () => {
   it("returns diff: undefined when the marker line is absent", async () => {
     const mockFetch = stubFetchSequence([

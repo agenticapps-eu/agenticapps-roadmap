@@ -253,7 +253,10 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
     if (!isJobsResponse(jobsJson)) {
       throw new Error("malformed jobs response");
     }
-    const job = jobsJson.jobs[0];
+    // WR-06: match the job by name rather than positional indexing, so an
+    // extra job added ahead of "backfill" in the workflow can't silently
+    // read the wrong job's logs.
+    const job = jobsJson.jobs.find((j) => j.name === "backfill");
     if (!job) {
       return jsonResponse({ status: run.status, conclusion: run.conclusion }, 200);
     }
