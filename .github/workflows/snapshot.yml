@@ -7,7 +7,7 @@ on:
     - cron: "0 6 * * *"
 
 concurrency:
-  group: snapshot
+  group: roadmap-git-writer
   cancel-in-progress: false
 
 jobs:
