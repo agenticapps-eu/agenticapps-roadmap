@@ -187,7 +187,7 @@ Plans:
 
 - [x] 07-01-PLAN.md — LIVE-01 Refresh: R-4 shouldRevalidate fix (TDD) + AppHeader Refresh button + null-safe freshness hint (Wave 1)
 - [x] 07-02-PLAN.md — LIVE-02 write-path backend: dispatch (allow-list + server-side preview-before-apply) + status (run→jobs→logs, identity verify, typed diff, correlation) Pages Functions (TDD) (Wave 1)
-- [ ] 07-06-PLAN.md — LIVE-02 CI workflows: backfill.yml (sibling checkout, env-var project, typed diff emit, sync:snapshot rebuild + commit both files) + snapshot.yml shared concurrency (Wave 1)
+- [x] 07-06-PLAN.md — LIVE-02 CI workflows: backfill.yml (sibling checkout, env-var project, typed diff emit, sync:snapshot rebuild + commit both files) + snapshot.yml shared concurrency (Wave 1)
 
 **Wave 2** *(depend on 07-02 route contract)*
 

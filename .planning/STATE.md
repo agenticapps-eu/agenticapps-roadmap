@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v0.1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-07-16T06:15:12.148Z"
+last_updated: "2026-07-16T06:25:58.837Z"
 last_activity: 2026-07-16
 progress:
   total_phases: 8
   completed_phases: 3
   total_plans: 32
-  completed_plans: 29
+  completed_plans: 30
   percent: 38
 ---
 
@@ -25,11 +25,11 @@ No `.planning/PROJECT.md` — design rationale lives in `docs/architecture.md` (
 ## Current Position
 
 Phase: 07 (Live refresh & write-back) — EXECUTING
-Plan: 3 of 6
+Plan: 4 of 6
 Status: Ready to execute
 Last activity: 2026-07-16
 
-Progress: [█████████░] 91%
+Progress: [█████████░] 94%
 
 ## Phase 3 Wave Plan
 
@@ -66,6 +66,8 @@ Execution mode: **sequential on main** (user-selected). Worktree isolation disab
 - [Phase 06]: 06-07: cli.ts's single-project apply path calls applyProject twice in one invocation (dryRun:true to render the y/N-gated diff, dryRun:false immediately after approval to execute) per 06-06's TOCTOU hand-off note; --project-less zero/multiple-match and --project-less-apply both throw the identical bulk-write-guard error string, while a wholly absent --project is only an error in apply mode (dry-run permits the zero-mutation multi-repo preview). Task 3 live-verify checkpoint deferred (LINEAR_API_KEY unset) -- documented under 'Human verification required' in 06-07-SUMMARY.md.
 - [Phase 07]: 07-01: Kept both branches of shouldRevalidateRoadmap (source-mode-flip AND identical-URL) -- additive R-4 fix, not a reversion; freshness hint tracks client-side lastRefreshedAt (seeded from initial load, bumped on revalidator loading-to-idle), not the live projection's own generatedAt, since the latter is always 'just now' in live mode.
 - [Phase 07]: 07-02: GH_BACKFILL_TOKEN kept distinct from LINEAR_API_KEY binding name; diff readback uses run->jobs->job-logs grep (no fflate/artifact path); preview-run verification collapses all failing checks to an undifferentiated 403
+- [Phase 07-06]: snapshot.yml concurrency group aligned to backfill.yml's shared roadmap-git-writer group (deliberate D-07-08 deviation to fix finding #9 cross-workflow git race)
+- [Phase 07-06]: dry-run diff marker emitted from a dedicated step (separate from CLI invocation) so the step's own echoed command text can never self-match the ___DIFF_JSON___ literal that status.ts scans for
 
 ### Pending Todos / Open Items
 

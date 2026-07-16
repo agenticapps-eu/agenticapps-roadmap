@@ -59,7 +59,7 @@
 ### Live refresh & write-back (Phase 7)
 
 - [x] **LIVE-01**: "Refresh from Linear" in live mode reconciles live data into the snapshot view.
-- [ ] **LIVE-02**: UI-triggered per-project backfill (behind Access) with optimistic UI + error rollback.
+- [x] **LIVE-02**: UI-triggered per-project backfill (behind Access) with optimistic UI + error rollback.
 - [ ] **LIVE-03**: Scheduled snapshot refresh (CI cron or Pages cron).
 
 ### Deploy, gate & document (Phase 8)
