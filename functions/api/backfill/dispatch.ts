@@ -99,23 +99,37 @@ const MAX_PREVIEW_AGE_MS = 15 * 60 * 1000;
 // after it authorizes one apply. Deferred until that binding is added —
 // see 07-HUMAN-UAT.md's Phase-8 items.
 
+// WR-04: escape regex metacharacters before anchoring a value into a
+// dynamically-built RegExp (project is allow-list-validated already, but
+// this keeps the helper correct regardless).
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 /**
  * Server-side verification that a previewRunId is a real, successful,
  * matching-project, RECENT dry-run of THIS workflow on `main` (finding #5,
  * T-07-10; CR-01 recency bound). The run-name contract (set by
  * backfill.yml, 07-06) is the only channel exposing a run's project/mode.
+ *
+ * WR-04: the run-name is anchored with a full-string regex (escaped
+ * delimiters) rather than free-form `.includes()`, so a run whose name
+ * merely CONTAINS a forged `[proj:...]`/`[mode:dry-run]` substring
+ * alongside its real, different values cannot pass verification.
  */
 function isValidPreviewRun(run: PreviewRun, project: string): boolean {
   const startedAt = new Date(run.run_started_at ?? run.created_at ?? 0).getTime();
   const ageMs = Date.now() - startedAt;
+  const namePattern = new RegExp(
+    `^backfill \\[proj:${escapeRegExp(project)}\\] \\[mode:dry-run\\] \\[cid:[^\\]]+\\]$`
+  );
   return (
     run.path === ".github/workflows/backfill.yml" &&
     run.head_branch === "main" &&
     run.event === "workflow_dispatch" &&
     run.status === "completed" &&
     run.conclusion === "success" &&
-    run.name.includes(`[proj:${project}]`) &&
-    run.name.includes("[mode:dry-run]") &&
+    namePattern.test(run.name) &&
     Number.isFinite(startedAt) &&
     ageMs >= 0 &&
     ageMs <= MAX_PREVIEW_AGE_MS

@@ -247,6 +247,28 @@ describe("apply with invalid preview run (403, no dispatch)", () => {
     expect(mockFetch).toHaveBeenCalledTimes(1);
   });
 
+  // WR-04: a run whose name merely CONTAINS the expected substrings amid
+  // extra/forged text must be rejected by the anchored full-string regex.
+  it("rejects a preview run whose name contains the right substrings but isn't an exact match", async () => {
+    const mockFetch = stubFetchSequence([
+      {
+        ok: true,
+        status: 200,
+        json: async () => ({
+          ...(await goodPreviewRun("cparx").json()),
+          name: "backfill [proj:cparx] [mode:dry-run] [cid:11111111-1111-1111-1111-111111111111] [proj:cparx] [mode:dry-run]",
+        }),
+      },
+    ]);
+
+    const res = await onRequestPost(
+      ctx({ project: "cparx", mode: "apply", previewRunId: 42 })
+    );
+
+    expect(res.status).toBe(403);
+    expect(mockFetch).toHaveBeenCalledTimes(1);
+  });
+
   it("accepts a preview run within the recency bound using created_at when run_started_at is absent", async () => {
     const recentTimestamp = new Date(Date.now() - 5 * 60 * 1000).toISOString();
     const mockFetch = stubFetchSequence([

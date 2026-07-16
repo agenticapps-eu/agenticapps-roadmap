@@ -97,6 +97,12 @@ function isJobsResponse(value: unknown): value is { jobs: Array<{ id: number; na
   );
 }
 
+// WR-04: escape regex metacharacters before anchoring a value (here, the
+// client-supplied correlationId) into a dynamically-built RegExp.
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 /** Identity verification (finding #7) — BEFORE reading any jobs/logs. */
 function isIdentityValid(run: Run): boolean {
   return (
@@ -202,7 +208,14 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
       if (!isRunsListResponse(listJson)) {
         throw new Error("malformed runs list response");
       }
-      const match = listJson.workflow_runs.find((r) => r.name.includes(`[cid:${correlationId}]`));
+      // WR-04: anchor the cid delimiter with an escaped regex instead of a
+      // free-form substring match, so a correlationId containing bracket
+      // characters cannot forge a match against an unrelated run's name.
+      // `correlationId` is guaranteed non-null here: the input-validation
+      // step above already rejected the `!hasValidRun && !correlationId`
+      // case before any fetch.
+      const cidPattern = new RegExp(`\\[cid:${escapeRegExp(correlationId as string)}\\]`);
+      const match = listJson.workflow_runs.find((r) => cidPattern.test(r.name));
       if (!match) {
         return jsonResponse({ status: "queued", conclusion: null }, 200);
       }

@@ -250,6 +250,29 @@ describe("correlationId resolve — matching run found", () => {
 // (f) correlationId — no matching run yet
 // ---------------------------------------------------------------------------
 
+// WR-04: a run name that merely contains an unbracketed/forged
+// correlationId substring must not match the anchored cid regex.
+describe("correlationId resolve — regex-injection safe", () => {
+  it("does not match a run whose name contains the correlationId without matching cid brackets", async () => {
+    const mockFetch = stubFetchSequence([
+      {
+        ok: true,
+        status: 200,
+        json: async () => ({
+          workflow_runs: [{ id: 999, name: `backfill [proj:cparx] [mode:dry-run] [cid:${CID}999]` }],
+        }),
+      },
+    ]);
+
+    const res = await onRequestGet(ctx(`https://x/api/backfill/status?correlationId=${CID}`));
+
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as { status: string };
+    expect(body.status).toBe("queued");
+    expect(mockFetch).toHaveBeenCalledTimes(1);
+  });
+});
+
 describe("correlationId resolve — not found yet", () => {
   it("returns { status: 'queued', conclusion: null } without further fetches", async () => {
     const mockFetch = stubFetchSequence([
