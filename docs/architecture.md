@@ -22,9 +22,10 @@ code. GitHub Pages can remain an optional public mirror of the static snapshot.
 
 ## Data paths
 
-1. **Snapshot (default).** CI (and an optional Pages cron) runs `sync:snapshot`,
-   which calls Linear GraphQL with `LINEAR_API_KEY` and writes
-   `public/roadmap.json` — a sanitized, token-free projection. The app renders
+1. **Snapshot (default).** A daily CI cron (`.github/workflows/snapshot.yml`,
+   `0 6 * * *` UTC) runs `sync:snapshot`, which calls Linear GraphQL with
+   `LINEAR_API_KEY` and writes `public/roadmap.json` — a sanitized, token-free
+   projection — committing it back to `main` when it changes. The app renders
    entirely from this file; instant load, works offline.
 2. **Live (enhancement).** In "Connect" mode the app calls `/api/linear/*` Pages
    Functions, which hold the token and proxy GraphQL — for on-demand refresh and
@@ -59,5 +60,4 @@ Direction is configurable (repos→Linear backfill now; two-way later). Always
 
 ## Open follow-ups
 
-- Scheduled snapshot refresh cadence (cron in CI vs Pages cron trigger).
 - Whether `fbc-platform` (Linear ahead of repo) should pull *down* into a `.planning/`.

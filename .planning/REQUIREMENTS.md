@@ -51,23 +51,23 @@
 
 ### sync-gsd-linear CLI (Phase 6)
 
-- [ ] **SYNC-01**: `.planning/` walker + `PLAN.md` parser producing a normalized `{ repo, phases[], tasks[] }` model.
-- [ ] **SYNC-02**: Linear resolver — stored `linear-map.json` first, then `roadmap:<repo>` label, then title-hash fallback — with no duplicate records.
-- [ ] **SYNC-03**: Per-project diff engine + date proposer (relative dates from phase order, shown for confirmation).
-- [ ] **SYNC-04**: `--dry-run` default and `--project <name>` apply path with explicit approval; idempotent upsert (re-run is a no-op).
+- [x] **SYNC-01**: `.planning/` walker + `PLAN.md` parser producing a normalized `{ repo, phases[], tasks[] }` model.
+- [x] **SYNC-02**: Linear resolver — stored `linear-map.json` first, then `roadmap:<repo>` label, then title-hash fallback — with no duplicate records.
+- [x] **SYNC-03**: Per-project diff engine + date proposer (relative dates from phase order, shown for confirmation).
+- [x] **SYNC-04**: `--dry-run` default and `--project <name>` apply path with explicit approval; idempotent upsert (re-run is a no-op).
 
 ### Live refresh & write-back (Phase 7)
 
-- [ ] **LIVE-01**: "Refresh from Linear" in live mode reconciles live data into the snapshot view.
-- [ ] **LIVE-02**: UI-triggered per-project backfill (behind Access) with optimistic UI + error rollback.
-- [ ] **LIVE-03**: Scheduled snapshot refresh (CI cron or Pages cron).
+- [x] **LIVE-01**: "Refresh from Linear" in live mode reconciles live data into the snapshot view.
+- [ ] **LIVE-02**: UI-triggered per-project backfill (behind Access) with optimistic UI + error rollback. Code-complete and unit-tested (dispatch/status Functions, client core, optimistic UI, CI workflow); left unchecked per 07-05-PLAN.md's explicit must_haves ("07-05 does NOT claim [LIVE-02] complete") — the live write path (dispatch → Actions → git push → Linear) is unproven until secrets + Access are bound. Check off only after Phase-8 HUMAN-UAT items pass (see `.planning/phases/07/07-HUMAN-UAT.md`).
+- [ ] **LIVE-03**: Scheduled snapshot refresh (CI cron or Pages cron). Mechanism verified structurally (see `.planning/phases/07/07-HUMAN-UAT.md`); left unchecked per 07-05-PLAN.md's explicit must_haves ("07-05 does NOT claim [LIVE-03] complete") — a real scheduled cron run has not yet fired. Check off only after Phase-8 HUMAN-UAT item #11 passes.
 
 ### Deploy, gate & document (Phase 8)
 
-- [ ] **DEPLOY-01**: Repo connected to Cloudflare Pages with production + preview builds and `LINEAR_API_KEY` bound.
-- [ ] **DEPLOY-02**: Cloudflare Access policy (email allow-list) applied and gating verified end-to-end.
-- [ ] **DEPLOY-03**: README + `docs/runbook.md` cover deploy, token rotation, snapshot refresh, and backfill.
-- [ ] **DEPLOY-04**: `v0.1.0` tagged with an ADR recording the hosting/sync decision.
+- [x] **DEPLOY-01**: Repo connected to Cloudflare Pages with production + preview builds and `LINEAR_API_KEY` bound.
+- [x] **DEPLOY-02**: Cloudflare Access policy (email allow-list) applied and gating verified end-to-end.
+- [x] **DEPLOY-03**: README + `docs/runbook.md` cover deploy, token rotation, snapshot refresh, and backfill.
+- [x] **DEPLOY-04**: `v0.1.0` tagged with an ADR recording the hosting/sync decision.
 
 ## Out of Scope
 

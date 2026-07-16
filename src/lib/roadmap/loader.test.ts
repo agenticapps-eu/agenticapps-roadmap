@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
-import type { LoaderFunctionArgs } from "react-router-dom";
-import { roadmapLoader } from "./loader.ts";
+import type { LoaderFunctionArgs, ShouldRevalidateFunctionArgs } from "react-router-dom";
+import { roadmapLoader, shouldRevalidateRoadmap } from "./loader.ts";
 import type { RoadmapJson } from "./schema.ts";
 
 // ---------------------------------------------------------------------------
@@ -190,5 +190,70 @@ describe("snapshot failure — error boundary", () => {
     await expect(
       roadmapLoader(args("http://localhost/")),
     ).rejects.toBeInstanceOf(Response);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// shouldRevalidateRoadmap — pure revalidation gate (OV-02 / 05-REVIEWS HIGH-BLOCKING)
+// ---------------------------------------------------------------------------
+
+/** Build ShouldRevalidateFunctionArgs from current/next URL strings. */
+function rargs(current: string, next: string): ShouldRevalidateFunctionArgs {
+  return {
+    currentUrl: new URL(current, "http://x"),
+    nextUrl: new URL(next, "http://x"),
+    currentParams: {},
+    nextParams: {},
+    defaultShouldRevalidate: true,
+  } as ShouldRevalidateFunctionArgs;
+}
+
+describe("shouldRevalidateRoadmap", () => {
+  it("returns false for a filter-only change (snapshot to snapshot)", () => {
+    expect(
+      shouldRevalidateRoadmap(rargs("/", "/?initiative=ini-001")),
+    ).toBe(false);
+  });
+
+  it("returns false when ?project opens", () => {
+    expect(
+      shouldRevalidateRoadmap(rargs("/", "/?project=proj-001")),
+    ).toBe(false);
+  });
+
+  it("returns false when ?project closes", () => {
+    expect(
+      shouldRevalidateRoadmap(rargs("/?project=proj-001", "/")),
+    ).toBe(false);
+  });
+
+  it("returns false for a filter change while staying in live mode", () => {
+    expect(
+      shouldRevalidateRoadmap(
+        rargs("/?source=live", "/?source=live&status=started"),
+      ),
+    ).toBe(false);
+  });
+
+  it("returns true when snapshot flips to live", () => {
+    expect(
+      shouldRevalidateRoadmap(rargs("/", "/?source=live")),
+    ).toBe(true);
+  });
+
+  it("returns true when live flips back to snapshot", () => {
+    expect(
+      shouldRevalidateRoadmap(rargs("/?source=live", "/")),
+    ).toBe(true);
+  });
+
+  it("returns true for an explicit same-URL revalidate in live mode", () => {
+    expect(
+      shouldRevalidateRoadmap(rargs("/?source=live", "/?source=live")),
+    ).toBe(true);
+  });
+
+  it("returns true for an explicit same-URL revalidate in snapshot mode", () => {
+    expect(shouldRevalidateRoadmap(rargs("/", "/"))).toBe(true);
   });
 });

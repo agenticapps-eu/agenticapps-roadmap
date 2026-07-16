@@ -17,6 +17,7 @@ const ProjectSchema = z.object({
   name: z.string(),
   summary: z.string().nullable(),
   url: z.string().nullish(),
+  planAhead: z.boolean().nullish(), // OV-04 (D-05-02) — populated by Phase 6 walker; badge renders only when truthy
   initiativeId: z.string().nullable(),
   status: z.string(),
   priority: z.number().int(),

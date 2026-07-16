@@ -1,16 +1,41 @@
-import { NavLink, useSearchParams, useRouteLoaderData, useNavigation } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import {
+  NavLink,
+  useSearchParams,
+  useRouteLoaderData,
+  useNavigation,
+  useRevalidator,
+} from "react-router-dom";
 import type { RoadmapLoaderData } from "@/lib/roadmap/loader";
+import { formatFreshness } from "@/lib/roadmap/freshness";
 
 export function AppHeader() {
   const [params, setParams] = useSearchParams();
   const live = params.get("source") === "live";
   const navigation = useNavigation();
   const isLoading = navigation.state === "loading";
+  const revalidator = useRevalidator();
+  const refreshing = revalidator.state === "loading";
 
   // liveUnavailable is only present after the loader has run; may be null
   // during initial hydration — read defensively.
   const loaderData = useRouteLoaderData("root") as RoadmapLoaderData | null;
   const liveUnavailable = loaderData?.liveUnavailable ?? false;
+
+  // Tracks the LAST successful refresh, not the live projection's own
+  // request-time `generatedAt` (which is always "just now" in live mode).
+  // Seeded from the initial load, then bumped on every loading -> idle
+  // transition of an explicit revalidate.
+  const [lastRefreshedAt, setLastRefreshedAt] = useState<string | undefined>(
+    () => loaderData?.data.generatedAt,
+  );
+  const prevRevalidatorState = useRef(revalidator.state);
+  useEffect(() => {
+    if (prevRevalidatorState.current === "loading" && revalidator.state === "idle") {
+      setLastRefreshedAt(new Date().toISOString());
+    }
+    prevRevalidatorState.current = revalidator.state;
+  }, [revalidator.state]);
 
   function handleToggle() {
     if (live) {
@@ -65,6 +90,25 @@ export function AppHeader() {
             <span className="text-xs text-(--color-muted-foreground)">
               live unavailable — showing snapshot
             </span>
+          )}
+          {live && loaderData && (
+            <>
+              <span className="text-xs text-(--color-muted-foreground)">
+                {formatFreshness(lastRefreshedAt, new Date())}
+              </span>
+              <button
+                onClick={() => revalidator.revalidate()}
+                disabled={refreshing}
+                aria-label="Refresh from Linear"
+                className={[
+                  "rounded-md px-3 py-1.5 text-sm transition-colors",
+                  refreshing ? "opacity-60 cursor-wait" : "cursor-pointer",
+                  "border border-(--color-border) text-(--color-muted-foreground) hover:text-(--color-foreground)",
+                ].join(" ")}
+              >
+                {refreshing ? "Refreshing…" : "↻ Refresh"}
+              </button>
+            </>
           )}
           <button
             onClick={handleToggle}

@@ -11,6 +11,7 @@
     "preview": "vite preview",
     "test": "vitest run",
     "sync:snapshot": "tsx scripts/sync-snapshot.ts",
+    "sync:gsd": "tsx scripts/sync-gsd-linear.ts",
     "preview:functions": "npx --yes wrangler@4 pages dev dist"
   },
   "dependencies": {

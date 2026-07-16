@@ -49,9 +49,18 @@ pnpm sync:gsd -- --dry-run   # preview repo → Linear backfill
 
 | Var | Where | Purpose |
 |---|---|---|
-| `LINEAR_API_KEY` | CI secret / Pages Functions binding | server-side Linear access |
+| `LINEAR_API_KEY` | CI secret / Pages Functions binding (Production) | server-side Linear access |
 | `LINEAR_TEAM_ID` | build env | `AGE` team id |
 | `ROADMAP_REPOS_ROOT` | local | parent dir(s) to scan for `.planning/` |
+| `GH_BACKFILL_TOKEN` | Cloudflare Pages Function binding (Production) | dispatch/status GitHub API calls |
+| `GH_CROSS_REPO_TOKEN` | GitHub Actions secret | same PAT value as `GH_BACKFILL_TOKEN`, used for sibling-repo checkout in CI |
+| `BACKFILL_NONCE` | Cloudflare KV binding (`wrangler.toml`) | consume-once apply nonce (D-08-06) |
 
-Never ship `LINEAR_API_KEY` to the client bundle — it lives only in CI and in
-Pages Functions.
+Never ship `LINEAR_API_KEY` or the GitHub PAT to the client bundle — they
+live only in CI and in Pages Functions (Production environment only).
+
+## Deploy
+
+Hosted on Cloudflare Pages behind Cloudflare Access (email allow-list). See
+[`docs/runbook.md`](docs/runbook.md) for the full deploy, token-rotation,
+snapshot-refresh, and backfill procedure.

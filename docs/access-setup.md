@@ -61,51 +61,45 @@ app.
 
 Cloudflare Access is the **primary authentication control** for this app. It
 gates reachability at the edge before any Function or static asset is served.
-The policy must cover **two targets**:
-
-1. The Pages project domain (the entire app).
-2. The `/api/*` path explicitly.
-
-**Omitting the `/api/*` path-level rule leaves the proxy open.** Even if the
-app root is gated, a direct request to `https://<domain>/api/linear/snapshot`
-without an Access session will reach the Function and be served — bypassing the
-authentication gate entirely. Both targets are required.
+Per D-08-01, a **single self-hosted Access application over the whole
+domain** (empty path — no path restriction) covers **the app root and every
+path under it**, including `/api/backfill/*` and the read-only
+`/api/linear/*` proxy. There is no separate `/api/*` application to create —
+one application, one policy, the entire domain.
 
 ### Steps (Cloudflare dashboard)
 
-1. Open **Cloudflare Zero Trust → Access → Applications → Add an application**.
-
-#### 2a. Gate the Pages project (app-level)
-
+1. Open **Cloudflare Zero Trust → Access → Applications → Add an
+   application**.
 2. Choose **Self-hosted** and point it at your Pages domain
-   (e.g. `agenticapps-roadmap.pages.dev` or your custom domain). Set the
+   (e.g. `agenticapps-roadmap.pages.dev` or your custom domain), leaving the
+   **Path** empty so the application matches the whole domain. Set the
    **Session duration** to something appropriate (e.g. 24 hours).
 3. Under **Policies**, add an **Allow** policy. Set **Action = Allow** and add
    an **Include** rule:
    - **Selector:** `Emails`
    - **Value:** the list of allowed email addresses (named allow-list, one
      per line or comma-separated depending on the UI version).
-4. Save the application.
+4. Save the application. Confirm both the root domain and every `/api/*`
+   route resolve under this one application before proceeding (§4's curl
+   checks verify this).
 
-#### 2b. Gate the /api/\* path (path-level)
-
-5. In the same application (or as a second application with the same domain),
-   add a **Path** entry: `/api/*`.
-
-   If the Cloudflare UI supports path-scoped policies within one application,
-   add `/api/*` as an additional path on the same application created above.
-   If it requires a separate application, create a second **Self-hosted**
-   application for the same domain with **Path** set to `/api/*` and apply
-   the same **Allow** email policy.
-
-6. Confirm both the root domain and `/api/*` show the same Allow policy before
-   proceeding.
-
-> **Why explicitly cover `/api/*`:** The Cloudflare Access STRIDE analysis
-> (T-03-13) identifies "unauth access to /api/*" as a Spoofing threat. The
-> per-isolate rate limiter already shipped in the Function is defense-in-depth
-> only. Access is the primary gate, and it must cover the path, not just the
-> domain root.
+> **Why a single whole-domain application is sufficient:** D-07-03 makes
+> Access the *sole* write authorization for `/api/backfill/*`, so that path
+> must be gated; gating the read-only `/api/linear/*` proxy too is free
+> protection since the app renders fully from the static `public/roadmap.json`
+> with no network — requiring login for live mode is an acceptable
+> enhancement, not a regression. A whole-domain application with an empty
+> path matches every route under the domain, so no second, path-scoped
+> application is needed. The per-isolate rate limiter already shipped in the
+> Function remains defense-in-depth only; Access is the primary gate.
+>
+> **Deferred:** gating the `*.pages.dev` **preview** deployment URLs
+> separately from production was considered and not selected (D-08-02) —
+> production Access is the gate for this phase. Note it as a residual
+> hardening option if ungated preview URLs later become a concern; see
+> `docs/runbook.md` §1 for why live secrets are never bound to Preview in the
+> meantime.
 
 ### Verify the policy is live
 

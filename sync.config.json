@@ -1,0 +1,20 @@
+[
+  {
+    "repoPath": "../claude-workflow",
+    "name": "claude-workflow",
+    "label": "roadmap:claude-workflow",
+    "teamKey": "AGE"
+  },
+  {
+    "repoPath": "../../factiv/cparx",
+    "name": "cparx",
+    "label": "roadmap:cparx",
+    "teamKey": "AGE"
+  },
+  {
+    "repoPath": "../../factiv/fx-signal-agent",
+    "name": "fx-signal-agent",
+    "label": "roadmap:fx-signal-agent",
+    "teamKey": "AGE"
+  }
+]

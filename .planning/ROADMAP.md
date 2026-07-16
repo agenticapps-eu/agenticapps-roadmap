@@ -24,9 +24,9 @@ are urgent insertions.
 - [x] **Phase 2: Linear data layer & static snapshot** — Sanitized token-free `roadmap.json`
 - [ ] **Phase 3: Linear proxy & Access** — Server-side GraphQL proxy + private gating (IN PROGRESS)
 - [ ] **Phase 4: Roadmap timeline UI** — Initiative swimlanes across a month axis
-- [ ] **Phase 5: Overview dashboard, filters & drill-down** — KPIs, shareable filters, Linear deep-links
-- [ ] **Phase 6: sync-gsd-linear CLI** — Per-project, dry-run-first backfill engine
-- [ ] **Phase 7: Live refresh & write-back** — On-demand refresh + UI-triggered backfill
+- [x] **Phase 5: Overview dashboard, filters & drill-down** — KPIs, shareable filters, Linear deep-links (completed 2026-07-15)
+- [x] **Phase 6: sync-gsd-linear CLI** — Per-project, dry-run-first backfill engine (completed 2026-07-15)
+- [x] **Phase 7: Live refresh & write-back** — On-demand refresh + UI-triggered backfill (completed 2026-07-16)
 - [ ] **Phase 8: Deploy, gate & document** — Production Pages + Access + runbook + v0.1.0
 
 ## Phase Details
@@ -144,7 +144,30 @@ Plans:
   2. Applying one project creates milestones/issues with no duplicates on re-run (idempotent).
   3. Dates are proposed from phase order and confirmed before any write.
 
-**Plans**: TBD · **Status**: Pending
+**Plans**: 7 plans · 5 waves · **Status**: Planned (hardened 2026-07-15 per cross-AI review — REVIEWS.md)
+
+Plans:
+**Wave 1**
+
+- [x] 06-01-PLAN.md — Config/map/normalized-model schemas (plan identity key + taskLines, config name, ResolvedIssue, SyncOperation) + Wave-0 fixtures + seed data files (Wave 1)
+
+**Wave 2** *(depend on 06-01 contracts)*
+
+- [x] 06-02-PLAN.md — .planning/ walker + PLAN.md parser -> normalized model (key + taskLines) (Wave 2)
+- [x] 06-03-PLAN.md — Stable identity-hash + typed GraphQL read/write document set (incl. paginated issue read) (Wave 2)
+
+**Wave 3** *(depend on 06-03)*
+
+- [x] 06-04-PLAN.md — Date proposer (cadence-from-anchor) + diff engine (full enumerated write set) (Wave 3)
+- [x] 06-05-PLAN.md — Linear resolver: map->label->title-hash, two label pools, team, issue-identity read (Wave 3)
+
+**Wave 4** *(depend on resolver + diff)*
+
+- [x] 06-06-PLAN.md — Apply engine: create-only idempotent upsert + atomic per-create map write-back + gated planAhead patch (Wave 4)
+
+**Wave 5** *(depend on apply + walker/parser)*
+
+- [x] 06-07-PLAN.md — prompt + cli (apply-mode truth table) + entrypoint + sync:gsd script + live E2E human-verify (Wave 5, checkpoint)
 
 ### Phase 7: Live refresh & write-back
 
@@ -157,7 +180,26 @@ Plans:
   2. A backfill applied via the UI appears in Linear and in the next snapshot.
   3. Writes are optimistic with error rollback; scheduled snapshot refresh runs.
 
-**Plans**: TBD · **Status**: Pending
+**Plans**: 6 plans · 4 waves · **Status**: Planned (revised per 07-REVIEWS cross-AI review)
+
+Plans:
+**Wave 1**
+
+- [x] 07-01-PLAN.md — LIVE-01 Refresh: R-4 shouldRevalidate fix (TDD) + AppHeader Refresh button + null-safe freshness hint (Wave 1)
+- [x] 07-02-PLAN.md — LIVE-02 write-path backend: dispatch (allow-list + server-side preview-before-apply) + status (run→jobs→logs, identity verify, typed diff, correlation) Pages Functions (TDD) (Wave 1)
+- [x] 07-06-PLAN.md — LIVE-02 CI workflows: backfill.yml (sibling checkout, env-var project, typed diff emit, sync:snapshot rebuild + commit both files) + snapshot.yml shared concurrency (Wave 1)
+
+**Wave 2** *(depend on 07-02 route contract)*
+
+- [x] 07-03-PLAN.md — LIVE-02 client core: pure dispatch/poll/optimistic-rollback with 204 correlation + transient-retry + all terminal conclusions (TDD) + explicit useBackfill hook (Wave 2)
+
+**Wave 3** *(depend on 07-03 hook)*
+
+- [x] 07-04-PLAN.md — LIVE-02 optimistic UI: BACKFILL_PROJECTS id→key eligibility map + SyncBadge override + ProjectDrillDownDialog typed-diff two-phase Backfill control + OverviewPage state owner (Wave 3, human-check)
+
+**Wave 4** *(depend on 07-01..07-04 + 07-06 finalized contracts)*
+
+- [x] 07-05-PLAN.md — LIVE-03 verify+reuse snapshot.yml (structural, beyond substring) + LIVE-02/03 operationally-pending record + consolidated Phase-8 HUMAN-UAT checklist (Wave 4)
 
 ### Phase 8: Deploy, gate & document
 
@@ -170,4 +212,14 @@ Plans:
   2. Snapshot auto-refreshes (CI or Pages cron).
   3. README + `docs/runbook.md` cover deploy, token rotation, snapshot refresh, and backfill; `v0.1.0` tagged with a hosting/sync ADR.
 
-**Plans**: TBD · **Status**: Pending
+**Plans**: 3 plans · 2 waves · **Status**: Planned
+
+Plans:
+**Wave 1** *(autonomous — code + docs, run in parallel)*
+
+- [x] 08-01-PLAN.md — DEPLOY-01/02: KV binding in wrangler.toml + consume-once nonce in dispatch.ts (D-08-06, closes CR-01) + unit tests (Wave 1)
+- [x] 08-02-PLAN.md — DEPLOY-03/04: hosting/sync ADR (docs/decisions/0001) + docs/runbook.md (deploy/rotation/refresh/backfill) + README secrets/deploy sections (Wave 1)
+
+**Wave 2** *(human-driven live deploy — depends on 08-01 + 08-02)*
+
+- [ ] 08-03-PLAN.md — DEPLOY-01/02/04: merge to main + Cloudflare Pages project + Access app (whole domain) + bind LINEAR_API_KEY/PAT/KV + run 13-item 07-HUMAN-UAT + real cron fire + tag v0.1.0 (Wave 2, autonomous: false)

@@ -1,3 +1,12 @@
 name = "agenticapps-roadmap"
 compatibility_date = "2025-01-01"
 pages_build_output_dir = "dist"
+
+# D-08-06: consume-once nonce for backfill apply replay suppression.
+# Real namespace id created via `npx --yes wrangler@4 kv namespace create
+# BACKFILL_NONCE` and landed on `main` through the single 08-03 release PR.
+# wrangler.toml is the sole source of truth for this binding (never attach it
+# in the Cloudflare dashboard).
+[[kv_namespaces]]
+binding = "BACKFILL_NONCE"
+id = "4b1725a56abd4340adaaabaa40814584"

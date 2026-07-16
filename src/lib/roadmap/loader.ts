@@ -1,4 +1,7 @@
-import type { LoaderFunctionArgs } from "react-router-dom";
+import type {
+  LoaderFunctionArgs,
+  ShouldRevalidateFunctionArgs,
+} from "react-router-dom";
 import { RoadmapJsonSchema, type RoadmapJson } from "./schema.ts";
 
 /**
@@ -62,4 +65,34 @@ export async function roadmapLoader({
     live: false,
     liveUnavailable: wantLive,
   };
+}
+
+/**
+ * Root-route revalidation gate (OV-02 / 05-REVIEWS.md HIGH-BLOCKING: "Root loader
+ * revalidation defeats zero-network").
+ *
+ * React Router 7 revalidates the root loader on EVERY navigation by default, and every
+ * Phase-5 filter toggle and drill-down open/close is a client-side `setSearchParams`
+ * navigation. Without this gate, each filter change would re-run roadmapLoader —
+ * refetching /roadmap.json in snapshot mode and repeatedly hitting /api/linear/snapshot
+ * in live mode, contradicting the snapshot-first / zero-network architecture.
+ *
+ * Revalidate ONLY when the effective source mode flips (snapshot<->live); every
+ * same-mode navigation (filters, ?project) is a no-op for the loader.
+ */
+export function shouldRevalidateRoadmap({
+  currentUrl,
+  nextUrl,
+}: ShouldRevalidateFunctionArgs): boolean {
+  // EXACT mirror of the loader's own source check above — must not drift.
+  const sourceMode = (u: URL) =>
+    u.searchParams.get("source") === "live" ? "live" : "snapshot";
+  if (sourceMode(currentUrl) !== sourceMode(nextUrl)) {
+    return true; // existing behavior: toggle flips source — unchanged
+  }
+  // An explicit revalidator.revalidate() re-navigates to the CURRENT location
+  // unchanged, so pathname+search are IDENTICAL between currentUrl/nextUrl.
+  // A filter/?project navigation always changes search, so stays false there.
+  const asString = (u: URL) => u.pathname + u.search;
+  return asString(currentUrl) === asString(nextUrl);
 }

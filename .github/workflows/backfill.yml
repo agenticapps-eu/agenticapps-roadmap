@@ -1,0 +1,149 @@
+name: Backfill project to Linear
+
+run-name: backfill [proj:${{ inputs.project }}] [mode:${{ inputs.mode }}] [cid:${{ inputs.correlation_id }}]
+
+on:
+  workflow_dispatch:
+    inputs:
+      project:
+        description: "sync.config.json entry name to backfill"
+        required: true
+        type: string
+      mode:
+        description: "dry-run (preview only) or apply (write + commit)"
+        required: true
+        type: choice
+        options:
+          - dry-run
+          - apply
+      correlation_id:
+        description: "Client-generated id status.ts uses to resolve a run when no run id is returned"
+        required: false
+        type: string
+
+concurrency:
+  group: roadmap-git-writer
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    env:
+      PROJECT_KEY: ${{ inputs.project }}
+      MODE: ${{ inputs.mode }}
+    steps:
+      # Sibling checkout layout (RESEARCH Pattern 2 / Pitfall 2): actions/checkout's
+      # `path:` cannot escape $GITHUB_WORKSPACE, so this repo is checked out into a
+      # subdirectory with the three sibling repos alongside it, reproducing
+      # sync.config.json's `../claude-workflow` / `../../factiv/*` relative paths
+      # inside the workspace boundary. sync.config.json itself is NOT edited.
+      - name: Checkout agenticapps-roadmap
+        uses: actions/checkout@v4
+        with:
+          path: agenticapps-roadmap
+
+      - name: Checkout claude-workflow (sibling)
+        uses: actions/checkout@v4
+        with:
+          repository: agenticapps-eu/claude-workflow
+          token: ${{ secrets.GH_CROSS_REPO_TOKEN }}
+          path: claude-workflow
+
+      - name: Checkout cparx (sibling)
+        uses: actions/checkout@v4
+        with:
+          repository: agenticapps-eu/cparx
+          token: ${{ secrets.GH_CROSS_REPO_TOKEN }}
+          path: factiv/cparx
+
+      - name: Checkout fx-signal-agent (sibling)
+        uses: actions/checkout@v4
+        with:
+          repository: agenticapps-eu/fx-signal-agent
+          token: ${{ secrets.GH_CROSS_REPO_TOKEN }}
+          path: factiv/fx-signal-agent
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: agenticapps-roadmap/pnpm-lock.yaml
+
+      - name: Install dependencies
+        working-directory: agenticapps-roadmap
+        run: pnpm install --frozen-lockfile
+
+      # Dry-run leg: the Phase-6 CLI (scripts/sync-gsd-linear/cli.ts) is invoked
+      # UNCHANGED via env-var project passing -- never a GitHub-expression
+      # interpolated into a shell command (finding #6).
+      - name: Run dry-run preview
+        if: ${{ inputs.mode == 'dry-run' }}
+        working-directory: agenticapps-roadmap
+        env:
+          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
+        run: |
+          pnpm sync:gsd -- --project "$PROJECT_KEY" > /tmp/backfill-dry-run.txt 2>&1
+          cat /tmp/backfill-dry-run.txt
+
+      # Dedicated emit step (RESOLUTION 1): strips ANSI, parses the two typed count
+      # lines renderDiff() prints, and prints ONE ___DIFF_JSON___{...}___END_DIFF___
+      # marker line consumed by functions/api/backfill/status.ts. The marker string
+      # is built from concatenated fragments so this step's OWN echoed command text
+      # never contains the literal marker (status.ts would otherwise match the
+      # echoed command instead of the real result line).
+      - name: Emit typed diff marker
+        if: ${{ inputs.mode == 'dry-run' }}
+        working-directory: agenticapps-roadmap
+        run: |
+          node <<'NODE_SCRIPT'
+          const fs = require("node:fs");
+          const raw = fs.readFileSync("/tmp/backfill-dry-run.txt", "utf8");
+          const clean = raw.replace(/\x1b\[[0-9;]*m/g, "");
+          const counts = clean.match(/\+ (\d+) milestones, \+ (\d+) issues, \+ (\d+) labels/);
+          const dates = clean.match(/~ (\d+) dates/);
+          const payload = {
+            milestones: counts ? Number(counts[1]) : 0,
+            issues: counts ? Number(counts[2]) : 0,
+            labels: counts ? Number(counts[3]) : 0,
+            dates: dates ? Number(dates[1]) : 0,
+          };
+          const marker = "___DIFF" + "_JSON___" + JSON.stringify(payload) + "___END" + "_DIFF___";
+          console.log(marker);
+          NODE_SCRIPT
+
+      # Apply leg: real write (--apply --yes), then a full snapshot rebuild so the
+      # committed roadmap.json is durably in-sync (buildSnapshot omits planAhead --
+      # findings #1/#2), then commit BOTH roadmap.json and linear-map.json
+      # (finding #3, the CLI's persisted identity map).
+      - name: Run apply
+        if: ${{ inputs.mode == 'apply' }}
+        working-directory: agenticapps-roadmap
+        env:
+          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
+        run: pnpm sync:gsd -- --project "$PROJECT_KEY" --apply --yes
+
+      - name: Rebuild snapshot
+        if: ${{ inputs.mode == 'apply' }}
+        working-directory: agenticapps-roadmap
+        env:
+          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
+        run: pnpm sync:snapshot
+
+      - name: Commit roadmap.json and linear-map.json
+        if: ${{ inputs.mode == 'apply' }}
+        working-directory: agenticapps-roadmap
+        run: |
+          git diff --quiet public/roadmap.json linear-map.json && echo "No changes" && exit 0
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add public/roadmap.json linear-map.json
+          git commit -m "chore: backfill $PROJECT_KEY to Linear [skip ci]"
+          git pull --rebase origin main
+          git push
