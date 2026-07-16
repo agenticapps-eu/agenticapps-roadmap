@@ -67,6 +67,10 @@ export function ProjectDrillDownDialog({
   // control dispatches the config KEY, never `project.name`.
   const backfillKey = project ? BACKFILL_PROJECTS[project.id] : undefined;
   const entry = project ? backfillState.get(project.id) : undefined;
+  // IN-02: this control isn't gated to snapshot-vs-live mode. That's harmless
+  // ONLY because buildSnapshot (scripts/linear/transform.ts) never sets
+  // project.planAhead in live mode, so SyncBadge's out-of-sync flip is a
+  // no-op there — check this invariant still holds if buildSnapshot changes.
 
   // Key-space per useBackfill.ts's header comment (07-03 key-decisions):
   // startPreview stores its diff/status/error under `backfillKey`;
