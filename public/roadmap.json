@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-18T08:00:53.879Z",
+  "generatedAt": "2026-07-19T08:27:08.756Z",
   "initiatives": [
     {
       "id": "b3ee916d-dadb-4ca3-939a-452f1273edf2",
@@ -33,6 +33,39 @@
     }
   ],
   "projects": [
+    {
+      "id": "d11dea8e-0855-4d30-adf9-577ebd748398",
+      "name": "cPARX MVP Phase 1 — Debt / Front Office",
+      "summary": "MVP Phase 1 laut Pflichtenheft v0.9: Front Office + Vermittlungs-Sub, Debt only, drei Sprints bis 15.10.2026.",
+      "url": "https://linear.app/agenticapps/project/cparx-mvp-phase-1-debt-front-office-a1f5eb73c3eb",
+      "initiativeId": null,
+      "status": "Backlog",
+      "priority": 0,
+      "startDate": null,
+      "targetDate": "2026-10-15",
+      "milestones": [
+        {
+          "id": "4df8e142-73ba-4116-a088-5bff55c127fc",
+          "name": "Sprint 3 · Decision und Match",
+          "targetDate": "2026-10-15"
+        },
+        {
+          "id": "a1490c03-9b0f-46a9-9a7c-76449b904859",
+          "name": "Sprint 2 · Sourcing",
+          "targetDate": "2026-09-19"
+        },
+        {
+          "id": "53b604ab-1ca9-493e-bf72-6f9eef2e3bb5",
+          "name": "Sprint 1 · Foundation",
+          "targetDate": "2026-08-15"
+        }
+      ],
+      "issueCounts": {
+        "backlog": 40,
+        "started": 0,
+        "done": 0
+      }
+    },
     {
       "id": "28f29610-6662-46ad-a5d5-ca93a5c53872",
       "name": "claude-workflow",
@@ -209,9 +242,9 @@
         }
       ],
       "issueCounts": {
-        "backlog": 25,
+        "backlog": 20,
         "started": 0,
-        "done": 6
+        "done": 14
       }
     },
     {
