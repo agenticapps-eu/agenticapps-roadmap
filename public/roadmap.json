@@ -1,21 +1,27 @@
 {
-  "generatedAt": "2026-07-19T08:27:08.756Z",
+  "generatedAt": "2026-07-20T09:25:23.477Z",
   "initiatives": [
     {
+      "id": "5f4d93ae-4e1c-4b7f-8906-a846071d41c7",
+      "name": "Fair Business Club",
+      "color": "#27ae60",
+      "status": "Active"
+    },
+    {
       "id": "b3ee916d-dadb-4ca3-939a-452f1273edf2",
-      "name": "Callbot",
+      "name": "Factiv — Callbot",
       "color": "#0ea5e9",
       "status": "Active"
     },
     {
       "id": "e6eb41b8-eb1c-4729-97f4-073e5c1fcb90",
-      "name": "agenticapps-workflow",
+      "name": "Factiv — Workflow",
       "color": null,
       "status": "Active"
     },
     {
       "id": "0f31858f-1e1c-4244-bb63-f4340ec3053c",
-      "name": "Factiv",
+      "name": "Factiv — Unternehmen",
       "color": "#f2994a",
       "status": "Active"
     },
@@ -27,23 +33,128 @@
     },
     {
       "id": "26fe7e6e-2cc3-40d7-89ca-d84cacbe6ef9",
-      "name": "fx-signals",
+      "name": "Factiv — fx-signals",
       "color": "#f2c94c",
       "status": "Active"
     }
   ],
   "projects": [
     {
+      "id": "f64d3868-a410-44b3-ae26-9e249015f1bd",
+      "name": "cPARX Phase 2 — Fondsanbindung und DORA",
+      "summary": "Was das Prozesshandbuch auf Phase 2/3 verschiebt: AIFM-, Administrator- und Verwahrstellen-Anbindung, DORA-Vollausbau, aktive Middle-Office-Logik, Skalierung.",
+      "url": "https://linear.app/agenticapps/project/cparx-phase-2-fondsanbindung-und-dora-360c2a60e48b",
+      "initiativeId": "b18933f6-f073-44b7-982e-2c801ced0866",
+      "status": "Backlog",
+      "priority": 3,
+      "startDate": null,
+      "targetDate": null,
+      "milestones": [],
+      "issueCounts": {
+        "backlog": 6,
+        "started": 0,
+        "done": 0
+      }
+    },
+    {
+      "id": "c80bafeb-55c0-42a2-8bc3-2d779e2aef18",
+      "name": "Callbot — Betrieb und Compliance",
+      "summary": "Laufende Pflichten neben dem Code: Monitoring, Runbook, Reviews, AV-Verträge, Versicherungen, anwaltliche Prüfung.",
+      "url": "https://linear.app/agenticapps/project/callbot-betrieb-und-compliance-c3b2b2d827d3",
+      "initiativeId": "b3ee916d-dadb-4ca3-939a-452f1273edf2",
+      "status": "Backlog",
+      "priority": 1,
+      "startDate": null,
+      "targetDate": null,
+      "milestones": [],
+      "issueCounts": {
+        "backlog": 6,
+        "started": 0,
+        "done": 2
+      }
+    },
+    {
+      "id": "37e15a16-b27a-4202-8d04-cc062dc4a3be",
+      "name": "Callbot — Go-to-Market",
+      "summary": "Vertrieb und die ersten beiden Pilotkunden: Sales-Material, BAFA-Choreografie, Pilot Hausarzt, Pilot Non-Healthcare.",
+      "url": "https://linear.app/agenticapps/project/callbot-go-to-market-c585dac6bca8",
+      "initiativeId": "b3ee916d-dadb-4ca3-939a-452f1273edf2",
+      "status": "Backlog",
+      "priority": 2,
+      "startDate": null,
+      "targetDate": null,
+      "milestones": [
+        {
+          "id": "52ac8360-f83d-4de8-8360-874b918800d8",
+          "name": "Pilot 2 · Non-Healthcare",
+          "targetDate": null
+        },
+        {
+          "id": "9951d070-1d28-459b-b17e-76d9424ba8ff",
+          "name": "Pilot 1 · Hausarzt",
+          "targetDate": null
+        }
+      ],
+      "issueCounts": {
+        "backlog": 7,
+        "started": 0,
+        "done": 0
+      }
+    },
+    {
+      "id": "73e061ee-44ea-4545-8619-a019f2f0dfbd",
+      "name": "Callbot MVP",
+      "summary": "Die vier sequenziellen MVP-Bausteine in einem Projekt: Infrastruktur, Backend, Admin-UI, Branchen-Template Hausarzt.",
+      "url": "https://linear.app/agenticapps/project/callbot-mvp-457705b83dcf",
+      "initiativeId": "b3ee916d-dadb-4ca3-939a-452f1273edf2",
+      "status": "Backlog",
+      "priority": 1,
+      "startDate": null,
+      "targetDate": null,
+      "milestones": [
+        {
+          "id": "1d90decf-dabb-4001-92e7-5c4bed51abd5",
+          "name": "4 · Branche Hausarzt",
+          "targetDate": null
+        },
+        {
+          "id": "1b953768-0619-4923-9953-5282a36f5c29",
+          "name": "3 · Admin UI MVP",
+          "targetDate": null
+        },
+        {
+          "id": "916d7622-14c6-4be7-929b-45d184a334be",
+          "name": "2 · Backend MVP",
+          "targetDate": null
+        },
+        {
+          "id": "4122d6a6-6d1d-4cfc-b0bf-4316351503bc",
+          "name": "1 · Infrastructure und Setup",
+          "targetDate": null
+        }
+      ],
+      "issueCounts": {
+        "backlog": 3,
+        "started": 1,
+        "done": 24
+      }
+    },
+    {
       "id": "d11dea8e-0855-4d30-adf9-577ebd748398",
       "name": "cPARX MVP Phase 1 — Debt / Front Office",
       "summary": "MVP Phase 1 laut Pflichtenheft v0.9: Front Office + Vermittlungs-Sub, Debt only, drei Sprints bis 15.10.2026.",
       "url": "https://linear.app/agenticapps/project/cparx-mvp-phase-1-debt-front-office-a1f5eb73c3eb",
-      "initiativeId": null,
-      "status": "Backlog",
+      "initiativeId": "b18933f6-f073-44b7-982e-2c801ced0866",
+      "status": "In Progress",
       "priority": 0,
-      "startDate": null,
+      "startDate": "2026-07-20T08:10:04.684Z",
       "targetDate": "2026-10-15",
       "milestones": [
+        {
+          "id": "2c20d079-4966-4858-b49b-516ed3e24ce1",
+          "name": "Sprint 4",
+          "targetDate": null
+        },
         {
           "id": "4df8e142-73ba-4116-a088-5bff55c127fc",
           "name": "Sprint 3 · Decision und Match",
@@ -61,9 +172,9 @@
         }
       ],
       "issueCounts": {
-        "backlog": 40,
-        "started": 0,
-        "done": 0
+        "backlog": 68,
+        "started": 1,
+        "done": 14
       }
     },
     {
@@ -71,7 +182,7 @@
       "name": "claude-workflow",
       "summary": "",
       "url": "https://linear.app/agenticapps/project/claude-workflow-013b1ac568bd",
-      "initiativeId": null,
+      "initiativeId": "e6eb41b8-eb1c-4729-97f4-073e5c1fcb90",
       "status": "Backlog",
       "priority": 0,
       "startDate": null,
@@ -214,7 +325,7 @@
       "name": "FBC Plattform – Roadmap (Phasen 1–4)",
       "summary": "Roadmap nach Review 29.06.2026: UI-Politur, Monetarisierung, CRM/Matching v2/Admin, Ökosystem & Ventures.",
       "url": "https://linear.app/agenticapps/project/fbc-plattform-roadmap-phasen-1-4-d4ab753d4f56",
-      "initiativeId": null,
+      "initiativeId": "5f4d93ae-4e1c-4b7f-8906-a846071d41c7",
       "status": "Backlog",
       "priority": 0,
       "startDate": null,
@@ -310,7 +421,7 @@
       "name": "FBC Plattform – Prototyp (abgeschlossen)",
       "summary": "Vorführbarer Prototyp der Fair-Business-Club-Plattform: Profil, Verzeichnis, Matching-Hub, Feed, Events mit gestaffelten Rechten.",
       "url": "https://linear.app/agenticapps/project/fbc-plattform-prototyp-abgeschlossen-abb91d9e8c99",
-      "initiativeId": null,
+      "initiativeId": "5f4d93ae-4e1c-4b7f-8906-a846071d41c7",
       "status": "Completed",
       "priority": 2,
       "startDate": null,
@@ -346,176 +457,6 @@
         "backlog": 0,
         "started": 0,
         "done": 24
-      }
-    },
-    {
-      "id": "1cabd30a-bcc1-43eb-b76c-8eee8295d8f4",
-      "name": "Callbot — Operations & Runbook",
-      "summary": "Laufender Betrieb: UptimeRobot-Monitoring, Sentry-Errors, 3-stufiger Failover-Plan, wöchentliches Transkript-Review, BAFA-Erinnerungen, Cost-Reviews, Runbook für Incidents.",
-      "url": "https://linear.app/agenticapps/project/callbot-operations-and-runbook-35eab5e4473e",
-      "initiativeId": "b3ee916d-dadb-4ca3-939a-452f1273edf2",
-      "status": "Backlog",
-      "priority": 3,
-      "startDate": null,
-      "targetDate": null,
-      "milestones": [],
-      "issueCounts": {
-        "backlog": 3,
-        "started": 0,
-        "done": 2
-      }
-    },
-    {
-      "id": "1a3e71a5-3af2-40a4-a13d-dcfc7d369627",
-      "name": "Callbot — Pilot Customer #2 (Non-Healthcare)",
-      "summary": "Zweiter Pilot in einer Non-Healthcare-Branche (Restaurant/Handwerk/Friseur/Fahrschule). Beweist Stack für nicht-medizinische Kunden — kein C5-Pfad nötig, einfacherer Sales-Zyklus.",
-      "url": "https://linear.app/agenticapps/project/callbot-pilot-customer-2-non-healthcare-f7252dbd4451",
-      "initiativeId": "b3ee916d-dadb-4ca3-939a-452f1273edf2",
-      "status": "Backlog",
-      "priority": 2,
-      "startDate": null,
-      "targetDate": null,
-      "milestones": [],
-      "issueCounts": {
-        "backlog": 1,
-        "started": 0,
-        "done": 0
-      }
-    },
-    {
-      "id": "f43815a6-d0f8-400f-8ba6-4730bf130c26",
-      "name": "Callbot — Pilot Customer #1 (Hausarzt)",
-      "summary": "Erster zahlender Hausarzt-Pilot. Von Lead-Qualifikation über T1–T3 bis Go-Live + 2 Wochen Hypercare. Pilot-Preis 1.500 € Setup + 199 €/Mon, 6 Mo Beta-Rabatt-Optik.",
-      "url": "https://linear.app/agenticapps/project/callbot-pilot-customer-1-hausarzt-e2496008442a",
-      "initiativeId": "b3ee916d-dadb-4ca3-939a-452f1273edf2",
-      "status": "Backlog",
-      "priority": 1,
-      "startDate": null,
-      "targetDate": null,
-      "milestones": [],
-      "issueCounts": {
-        "backlog": 2,
-        "started": 0,
-        "done": 0
-      }
-    },
-    {
-      "id": "a90f04b2-b193-4bac-ba09-327d0fab61a9",
-      "name": "Callbot — Sales Operations",
-      "summary": "Bernards 3-Termin-Prozess operationalisieren: Sales-Material, BAFA-Choreografie, Lead-Pipeline, Asana-Onboarding-Template, Demo-Setup.",
-      "url": "https://linear.app/agenticapps/project/callbot-sales-operations-27d0562313e1",
-      "initiativeId": "b3ee916d-dadb-4ca3-939a-452f1273edf2",
-      "status": "Backlog",
-      "priority": 2,
-      "startDate": null,
-      "targetDate": null,
-      "milestones": [],
-      "issueCounts": {
-        "backlog": 3,
-        "started": 0,
-        "done": 0
-      }
-    },
-    {
-      "id": "17e78750-2b8b-49e4-b1e2-830230966165",
-      "name": "Callbot — Compliance & Legal",
-      "summary": "AV-Verträge mit allen Sub-Processors, DSFA-Template, anwaltlich geprüfte Vertragsklauseln, IT-Haftpflicht + Cyber + Produkthaftpflicht Versicherungen, GmbH/UG-Gründung, BAFA-Antragsbegleitung.",
-      "url": "https://linear.app/agenticapps/project/callbot-compliance-and-legal-595367b8f5ec",
-      "initiativeId": "b3ee916d-dadb-4ca3-939a-452f1273edf2",
-      "status": "Backlog",
-      "priority": 1,
-      "startDate": null,
-      "targetDate": null,
-      "milestones": [],
-      "issueCounts": {
-        "backlog": 3,
-        "started": 0,
-        "done": 0
-      }
-    },
-    {
-      "id": "184e600e-134a-497c-852b-5a3d79072167",
-      "name": "Callbot — Branche: Non-Healthcare (TBD)",
-      "summary": "Zweites Branchen-Template (Restaurant, Handwerk, Friseur, Fahrschule, …). Auswahl mit Bernard nach Lead-Pipeline. Kein C5-Pfad nötig — beweist Stack auf Non-Healthcare.",
-      "url": "https://linear.app/agenticapps/project/callbot-branche-non-healthcare-tbd-0aa7ba21baf1",
-      "initiativeId": "b3ee916d-dadb-4ca3-939a-452f1273edf2",
-      "status": "Backlog",
-      "priority": 2,
-      "startDate": null,
-      "targetDate": null,
-      "milestones": [],
-      "issueCounts": {
-        "backlog": 1,
-        "started": 0,
-        "done": 0
-      }
-    },
-    {
-      "id": "27eb2c3f-2351-4ffc-bd71-d6d8dbac776a",
-      "name": "Callbot — Branche: Hausarzt",
-      "summary": "Branchen-Template Hausarzt: System-Prompt, 8 Intents, Notfall-Trigger, BTM-Blacklist, Slot-Definitionen, 30+ Black-Box-Test-Szenarien, RAG-Eval auf 30 echten FAQ-Fragen.",
-      "url": "https://linear.app/agenticapps/project/callbot-branche-hausarzt-97c0ef5eb17d",
-      "initiativeId": "b3ee916d-dadb-4ca3-939a-452f1273edf2",
-      "status": "Backlog",
-      "priority": 1,
-      "startDate": null,
-      "targetDate": null,
-      "milestones": [],
-      "issueCounts": {
-        "backlog": 0,
-        "started": 0,
-        "done": 3
-      }
-    },
-    {
-      "id": "a30409c6-f837-41ea-8555-358cbb98f963",
-      "name": "Callbot — Admin UI MVP",
-      "summary": "Kleines internes Admin-UI für Bernard + Donald (Vite/React/Tailwind/shadcn + Supabase Magic Link). CRUD für Tenants, Doctors, Opening Hours, FAQ, IGeL, Intents. KEIN Customer-facing Self-Service.",
-      "url": "https://linear.app/agenticapps/project/callbot-admin-ui-mvp-602d8733a313",
-      "initiativeId": "b3ee916d-dadb-4ca3-939a-452f1273edf2",
-      "status": "Backlog",
-      "priority": 2,
-      "startDate": null,
-      "targetDate": null,
-      "milestones": [],
-      "issueCounts": {
-        "backlog": 0,
-        "started": 0,
-        "done": 8
-      }
-    },
-    {
-      "id": "5e5b86fe-8c66-4b76-b10d-cc037ceaf7ef",
-      "name": "Callbot — Backend MVP",
-      "summary": "Hono-Worker auf Cloudflare: Vapi/Twilio Webhooks, Compliance-Module (5-Sek-KI, Notfall, BTM), RAG-Retrieval gegen pgvector, 30-Tage-Retention-Cron, Audit-Log.",
-      "url": "https://linear.app/agenticapps/project/callbot-backend-mvp-ceaf6f0f0620",
-      "initiativeId": "b3ee916d-dadb-4ca3-939a-452f1273edf2",
-      "status": "Backlog",
-      "priority": 1,
-      "startDate": null,
-      "targetDate": null,
-      "milestones": [],
-      "issueCounts": {
-        "backlog": 0,
-        "started": 0,
-        "done": 6
-      }
-    },
-    {
-      "id": "cc1dcbc9-2137-4755-ad9c-c4ac9d62dd08",
-      "name": "Callbot — Infrastructure & Setup",
-      "summary": "Accounts & Secrets für Supabase Frankfurt, Vapi (EU), Twilio (EU + DE DID), OpenRouter, Cloudflare Workers + Pages, GitHub. End-to-end smoke-test.",
-      "url": "https://linear.app/agenticapps/project/callbot-infrastructure-and-setup-b0e8fa6b55d5",
-      "initiativeId": "b3ee916d-dadb-4ca3-939a-452f1273edf2",
-      "status": "Backlog",
-      "priority": 1,
-      "startDate": null,
-      "targetDate": null,
-      "milestones": [],
-      "issueCounts": {
-        "backlog": 3,
-        "started": 1,
-        "done": 7
       }
     },
     {
@@ -594,28 +535,11 @@
       }
     },
     {
-      "id": "b8d03fa8-af5f-4699-8c68-7bfd6bd577e6",
-      "name": "cPARX v1",
-      "summary": "",
-      "url": "https://linear.app/agenticapps/project/cparx-v1-9dd96154d67c",
-      "initiativeId": null,
-      "status": "Backlog",
-      "priority": 0,
-      "startDate": null,
-      "targetDate": null,
-      "milestones": [],
-      "issueCounts": {
-        "backlog": 2,
-        "started": 0,
-        "done": 8
-      }
-    },
-    {
       "id": "aedc33f2-5a9b-454b-b563-07458f09be2d",
       "name": "Factiv website",
       "summary": "",
       "url": "https://linear.app/agenticapps/project/factiv-website-be9fe1f946c3",
-      "initiativeId": null,
+      "initiativeId": "0f31858f-1e1c-4244-bb63-f4340ec3053c",
       "status": "Backlog",
       "priority": 0,
       "startDate": null,
@@ -632,7 +556,7 @@
       "name": "Factiv company setup",
       "summary": "",
       "url": "https://linear.app/agenticapps/project/factiv-company-setup-0dcde82ce404",
-      "initiativeId": null,
+      "initiativeId": "0f31858f-1e1c-4244-bb63-f4340ec3053c",
       "status": "Backlog",
       "priority": 0,
       "startDate": null,
@@ -684,7 +608,7 @@
       "summary": "4-week prototype of the cPARX AI platform: document-based DD pipeline, mock Investment Readiness scoring, chatbot + case dashboard, architecture docs. Budget EUR 6,800 (80h @ EUR 85/h).",
       "url": "https://linear.app/agenticapps/project/cparx-prototype-379bb53e53f4",
       "initiativeId": "b18933f6-f073-44b7-982e-2c801ced0866",
-      "status": "Backlog",
+      "status": "Completed",
       "priority": 0,
       "startDate": null,
       "targetDate": "2026-05-08",
@@ -716,9 +640,9 @@
         }
       ],
       "issueCounts": {
-        "backlog": 12,
-        "started": 1,
-        "done": 82
+        "backlog": 0,
+        "started": 0,
+        "done": 88
       }
     }
   ]
