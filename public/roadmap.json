@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-26T08:33:35.251Z",
+  "generatedAt": "2026-07-27T10:00:59.978Z",
   "initiatives": [
     {
       "id": "5f4d93ae-4e1c-4b7f-8906-a846071d41c7",
@@ -39,6 +39,54 @@
     }
   ],
   "projects": [
+    {
+      "id": "8c2d1747-4e8f-4a15-b5bd-bbd13ff33f29",
+      "name": "Dashboard v2 — Vereinfachung, Fleet-Versionen, Kanban",
+      "summary": "Radikale Vereinfachung des agenticapps-dashboard: sechs Readiness-Checks pro Repo, eine versionsgenaue Workflow-Fleet-Seite, ein Kanban-Board über die Agent-Sessions. GitNexus und Observability fliegen raus.",
+      "url": "https://linear.app/agenticapps/project/dashboard-v2-vereinfachung-fleet-versionen-kanban-0ab6d6d3537a",
+      "initiativeId": "e6eb41b8-eb1c-4729-97f4-073e5c1fcb90",
+      "status": "Backlog",
+      "priority": 2,
+      "startDate": null,
+      "targetDate": null,
+      "milestones": [
+        {
+          "id": "dc2e0144-87c4-4234-b584-4c4045f0b20a",
+          "name": "M0 — Offene Migrations-Changes",
+          "targetDate": null
+        },
+        {
+          "id": "8ce53ae4-07dc-4167-8de6-996ba3fee5fe",
+          "name": "M5 — Cutover und Abbau",
+          "targetDate": null
+        },
+        {
+          "id": "fd940618-630e-41ce-94a2-1059dc8c9ead",
+          "name": "M4 — Board",
+          "targetDate": null
+        },
+        {
+          "id": "66ca5a1b-36a4-4366-914a-244c11492a94",
+          "name": "M3 — Workflow-Fleet",
+          "targetDate": null
+        },
+        {
+          "id": "6427972c-a3a8-42f1-b504-8172850a6059",
+          "name": "M2 — Fleet und Repo-Detail",
+          "targetDate": null
+        },
+        {
+          "id": "2be62011-d675-4853-afd6-55cb94076926",
+          "name": "M1 — Fundament",
+          "targetDate": null
+        }
+      ],
+      "issueCounts": {
+        "backlog": 28,
+        "started": 0,
+        "done": 0
+      }
+    },
     {
       "id": "f64d3868-a410-44b3-ae26-9e249015f1bd",
       "name": "cPARX Phase 2 — Fondsanbindung und DORA",
