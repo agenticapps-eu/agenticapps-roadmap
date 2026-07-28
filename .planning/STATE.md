@@ -24,10 +24,10 @@ No `.planning/PROJECT.md` — design rationale lives in `docs/architecture.md` (
 
 ## Current Position
 
-Phase: 08 (Deploy, gate & document) — EXECUTING
-Plan: 3 of 3
-Status: Ready to execute
-Last activity: 2026-07-16
+Phase: 08 (Deploy, gate & document) — EXECUTING (paused mid Wave 2)
+Plan: 3 of 3 (08-03 Task 3 paused — awaiting live UAT session after 06:00 UTC cron)
+Status: 08-01 ✓, 08-02 ✓ (merged to main via PR #7). 08-03: Task 1 ✓ (release merged), Task 2 ✓ (Pages+Access+secrets, live), Task 3 PENDING (13-item UAT + v0.1.0 tag)
+Last activity: 2026-07-17 -- Phase 8 Tasks 1-2 deployed; UAT paused for cron
 
 Progress: [██████████] 100%
 
