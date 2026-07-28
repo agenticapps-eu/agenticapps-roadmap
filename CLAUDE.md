@@ -132,6 +132,12 @@ pnpm sync:gsd -- --project <name>  # apply one project after approval
 
 ## Workflow
 
-This project uses the AgenticApps Superpowers + GSD + gstack workflow.
-Full hooks, rituals, and red-flag tables: [`.claude/claude-md/workflow.md`](.claude/claude-md/workflow.md).
-Vendored — re-sync via `/update-agenticapps-workflow`.
+This project uses the AgenticApps **OpenSpec + Superpowers + gstack** workflow.
+Planning is an OpenSpec *change* (`openspec/changes/`); durable current truth is
+`openspec/specs/`. The lifecycle, hooks, and red-flag rituals are enforced by the
+`agentic-apps-workflow` skill and the §18 change-gate — re-sync via
+`/update-agenticapps-workflow`.
+
+> `.planning/` is retained deliberately. It is no longer this repo's planning
+> front end, but it **is** input data for the `sync-gsd-linear` CLI below, which
+> walks sibling repos' `.planning/` trees. Do not delete it.
