@@ -91,8 +91,15 @@ absence of work itself.
 
 The sync SHALL key each Linear issue on a stable identifier derived from the repo
 name and the change directory name, written into the issue description under a
-marker distinct from the GSD-era `<!--gsd-key:...-->`. It SHALL NOT read, adopt,
-update, or archive any Linear issue carrying a `<!--gsd-key:...-->` marker.
+marker distinct from the GSD-era `<!--gsd-key:...-->`. It SHALL read issue
+descriptions only far enough to CLASSIFY them, and SHALL NOT adopt, update, or
+archive any issue carrying a `<!--gsd-key:...-->` marker. New-generation issues
+SHALL additionally carry a Linear label distinct from the GSD generation's.
+
+**On the read/classify split**: an earlier draft said the sync "SHALL NOT read"
+old-marker issues, which is not implementable — detecting the marker requires
+reading the description that carries it. Classification is permitted; acting on
+the result is what is forbidden.
 
 **Rationale**: `linear-map.json` holds 77 records keyed to GSD phase identities.
 This is a deliberate clean cutover — those records are abandoned in place rather

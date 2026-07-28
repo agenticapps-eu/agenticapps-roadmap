@@ -6,7 +6,7 @@ across the three repos in `sync.config.json`:
 
 | Repo | `.planning/phases/` | ROADMAP.md / STATE.md | `openspec/changes/` |
 |---|---|---|---|
-| `factiv/fx-signal-agent` | **0 dirs** | **both missing** | 12 |
+| `factiv/fx-signal-agent` | **0 dirs** | **both missing** | 10 |
 | `claude-workflow` | 35 dirs | frozen 2026-06-03 | 0 |
 | `factiv/cparx` | 39 dirs | mid-migration | 1 |
 
@@ -57,9 +57,10 @@ becoming a viewer for data that stopped being written.
 
 ### New Capabilities
 
-- `plan-sync`: reading sibling repos' OpenSpec artifacts and reconciling them
-  into Linear issues — source discovery, artifact parsing, change/spec→Linear
-  mapping, dry-run-first reconciliation, and the per-project approval gate.
+- `plan-sync`: reading sibling repos' OpenSpec **changes** and reconciling them
+  into Linear issues — source discovery, artifact parsing, change→Linear mapping,
+  dry-run-first reconciliation, and the per-project approval gate. Capability
+  specs are explicitly out of the mapping.
 
 ### Modified Capabilities
 
@@ -82,11 +83,12 @@ becoming a viewer for data that stopped being written.
   they cover.
 
 **Live Linear data**
-- `linear-map.json` (9.6k, 77 records: projects, milestones, issues,
-  projectLabels, issueLabels) is retired to `linear-map.gsd.json`, read by
+- `linear-map.json` (9.6k, 77 records: 1 project, 34 milestones, 40 issues,
+  1 projectLabel, 1 issueLabel) is retired to `linear-map.gsd.json`, read by
   nothing, kept so the abandoned identities remain traceable. The new sync
   starts from an empty map.
-- The 77 existing Linear issues are left exactly as they are.
+- The 40 existing Linear issues (of 77 total records) are left exactly as they
+  are, as are the 34 milestones. Neither is read nor written.
 
 **Config**
 - `sync.config.json`: the three `repoPath` entries stay, but each target must
@@ -99,7 +101,17 @@ becoming a viewer for data that stopped being written.
   retention note added at line 139 during the 3.0.0 migration — that note exists
   only to explain why `.planning/` was kept for this CLI, so it goes too.
 
-**Not affected**
-- The Linear side: team keys, labels, and the dry-run-first + per-project
-  approval gate are unchanged. This changes where plans are read from, not how
-  they are written.
+**Linear write behaviour — changed, not preserved**
+An earlier draft claimed the Linear side was unaffected. It is not: the existing
+pipeline is create-only and maps project → phase milestone → plan issue, whereas
+this delta requires in-place ISSUE UPDATES and one issue per change. What is
+genuinely unchanged is the write *contract* — team keys, labels, dry-run-first,
+and the per-project approval gate.
+
+Still to settle before implementation (raised in review, not yet decided):
+- **Milestone disposition.** 34 milestones exist under the phase model. A change
+  is not a phase, so they either map to something, stay frozen, or are abandoned
+  with the rest of the GSD generation.
+- **Protection for human edits.** Once the sync updates issues in place rather
+  than only creating them, a field a person edited in Linear can be overwritten.
+  Which fields the sync owns needs stating.

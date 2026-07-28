@@ -19,11 +19,17 @@ this is the first change, so `plan-sync` is a new capability rather than a delta
 
 **Goals:**
 
-- Read plans from `openspec/changes/` and `openspec/specs/`.
-- Fail loudly when a listed source contributes nothing.
+- Read plans from `openspec/changes/`. Capability specs under `openspec/specs/`
+  are not read at all — see the post-review decisions below.
+- Fail loudly when a listed source is MISCONFIGURED (missing slot, unresolvable
+  path). A correctly configured repo with no active work succeeds and reports
+  zero; the original defect was that the two were indistinguishable, not that a
+  repo contributed nothing.
 - Remove every GSD-era name from the sync path and its documentation.
-- Preserve the Linear-side contract: team keys, labels, dry-run-first, and the
-  per-project approval gate are unchanged.
+- Keep the Linear-side write contract — team keys, labels, dry-run-first,
+  per-project approval — intact. NOT a claim that the Linear layer is unchanged:
+  it moves from create-only to create-and-update, and milestone disposition is an
+  open item below.
 
 **Non-Goals:**
 
@@ -46,12 +52,13 @@ Rejected — it buys history preservation this change has already scoped out, an
 pays for it in the stages most expensive to complicate.
 
 **A new `source.ts`, not an edited `walker.ts`.** The OpenSpec reader has a
-different shape: `changes/<name>/{proposal,design,tasks}.md` plus
-`specs/<cap>/spec.md`, versus `phases/<slug>/*PLAN.md` plus two repo-level files.
-Editing in place would leave `RawPhaseDir`'s vocabulary (`slug`, `planFiles`,
-`roadmapPath`, `statePath`) describing fields that no longer exist. A new module
-with a `RawChange` / `RawCapability` pair keeps the naming honest and lets the
-old tests be deleted alongside the old module rather than half-ported.
+different shape: `changes/<name>/{proposal,design,tasks}.md` versus
+`phases/<slug>/*PLAN.md` plus two repo-level files. Editing in place would leave
+`RawPhaseDir`'s vocabulary (`slug`, `planFiles`, `roadmapPath`, `statePath`)
+describing fields that no longer exist. A new module exporting `RawChange` keeps
+the naming honest and lets the old tests be deleted alongside the old module
+rather than half-ported. (An earlier draft paired it with a `RawCapability`;
+that went away with the decision not to sync specs.)
 
 **Hard error over `console.warn`.** The predecessor's warn-and-continue is the
 specific defect that hid a dead source arm for weeks (see the spec's stated
@@ -121,7 +128,7 @@ and is reported. Disposal stays a human decision.
   written against the archived trees later — deleting the walker does not
   destroy its input.
 
-- **Duplication in Linear after the identity reset** → The 77 abandoned issues
+- **Duplication in Linear after the identity reset** → The 40 abandoned issues
   stay visible alongside newly created change issues, and nothing in the tool
   distinguishes them. Mitigate with a distinct label on the new issues so the
   two generations are filterable, and note the cutover date in the Linear team
@@ -150,11 +157,18 @@ and is reported. Disposal stays a human decision.
 4. Rename the directory, entry point, and `package.json` key.
 5. Update `sync.config.json` (drop `claude-workflow`), `SyncBadge.tsx`, and
    CLAUDE.md.
-6. Acceptance: dry-run against `fx-signal-agent` (12 changes) and confirm the
+6. Acceptance: dry-run against `fx-signal-agent` (10 active changes today) and confirm the
    printed plan matches its `openspec/changes/` contents.
 
-**Rollback**: the change is confined to `scripts/`, one component, and docs. The
-prior implementation is one revert away and its input trees were never modified.
+**Rollback**: the code is confined to `scripts/`, one component, and docs, so a
+revert restores it. But a revert alone is NOT sufficient — step 3 renames
+`linear-map.json` to `linear-map.gsd.json`, and the restored GSD-era code reads
+the original path. Reverting without restoring that file would leave it unable to
+find its identity map and re-creating all 40 issues as duplicates. Rollback is
+therefore: revert the code, THEN `git mv linear-map.gsd.json linear-map.json`,
+and verify a dry-run reports zero creates before any apply. Sibling repos'
+`.planning/` trees are never modified, so nothing outside this repo needs
+unwinding.
 
 ## Open Questions
 

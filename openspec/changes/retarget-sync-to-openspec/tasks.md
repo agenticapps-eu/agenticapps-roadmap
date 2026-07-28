@@ -86,7 +86,8 @@
 
 ## 8. Acceptance
 
-- [ ] 8.1 Dry-run against `factiv/fx-signal-agent` (12 changes); confirm the
+- [ ] 8.1 Dry-run against `factiv/fx-signal-agent` (10 active changes at time of
+      writing — assert against the live count, do not hard-code); confirm the
       printed plan matches its `openspec/changes/` contents exactly
 - [ ] 8.2 Apply to a scratch Linear team, then re-run apply against the
       unmodified source; confirm the second run reports zero creates and zero
