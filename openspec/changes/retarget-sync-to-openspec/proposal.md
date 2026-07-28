@@ -19,18 +19,35 @@ becoming a viewer for data that stopped being written.
 ## What Changes
 
 - **BREAKING**: the sync source moves from `.planning/phases/` to
-  `openspec/changes/` (in-flight work) and `openspec/specs/` (current truth).
-  Repos with no `openspec/` slot are no longer syncable.
+  `openspec/changes/`. Repos with no `openspec/` slot are no longer syncable.
 - **BREAKING**: `scripts/sync-gsd-linear/` → `scripts/sync-openspec-linear/`,
   and the `pnpm sync:gsd` script → `pnpm sync:openspec`. The GSD-era names
   describe a planning system this repo no longer reads.
-- `walker.ts` is deleted. `parser.ts` is rewritten against the OpenSpec artifact
-  shape (`proposal.md`, `tasks.md`, `design.md`, `specs/**/*.md`) instead of
-  `PLAN.md` / `ROADMAP.md` / `STATE.md`.
-- A missing or empty source becomes a **hard error**, not a `console.warn`. The
-  current silent-skip is what let a dead arm run unnoticed for weeks.
+- **BREAKING — identity resets.** `linear-map.json` holds **77 records** keyed to
+  GSD phase identities, anchored by `<!--gsd-key:...-->` markers embedded in
+  Linear issue descriptions (`apply.ts:376`). The new sync uses its own marker
+  and its own map, and is forbidden from reading, adopting, or modifying any
+  issue carrying the old one. Those 77 records are **abandoned in place** — not
+  translated, not archived, not deleted. Expect visible duplication in Linear
+  where old phase issues and new change issues describe related work.
+- **BREAKING**: `--apply` becomes the sole write opt-in. `--yes` currently
+  triggers a write on its own (`cli.ts:18`); it is demoted to a prompt
+  suppressor and is inert without `--apply`.
+- `openspec/specs/` capabilities are **not** synced to Linear at all. A spec is
+  durable truth, not a work item; syncing it produces issues that never close.
+- `walker.ts` is deleted. `parser.ts` is rewritten against the OpenSpec change
+  shape (`proposal.md`, `tasks.md`, `design.md`) instead of `PLAN.md` /
+  `ROADMAP.md` / `STATE.md`.
+- A **misconfigured** source becomes a hard error (missing slot, unresolvable
+  path). A correctly configured source with **no active work** is not an error —
+  it succeeds and reports zero. The original defect was that success and failure
+  looked identical, which per-repo reporting fixes; failing on legitimate empty
+  states would break repos that are merely between changes or newly initialised.
+- Reconciliation stays create-and-update only. `mutations.ts` has no archive
+  path, and adding one is out of scope: a change vanishing from the source
+  leaves its Linear issue untouched.
 - The GSD→Linear concept mapping in `CLAUDE.md:116` is replaced by a
-  change/spec→Linear mapping; the prose at `CLAUDE.md:3, 91, 103, 111, 129-130`
+  change→Linear mapping; the prose at `CLAUDE.md:3, 91, 103, 111, 129-130`
   is updated to the new names.
 - **Not** carried over: the 74 historical GSD phase directories. This is a clean
   cutover — whatever the sync already pushed to Linear stays in Linear, and the
@@ -58,10 +75,18 @@ becoming a viewer for data that stopped being written.
   `apply.ts`, `mutations.ts`, `cli.ts`, `config.ts` retargeted.
 - `scripts/sync-gsd-linear.ts` entry point and the `sync:gsd` key in
   `package.json`.
-- `src/components/overview/SyncBadge.tsx` — reads `.planning`.
+- `src/components/overview/SyncBadge.tsx` — reads `.planning`; needs a
+  source-unavailable state now that a misconfigured repo fails the run.
 - `__fixtures__/` — GSD phase fixtures replaced with OpenSpec change fixtures.
 - 132 existing tests across 10 files will need rewriting alongside the parsers
   they cover.
+
+**Live Linear data**
+- `linear-map.json` (9.6k, 77 records: projects, milestones, issues,
+  projectLabels, issueLabels) is retired to `linear-map.gsd.json`, read by
+  nothing, kept so the abandoned identities remain traceable. The new sync
+  starts from an empty map.
+- The 77 existing Linear issues are left exactly as they are.
 
 **Config**
 - `sync.config.json`: the three `repoPath` entries stay, but each target must

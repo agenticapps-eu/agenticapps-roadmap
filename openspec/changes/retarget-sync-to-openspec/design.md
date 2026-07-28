@@ -70,6 +70,49 @@ no `openspec/` slot, so under the new hard-error rule it would fail every run.
 Removing it is the honest encoding of "not syncable yet"; it can be re-added
 when it migrates.
 
+### Decisions taken after plan review
+
+Both reviewers returned REQUEST-CHANGES. These four decisions close their
+findings; the corresponding requirements carry the rationale inline.
+
+**Identity resets; the 77 GSD records are abandoned in place.** Codex found what
+the original design missed: `linear-map.json` holds 77 records and `apply.ts:376`
+writes `<!--gsd-key:${plan.key}-->` into every issue description as its identity
+anchor. A cutover that mints new keys without addressing this would either adopt
+legacy issues under a mismatched shape or treat them as orphans. Options were
+translate-forward (map GSD phase identities onto change identities) or clean
+break. **Clean break chosen.** The phase→change mapping is not one-to-one — a
+phase was an execution unit, a change is a spec delta — so any translation would
+be a guess encoded as data. Isolation is therefore promoted to a hard
+requirement: the new sync is forbidden from touching anything carrying the old
+marker. Cost: visible duplication in Linear where old and new issues describe
+related work. Accepted deliberately.
+
+**Capability specs are not synced.** Both reviewers objected independently. A
+spec is durable truth; as a Linear issue it never closes, so it accumulates as
+permanent non-actionable noise. `openspec/specs/` is therefore not read at all —
+which also simplifies the source reader and the empty-source rule to one
+directory.
+
+**`--apply` is the only write opt-in.** `cli.ts:18` documents `--project X --yes`
+as writing without `--apply`, so the predecessor had two independent write
+triggers. `--yes` is demoted to a prompt suppressor, inert on its own. One path
+to a write is easier to reason about and to test than two.
+
+**Empty is not an error; misconfigured is.** The first draft made both fatal, and
+gemini caught the contradiction against this document's own risk section. The
+original defect was never "a repo contributed nothing" — it was that
+contributing nothing and being broken looked identical. Splitting them is the
+actual fix: a missing slot or unresolvable path fails the run, while zero active
+changes succeeds and is reported as zero. This also stops a newly-initialised or
+fully-archived repo from failing a run it has no business failing.
+
+**Archive stays out of scope.** `mutations.ts` implements `issueCreate` and
+`issueUpdate` only — there is no archive path, and the first draft's "zero
+archives" scenario referenced a capability that does not exist. Rather than build
+one, a change that disappears from the source leaves its Linear issue untouched
+and is reported. Disposal stays a human decision.
+
 ## Risks / Trade-offs
 
 - **Historical phase data stops syncing** → Accepted, explicitly. Whatever prior
@@ -78,11 +121,15 @@ when it migrates.
   written against the archived trees later — deleting the walker does not
   destroy its input.
 
-- **Hard-erroring on an empty slot could block routine runs** → A repo that has
-  genuinely finished all its changes and archived them would fail a run. Mitigate
-  by treating archived changes as valid content: a repo with
-  `openspec/changes/archive/` populated but no active changes is *not* empty.
-  Worth confirming during implementation against a repo in that state.
+- **Duplication in Linear after the identity reset** → The 77 abandoned issues
+  stay visible alongside newly created change issues, and nothing in the tool
+  distinguishes them. Mitigate with a distinct label on the new issues so the
+  two generations are filterable, and note the cutover date in the Linear team
+  description. There is no automated cleanup; retiring the old issues is manual
+  and optional.
+
+- ~~Hard-erroring on an empty slot could block routine runs~~ → Resolved: empty
+  and misconfigured are now separate cases. See the decision above.
 
 - **132 tests rewritten at once is a large, hard-to-review diff** → Sequence the
   tasks so `source.ts` and its tests land before the downstream stages are
@@ -111,11 +158,16 @@ prior implementation is one revert away and its input trees were never modified.
 
 ## Open Questions
 
-- Does a repo with only archived changes count as empty? Leaning no — see the
-  risk above — but it needs deciding before the hard-error rule ships.
-- Should `openspec/specs/` capabilities become Linear issues at all, or only
-  `changes/`? The spec currently says both. Specs are durable truth rather than
-  work items, so they may map better to a Linear document or project than to an
-  issue.
-- Does `SyncBadge.tsx` surface per-repo source health? If a hard error now fails
-  the whole run, the badge's states may need a "source unavailable" variant.
+All three questions from the pre-review draft are now closed — archived-changes
+handling, specs-as-issues, and the write contract are decided above. Remaining:
+
+- `SyncBadge.tsx` needs a source-unavailable state now that a misconfigured repo
+  fails the whole run. Its exact states depend on what the component currently
+  renders; settle during task 6.2 rather than guessing here.
+- Codex raised a PII/secret boundary for copying repository documents into
+  Linear. Lower risk than it first appears — these are OpenSpec proposals and
+  task lists, already committed to the repo, and the predecessor has been
+  copying `PLAN.md` bodies into Linear for months. Worth an explicit size cap
+  and a path-confinement check (canonical path must stay inside the allow-listed
+  repo, no symlink escape) rather than a content scanner. Tracked as task 1.6;
+  raise it to its own change if the cap turns out to need real policy.
