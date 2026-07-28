@@ -170,18 +170,58 @@ and verify a dry-run reports zero creates before any apply. Sibling repos'
 `.planning/` trees are never modified, so nothing outside this repo needs
 unwinding.
 
+## Status: PAUSED — do not implement yet
+
+**Paused 2026-07-28, deliberately.** `agenticapps-dashboard` and
+`agents-task-viewer` are being rebuilt around OpenSpec. Both are peers of this
+repo in the same read path — they consume the same sibling-repo planning data
+this CLI syncs — so the rebuild may change what shape roadmap should read, and
+possibly whether a Linear sync is still the right destination at all.
+
+Implementing against today's assumptions risks building the wrong reader twice.
+**Revisit the questions below once those two land**, then re-review before any
+code. The two REQUEST-CHANGES verdicts in `REVIEWS.md` are unresolved and the
+§18 gate will keep flagging this change on every edit — that is correct and
+should stay until a review comes back APPROVE.
+
 ## Open Questions
 
-All three questions from the pre-review draft are now closed — archived-changes
-handling, specs-as-issues, and the write contract are decided above. Remaining:
+Pre-review questions (archived-changes handling, specs-as-issues, write
+contract) are closed and decided above. These are open:
 
-- `SyncBadge.tsx` needs a source-unavailable state now that a misconfigured repo
-  fails the whole run. Its exact states depend on what the component currently
-  renders; settle during task 6.2 rather than guessing here.
-- Codex raised a PII/secret boundary for copying repository documents into
-  Linear. Lower risk than it first appears — these are OpenSpec proposals and
-  task lists, already committed to the repo, and the predecessor has been
-  copying `PLAN.md` bodies into Linear for months. Worth an explicit size cap
-  and a path-confinement check (canonical path must stay inside the allow-listed
-  repo, no symlink escape) rather than a content scanner. Tracked as task 1.6;
-  raise it to its own change if the cap turns out to need real policy.
+**Blocked on the dashboard / agents-task-viewer rebuild:**
+
+- Does a Linear sync remain the right destination once those two read OpenSpec
+  natively? This CLI exists because Linear was the only place plans were
+  aggregated. If the dashboard aggregates changes directly, the sync may be
+  redundant rather than needing a retarget.
+- Whatever reader the rebuild produces for `openspec/changes/` is the same
+  reader `source.ts` would be. If it lands first, `source.ts` should reuse it
+  rather than become a third parallel implementation of the same walk.
+
+**Product decisions, unresolved:**
+
+- **Milestone disposition.** 34 milestones exist under the phase model. A change
+  is not a phase, so they map onto something, stay frozen, or are abandoned with
+  the rest of the GSD generation. Not decided.
+- **Protection for human-edited fields.** The pipeline moves from create-only to
+  create-and-update, so a field someone edited in Linear can be overwritten.
+  Which fields the sync owns needs stating before the first apply.
+- **Orphan reporting.** Gemini's suggestion: since a change vanishing from the
+  source deliberately leaves its Linear issue untouched, Linear accumulates
+  stale issues silently. Listing them under a "stale issues needing review"
+  heading in the run summary is cheap and makes the accumulation visible.
+  Accepted in principle, not yet written as a requirement.
+
+**Smaller:**
+
+- `SyncBadge.tsx` needs a source-unavailable state distinct from zero-changes,
+  now that a misconfigured repo fails the whole run. Exact states depend on what
+  the component renders after the rebuild; settle during task 7.2.
+- PII/secret boundary for copying repo documents into Linear. Both reviewers
+  wanted it normative rather than living only in task 1.6. Lower risk than it
+  first reads — these are OpenSpec proposals and task lists already committed to
+  the repo, and the predecessor has copied `PLAN.md` bodies into Linear for
+  months — but codex's "committed to the repo does not mean safe to copy into
+  Linear" is fair. A path-confinement check plus an explicit size cap, promoted
+  to requirements, is probably the right weight; a content scanner is not.
