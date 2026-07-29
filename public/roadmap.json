@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-28T08:43:40.615Z",
+  "generatedAt": "2026-07-29T08:48:44.106Z",
   "initiatives": [
     {
       "id": "5f4d93ae-4e1c-4b7f-8906-a846071d41c7",
@@ -220,9 +220,9 @@
         }
       ],
       "issueCounts": {
-        "backlog": 68,
+        "backlog": 52,
         "started": 1,
-        "done": 16
+        "done": 30
       }
     },
     {
