@@ -13,17 +13,6 @@
         ]
       },
       {
-        "_hook": "Hook 2 — Design Shotgun Pre-Flight Gate",
-        "matcher": "Edit|Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/design-shotgun-gate.sh",
-            "timeout": 5000
-          }
-        ]
-      },
-      {
         "_hook": "Hook 7 — OpenSpec Change Gate (spec §18; retarget of the multi-AI plan-review gate)",
         "matcher": "Edit|Write|MultiEdit|NotebookEdit",
         "hooks": [
