@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # openspec-change-gate — shim. Resolves the shared gate and hands over.
 #
-# shim-contract: 1.0.0
+# shim-contract: 1.1.0
 #
 # The spec §18 change gate. This file is a SHIM, not an implementation: the
 # enforcement surface is ONE host-agnostic script shared by every agent (claude,
@@ -97,11 +97,16 @@ report_rate_limited() {
 # silently ignored explicit instruction is worse than a loud one. Not rate
 # limited: this is the kill switch, and for the §18 gate it is a one-variable
 # bypass of enforcement at the tool boundary.
+#
+# REGULAR FILE, not merely `-x` — `-x` is true of any searchable directory, so
+# this `exec`ed a directory and bash exited 126 before the report below could
+# fire (shim-contract 1.1.0, Stage-2 finding 6). An override set to the empty
+# string still falls through, deliberately; see the template's note.
 if [ -n "$OVERRIDE" ]; then
-  if [ -x "$OVERRIDE" ]; then
+  if [ -f "$OVERRIDE" ] && [ -x "$OVERRIDE" ]; then
     exec "$OVERRIDE" "$@"
   fi
-  report "$HOOK hook: OPENSPEC_GATE is set to '$OVERRIDE', which is not an executable file — the change gate did NOT run, and no fallback was used" \
+  report "$HOOK hook: OPENSPEC_GATE is set to '$OVERRIDE', which is not an executable regular file — the change gate did NOT run, and no fallback was used" \
          "  Unset OPENSPEC_GATE to use the shared install at $SHARED."
   exit 1
 fi
@@ -116,5 +121,5 @@ report_rate_limited \
   "  On this machine the git pre-commit wrapper resolves the same absent install" \
   "  and also fails open, so CI is the only remaining floor. Run" \
   "  install-shared-artifact.sh from agenticapps-workflow-core." \
-  "  Reported at most once per hour; see shim-contract 1.0.0."
+  "  Reported at most once per hour; see shim-contract 1.1.0."
 exit 1

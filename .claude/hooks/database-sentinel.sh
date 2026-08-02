@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # database-sentinel — shim. Resolves the fleet-shared implementation and hands over.
 #
-# shim-contract: 1.0.0
+# shim-contract: 1.1.0
 #
 # This file is a SHIM, not an implementation. Editing it changes nothing about
 # what the hook enforces; the implementation lives in agenticapps-workflow-core
@@ -83,11 +83,22 @@ report_rate_limited() {
 # kill switch: it is the only signal that a hook has been switched off on an
 # otherwise healthy machine, and a rate limit adopted to quiet the benign,
 # self-correcting condition above must not also silence it.
+#
+# REGULAR FILE, not merely `-x`. `-x` on a directory tests the search bit, which
+# every ordinary directory has, so `[ -x "$OVERRIDE" ]` alone called a directory
+# executable and `exec`ed it — bash then exited 126 with its own "is a directory"
+# message, the report below never fired, and the exit code was not the 1 this
+# contract states (shim-contract 1.1.0, Stage-2 finding 6).
+#
+# An override set to the EMPTY STRING is treated as unset and falls through,
+# deliberately: `FOO=` is the conventional way to say "no override", not a way to
+# name a broken one, so "set" here means set to a non-empty value. Asserted in
+# tools/project-hook-shim.test.sh so the reading is a decision, not an accident.
 if [ -n "$OVERRIDE" ]; then
-  if [ -x "$OVERRIDE" ]; then
+  if [ -f "$OVERRIDE" ] && [ -x "$OVERRIDE" ]; then
     exec "$OVERRIDE" "$@"
   fi
-  report "$HOOK hook: $OVERRIDE_VAR is set to '$OVERRIDE', which is not an executable file — this hook did NOT run, and no fallback was used" \
+  report "$HOOK hook: $OVERRIDE_VAR is set to '$OVERRIDE', which is not an executable regular file — this hook did NOT run, and no fallback was used" \
          "  Unset $OVERRIDE_VAR to use the shared install at $SHARED," \
          "  or point it at an executable implementation."
   exit 1
@@ -103,5 +114,5 @@ report_rate_limited \
   "$HOOK hook: not installed at $SHARED — this hook did NOT run, and the tool call was allowed" \
   "  This machine is unprovisioned. Run install-shared-artifact.sh from" \
   "  agenticapps-workflow-core to publish the shared implementations." \
-  "  Reported at most once per hour per hook; see shim-contract 1.0.0."
+  "  Reported at most once per hour per hook; see shim-contract 1.1.0."
 exit 1
