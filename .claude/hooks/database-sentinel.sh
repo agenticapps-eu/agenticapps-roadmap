@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # database-sentinel — shim. Resolves the fleet-shared implementation and hands over.
 #
-# shim-contract: 1.1.0
+# shim-contract: 1.2.0
 #
 # This file is a SHIM, not an implementation. Editing it changes nothing about
 # what the hook enforces; the implementation lives in agenticapps-workflow-core
@@ -50,9 +50,23 @@ SHARED="$HOME/.agenticapps/bin/$HOOK.sh"
 report() { printf '%s\n' "$@" >&2; }
 
 # The unresolvable-implementation condition is persistent: on an unprovisioned
-# machine it holds on every Bash, Edit and Write, indefinitely. Reporting each
-# time is the alarm fatigue this change rejects elsewhere, so it is rate limited
-# to once per hour, per hook, per machine.
+# machine it holds on every Bash, Edit and Write, indefinitely. Reporting the
+# whole notice each time is the alarm fatigue this change rejects elsewhere, so
+# the FULL report is limited to once per hour, per hook, per machine.
+#
+# WHAT THE LIMIT ACTUALLY SAVES IS VERBOSITY, NOT INTERRUPTION, and saying so
+# is the correction at contract 1.2.0. The exit code is not suppressible: this
+# shim must exit non-zero for stderr to reach the operator at all, so a
+# suppressed call still interrupts. The previous revision suppressed the message
+# and kept the exit, which produced `hook error — No stderr output` on every
+# call after the first — an alarm that fires exactly as often as the message
+# would have and tells the operator nothing. Contentless is worse than either
+# alternative: worse than reporting, which at least says what broke, and worse
+# than silence, which at least does not interrupt.
+#
+# So a suppressed call still says ONE line, and it says something the full
+# report does not — that this is a repeat. Reusing the full report's first line
+# would leave the operator unable to tell a repeat from a fresh failure.
 #
 # ONCE PER HOUR, NOT ONCE PER SESSION, and the reason is recorded rather than
 # the option dropped silently (task 2.11a): the session identifier exists only
@@ -61,17 +75,30 @@ report() { printf '%s\n' "$@" >&2; }
 # input. An hour approximates a session closely enough to serve, while
 # guaranteeing a long session sees the condition more than once.
 #
+# AN HOUR BUCKET, NOT A ROLLING HOUR. `epoch/3600` is wall-clock: two calls four
+# seconds apart can land in different buckets and both report in full. The
+# wording says "this hour" because that is what the arithmetic means.
+#
 # One marker path, read and written. No tool payload is inspected.
 STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/agenticapps"
 MARKER="$STATE_DIR/$HOOK.unresolved-report"
 
+# REPORT FIRST, THEN MARK. Ordered the other way, a failure between the two
+# leaves the marker claiming a notice that was never emitted, and every later
+# line this hour refers the operator to something they never saw. A marker write
+# that fails therefore suppresses nothing: the shim has no record of having
+# reported, and suppressing on the strength of a write that failed suppresses on
+# a state that was never recorded.
 report_rate_limited() {
   local now last
   now=$(( $(date +%s) / 3600 ))
   last=$(cat "$MARKER" 2>/dev/null) || last=""
-  [ "$last" = "$now" ] && return 0
-  mkdir -p "$STATE_DIR" 2>/dev/null && printf '%s\n' "$now" > "$MARKER" 2>/dev/null
+  if [ "$last" = "$now" ]; then
+    report "$HOOK hook: still not installed at $SHARED — this call was allowed; full notice already made this hour"
+    return 0
+  fi
   report "$@"
+  mkdir -p "$STATE_DIR" 2>/dev/null && printf '%s\n' "$now" > "$MARKER" 2>/dev/null
 }
 
 # --- candidate 1: the explicit override -------------------------------------
@@ -105,7 +132,27 @@ if [ -n "$OVERRIDE" ]; then
 fi
 
 # --- candidate 2: the shared install ----------------------------------------
-if [ -x "$SHARED" ]; then
+# REGULAR FILE HERE TOO — and the omission is Stage-2 finding 6's second half.
+# The override branch above was hardened to `-f` and `-x` at contract 1.1.0,
+# under a comment explaining that `-x` is true of any searchable directory. This
+# candidate kept the bare `-x` eleven lines below that comment, so a directory at
+# the shared-install path was `exec`ed: bash exited 126 with its own "is a
+# directory" message, which is neither the exit code this contract defines nor a
+# sentence naming the hook or saying the call was allowed.
+#
+# A path that EXISTS but is not usable is reported specifically rather than
+# folded into "not installed", which would be false — something is installed
+# there. It is NOT rate limited, for the reason the override is not: the limit
+# exists for the benign, expected unprovisioned state, and a non-regular file in
+# the shared bin is an anomaly the operator has to see on the call that hit it.
+if [ -e "$SHARED" ] && { [ ! -f "$SHARED" ] || [ ! -x "$SHARED" ]; }; then
+  report "$HOOK hook: $SHARED exists but is not an executable regular file — this hook did NOT run, and the tool call was allowed" \
+         "  Something other than the published implementation occupies that path." \
+         "  Re-run install-shared-artifact.sh from agenticapps-workflow-core."
+  exit 1
+fi
+
+if [ -f "$SHARED" ] && [ -x "$SHARED" ]; then
   exec "$SHARED" "$@"
 fi
 
@@ -114,5 +161,5 @@ report_rate_limited \
   "$HOOK hook: not installed at $SHARED — this hook did NOT run, and the tool call was allowed" \
   "  This machine is unprovisioned. Run install-shared-artifact.sh from" \
   "  agenticapps-workflow-core to publish the shared implementations." \
-  "  Reported at most once per hour per hook; see shim-contract 1.1.0."
+  "  Full notice at most once per hour per hook; see shim-contract 1.2.0."
 exit 1
