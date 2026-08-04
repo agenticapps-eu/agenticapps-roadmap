@@ -3,7 +3,7 @@
     "PreToolUse": [
       {
         "_hook": "Hook 1 — Database Sentinel",
-        "matcher": "Bash|Edit|Write",
+        "matcher": "Bash|Edit|Write|MultiEdit",
         "hooks": [
           {
             "type": "command",
