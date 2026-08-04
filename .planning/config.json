@@ -9,10 +9,6 @@
     "initiative": "agenticapps-workflow",
     "project": "AgenticApps Roadmap"
   },
-  "knowledge_capture": {
-    "enabled": true,
-    "note": "~/Obsidian/Memex/40-49 Resources/44 Agentic Coding Learnings/agenticapps-roadmap.md"
-  },
   "implements_spec": "1.0.0",
   "front_end": "openspec",
   "_enforcement_contract": "docs/ENFORCEMENT-PLAN.md",

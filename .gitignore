@@ -19,5 +19,6 @@ venv/
 .vscode/
 .planning/cache/
 .planning/state/
+.planning/skill-observations/
 session-handoff.md
 .gstack/
