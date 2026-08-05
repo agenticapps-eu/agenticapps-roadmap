@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-04T08:46:46.433Z",
+  "generatedAt": "2026-08-05T08:43:57.139Z",
   "initiatives": [
     {
       "id": "5f4d93ae-4e1c-4b7f-8906-a846071d41c7",
@@ -39,6 +39,40 @@
     }
   ],
   "projects": [
+    {
+      "id": "b815c05b-f6ed-413c-95a2-755cde30e916",
+      "name": "eff.bee.zee — Backlog (nach Go-Live)",
+      "summary": "Alles, was nach dem internen Go-Live am 17.08.2026 kommt: Öffentlichkeit, Zahlungen, Compass, Matching, Ökosystem.",
+      "url": "https://linear.app/agenticapps/project/effbeezee-backlog-nach-go-live-decd62f083e4",
+      "initiativeId": "5f4d93ae-4e1c-4b7f-8906-a846071d41c7",
+      "status": "Backlog",
+      "priority": 0,
+      "startDate": null,
+      "targetDate": null,
+      "milestones": [],
+      "issueCounts": {
+        "backlog": 13,
+        "started": 0,
+        "done": 0
+      }
+    },
+    {
+      "id": "af2ec5d3-7185-4b07-a864-9abc9a9f8cb0",
+      "name": "eff.bee.zee — Go-Live August 2026",
+      "summary": "Umbau + Migration der bestehenden FBC-Mitglieder auf eff.bee.zee. Go-Live per Rundmail am 17.08.2026.",
+      "url": "https://linear.app/agenticapps/project/effbeezee-go-live-august-2026-eacbcdd036a7",
+      "initiativeId": "5f4d93ae-4e1c-4b7f-8906-a846071d41c7",
+      "status": "In Progress",
+      "priority": 0,
+      "startDate": "2026-08-04T09:41:19.653Z",
+      "targetDate": "2026-08-17",
+      "milestones": [],
+      "issueCounts": {
+        "backlog": 8,
+        "started": 0,
+        "done": 3
+      }
+    },
     {
       "id": "8c2d1747-4e8f-4a15-b5bd-bbd13ff33f29",
       "name": "Dashboard v2 — Vereinfachung, Fleet-Versionen, Kanban",
@@ -363,18 +397,18 @@
         }
       ],
       "issueCounts": {
-        "backlog": 40,
+        "backlog": 41,
         "started": 0,
         "done": 0
       }
     },
     {
       "id": "bfb14e0b-eae1-4257-acdb-0874b7756cee",
-      "name": "FBC Plattform – Roadmap (Phasen 1–4)",
-      "summary": "Roadmap nach Review 29.06.2026: UI-Politur, Monetarisierung, CRM/Matching v2/Admin, Ökosystem & Ventures.",
-      "url": "https://linear.app/agenticapps/project/fbc-plattform-roadmap-phasen-1-4-d4ab753d4f56",
+      "name": "FBC Plattform – Roadmap Phasen 1–4 (abgelöst 08/2026)",
+      "summary": "Historisch. Abgelöst durch „eff.bee.zee — Go-Live August 2026\" und „eff.bee.zee — Backlog (nach Go-Live)\".",
+      "url": "https://linear.app/agenticapps/project/fbc-plattform-roadmap-phasen-1-4-abgelost-082026-d4ab753d4f56",
       "initiativeId": "5f4d93ae-4e1c-4b7f-8906-a846071d41c7",
-      "status": "Backlog",
+      "status": "Completed",
       "priority": 0,
       "startDate": null,
       "targetDate": null,
@@ -401,7 +435,7 @@
         }
       ],
       "issueCounts": {
-        "backlog": 25,
+        "backlog": 0,
         "started": 0,
         "done": 27
       }
